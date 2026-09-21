@@ -14,11 +14,13 @@ src/
 ├── LaravelAutentiqueServiceProvider.php   # merges the config, binds the contract
 ├── AutentiqueManager.php                  # the Autentique implementation
 ├── Contracts/                             # Autentique, GraphQLClient, FileSource
-├── Api/                                   # one class per area of the API: Account
+├── Api/                                   # one class per area of the API: Account, Documents, PendingDocument
 ├── Commands/                              # CheckCommand, SchemaCommand
 ├── Facades/Autentique.php
-├── Data/                                  # value objects: User, Organization, Group, Subscription, ApiError, Violation
-├── Enums/                                 # ErrorCode
+├── Data/                                  # value objects returned: Document, Signature, User, …
+│   └── Input/                             # value objects sent: NewDocument, Signer, Position, …
+├── Enums/                                 # every closed set of API values, and ErrorCode
+├── Io/                                    # PathFile, UploadedFileSource, DiskFile
 ├── Exceptions/                            # AutentiqueException and what extends it
 ├── GraphQL/                               # Client, ResponseParser, Operation, Endpoint, OperationLoader
 └── Resources/graphql/                     # one .graphql file per operation
@@ -37,6 +39,9 @@ through the `Autentique` facade, which is auto discovered.
 | Method | Returns | Notes |
 |---|---|---|
 | `account()` | `Api\Account` | `me()` returns `Data\User` |
+| `documents()` | `Api\Documents` | `create()` returns `Data\Document` |
+| `newDocument($name)` | `Api\PendingDocument` | the builder; `send()` returns `Data\Document` |
+| `fromPath($path, ?$name)`, `fromUpload($file, ?$name)`, `fromDisk($disk, $path, ?$name)` | `Contracts\FileSource` | **Laravel only**: uploads and disks stream |
 | `query($graphql, $variables)` | `array<string, mixed>`, the response's `data` | the escape hatch; values as variables, the document is the caller's |
 
 Every method must appear in the README, which `tests/Project/ArchTest.php`
@@ -78,6 +83,22 @@ omit is nullable.
 |---|---|
 | `Data\User` | `me` |
 | `Data\Subscription`, `Data\Organization`, `Data\Group` | nested in the above, and in `organization` |
+| `Data\Document` | `createDocument` and every operation returning a document |
+| `Data\Signature`, `Data\Link`, `Data\Files`, `Data\Event`, `Data\Geolocation`, `Data\EmailEvents`, `Data\SignaturePosition`, `Data\Verification` | nested in a document |
+
+An enum value the API returns and the package does not know yet becomes `null`
+rather than an exception, so a new value Autentique adds breaks nothing.
+
+## Inputs
+
+What is sent is a `final readonly` class under `Data\Input\`: `NewDocument`,
+`Signer`, `Position`, `SecurityVerification`, `Locale`, `DocumentConfig`,
+`Expiration`. Each refuses, with `InvalidInput`, a value Autentique documents it
+would refuse or silently change. `toArray()` returns what is sent, with every
+unset option left out so Autentique's default applies.
+
+`Api\PendingDocument` is the one mutable class: a builder, whose methods
+return the same instance.
 
 Adding a property is a minor release; removing one, or making a nullable one
 required, is a major release.
@@ -101,6 +122,7 @@ is abstract.
 | `MissingToken` | no token configured, nothing sent |
 | `InvalidOperation` | an operation file is missing or spreads a fragment no file defines. A defect in the package, which the suite exists to prevent |
 | `UnexpectedResponse` | an answer without a field the package requires. The API and the package disagree about the schema |
+| `InvalidInput` | a value refused before sending |
 
 `Enums\ErrorCode` lists every code Autentique documents; `Data\ApiError` and
 `Data\Violation` carry what arrived. Adding a case is a minor release.

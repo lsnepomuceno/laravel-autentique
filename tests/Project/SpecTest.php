@@ -212,9 +212,11 @@ function specSymbolReferences(string $contents, string $from): array
     }
 
     // The fully qualified form, with or without a leading backslash, and
-    // whatever follows a `::`.
+    // whatever follows a `::`. The possessive quantifier and the lookahead
+    // skip the prefix of a grouped import, `…\Data\Input\{Position, Signer}`,
+    // which names a namespace rather than a symbol.
     preg_match_all(
-        '/\\\\?(LSNepomuceno\\\\LaravelAutentique(?:\\\\[A-Za-z_][A-Za-z0-9_]*)+)(?:::([A-Za-z_][A-Za-z0-9_]*))?/',
+        '/\\\\?(LSNepomuceno\\\\LaravelAutentique(?:\\\\[A-Za-z_][A-Za-z0-9_]*)++)(?!\\\\\\{)(?:::([A-Za-z_][A-Za-z0-9_]*))?/',
         $contents,
         $matches,
         PREG_SET_ORDER,
@@ -312,6 +314,15 @@ it('reads a symbol out of prose the way a comment writes it', function () {
         'LSNepomuceno\LaravelAutentique\Contracts\Autentique',
         'LSNepomuceno\LaravelAutentique\LaravelAutentiqueServiceProvider::boot',
     ]);
+});
+
+it('skips the namespace a grouped import starts from', function () {
+    $cited = specSymbolReferences(
+        'use LSNepomuceno\\LaravelAutentique\\Data\\Input\\{Position, Signer};',
+        'guide.md',
+    );
+
+    expect($cited)->toBe([]);
 });
 
 it('reads only the comments of a PHP file', function () {

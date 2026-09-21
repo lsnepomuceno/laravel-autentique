@@ -44,5 +44,6 @@ document in staging, or a sandbox document in production, says so at the call.
 
 ## Outcome
 
-Not yet written: this section is filled in when the code that depends on this
-record ships.
+Shipped in #11 for creation: `PendingDocument::sandbox()` and the `$sandbox`
+argument of `Api\Documents::create()`, both falling back to `autentique.sandbox`
+when null. The listing's half of the decision lands with #12.

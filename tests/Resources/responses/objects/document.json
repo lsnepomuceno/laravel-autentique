@@ -1,0 +1,112 @@
+{
+  "id": "89c7d2ab31f9f5a13b3d20ecf53319af387e54d240ae7be993",
+  "name": "Marketing contract",
+  "message": "Custom message sent to the signer's email",
+  "reminder": "WEEKLY",
+  "refusable": true,
+  "sortable": false,
+  "qualified": false,
+  "sandbox": true,
+  "stop_on_rejected": true,
+  "new_signature_style": true,
+  "show_audit_page": false,
+  "footer": "BOTTOM",
+  "email_template_id": null,
+  "created_at": "2023-10-17T16:43:13.000000Z",
+  "deleted_at": null,
+  "deadline_at": "2023-11-24T02:59:59.999000Z",
+  "expiration_at": null,
+  "files": {
+    "original": "https://storage.googleapis.com/f77/6e7a1fadeed9c56cf037b43a9cd0e6d1/o9baEgHHv1Tuf7AZttDqdL8vK68eUw56PaYXzRqV.original.pdf",
+    "signed": "https://painel.autentique.com.br/documentos/89c7d2ab31f9f5a13b3d20ecf53319af387e54d240ae7be993/assinado.pdf",
+    "certified": "https://painel.autentique.com.br/documentos/89c7d2ab31f9f5a13b3d20ecf53319af387e54d240ae7be993/certificado.pdf",
+    "pades": "https://painel.autentique.com.br/documentos/89c7d2ab31f9f5a13b3d20ecf53319af387e54d240ae7be993/pades.pdf"
+  },
+  "signatures": [
+    {
+      "public_id": "434fcd4c6d0c11eea3c542010a2b60c6",
+      "name": "Mateus Zanella",
+      "email": "change-this-public-email@example.com",
+      "delivery_method": "DELIVERY_METHOD_EMAIL",
+      "type": "STANDARD",
+      "created_at": "2023-10-17T16:43:13.000000Z",
+      "action": { "name": "SIGN" },
+      "link": null,
+      "user": {
+        "id": "1ac41a793ed27015abd0a381eb2846e1c3e7fe01",
+        "name": "Mateus Zanella",
+        "email": "change-this-public-email@example.com",
+        "phone": null
+      },
+      "email_events": {
+        "sent": "2023-10-17 16:43:15",
+        "opened": "2023-10-17 16:50:02",
+        "delivered": null,
+        "refused": null,
+        "reason": null
+      },
+      "positions": [
+        { "element": "SIGNATURE", "x": "5.0", "y": "90.0", "z": 1, "angle": 0 }
+      ],
+      "verifications": [
+        {
+          "id": 430555,
+          "type": "MANUAL",
+          "verify_phone": null,
+          "fallback_behavior": null,
+          "payload": null,
+          "user": {
+            "images": {
+              "front": "https://storage.googleapis.com/biometric-auth/teste/exemplo.jpg",
+              "selfie": "https://storage.googleapis.com/biometric-auth/teste/exemplo.jpg"
+            },
+            "confidence": null
+          },
+          "verified_at": null,
+          "max_attempt": 3
+        }
+      ],
+      "viewed": {
+        "ip": "192.168.65.1",
+        "port": 29317,
+        "reason": null,
+        "created_at": "2023-10-17T16:51:00.000000Z",
+        "geolocation": {
+          "country": "Brazil",
+          "countryISO": "BR",
+          "state": "Rio Grande do Sul",
+          "stateISO": "RS",
+          "city": "Erechim",
+          "zipcode": "99704094",
+          "latitude": "-27.6767",
+          "longitude": "-52.2559"
+        }
+      },
+      "signed": null,
+      "rejected": null,
+      "signed_unapproved": null,
+      "biometric_approved": null,
+      "biometric_rejected": null
+    },
+    {
+      "public_id": "93115640-df08-11ef-903c-0242ac140004",
+      "name": "Ronaldo Fuzinato",
+      "email": null,
+      "delivery_method": null,
+      "type": "STANDARD",
+      "created_at": "2023-10-17T16:43:13.000000Z",
+      "action": { "name": "SIGN_AS_A_WITNESS" },
+      "link": { "id": "a1b2", "short_link": "https://assina.ae/A9pQN40FuNc10Na8K8" },
+      "user": null,
+      "email_events": null,
+      "positions": [],
+      "verifications": [],
+      "viewed": null,
+      "signed": null,
+      "rejected": null,
+      "signed_unapproved": null,
+      "biometric_approved": null,
+      "biometric_rejected": null
+    }
+  ]
+}

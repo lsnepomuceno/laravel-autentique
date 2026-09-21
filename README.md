@@ -27,6 +27,20 @@ today:
 ```php
 use LSNepomuceno\LaravelAutentique\Facades\Autentique;
 
+// A document, its file and its signers, sent in one call.
+$document = Autentique::newDocument('Service agreement')
+    ->file($request->file('contract'))            // or a path, or Autentique::fromDisk('s3', 'contracts/1.pdf')
+    ->signer(Signer::email('ana@example.com')->withPosition(Position::signature(x: 50, y: 90)))
+    ->signer(Signer::whatsapp('+5554999999999', Action::Approve))
+    ->reminder(Reminder::Weekly)
+    ->send();
+
+$document->signatures[0]->publicId;
+
+// The same call without the builder, and the file sources it accepts.
+Autentique::documents()->create($newDocument, $signers, Autentique::fromPath('/tmp/contract.pdf'));
+Autentique::fromUpload($request->file('contract'));
+
 // Who the token belongs to, their plan and their organization.
 $user = Autentique::account()->me();
 $user->subscription?->documents;

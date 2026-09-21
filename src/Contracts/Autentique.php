@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace LSNepomuceno\LaravelAutentique\Contracts;
 
-use LSNepomuceno\LaravelAutentique\Api\Account;
-use LSNepomuceno\LaravelAutentique\Exceptions\AutentiqueException;
+use Illuminate\Http\UploadedFile;
+use LSNepomuceno\LaravelAutentique\Api\{Account, Documents, PendingDocument};
+use LSNepomuceno\LaravelAutentique\Exceptions\{AutentiqueException, InvalidInput};
 
 /**
  * What this package exposes, resolved from the container or reached through
@@ -17,6 +18,37 @@ interface Autentique
      * The account the token belongs to: `account()->me()`.
      */
     public function account(): Account;
+
+    /**
+     * Documents: creating, reading, changing and removing them.
+     */
+    public function documents(): Documents;
+
+    /**
+     * Starts a document, sent with `->send()`.
+     */
+    public function newDocument(string $name): PendingDocument;
+
+    /**
+     * A file on the local filesystem, to upload.
+     *
+     * @throws InvalidInput
+     */
+    public function fromPath(string $path, ?string $name = null): FileSource;
+
+    /**
+     * A file received in the current request, to upload.
+     *
+     * @throws InvalidInput
+     */
+    public function fromUpload(UploadedFile $file, ?string $name = null): FileSource;
+
+    /**
+     * A file on one of the application's `Storage` disks, streamed from it.
+     *
+     * @throws InvalidInput
+     */
+    public function fromDisk(string $disk, string $path, ?string $name = null): FileSource;
 
     /**
      * Sends a GraphQL document the package does not ship, and returns its
