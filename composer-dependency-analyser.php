@@ -26,6 +26,6 @@ return new Configuration()
      * base class, neither of which is a direct require.
      */
     ->ignoreErrorsOnPackages(
-        ['orchestra/testbench-core'],
+        ['orchestra/testbench-core', 'pestphp/pest-plugin-arch'],
         [ErrorType::SHADOW_DEPENDENCY],
     );
