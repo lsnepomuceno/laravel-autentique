@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace LSNepomuceno\LaravelAutentique\Contracts;
 
 use Illuminate\Http\UploadedFile;
-use LSNepomuceno\LaravelAutentique\Api\{Account, Documents, PendingDocument};
+use LSNepomuceno\LaravelAutentique\Api\{Account, Documents, PendingDocument, Signers};
 use LSNepomuceno\LaravelAutentique\Exceptions\{AutentiqueException, InvalidInput};
 
 /**
@@ -23,6 +23,12 @@ interface Autentique
      * Documents: creating, reading, changing and removing them.
      */
     public function documents(): Documents;
+
+    /**
+     * The signers of an existing document: adding, removing, resending, links
+     * and biometric approval.
+     */
+    public function signers(): Signers;
 
     /**
      * Starts a document, sent with `->send()`.

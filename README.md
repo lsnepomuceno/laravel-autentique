@@ -41,6 +41,10 @@ $document->signatures[0]->publicId;
 Autentique::documents()->create($newDocument, $signers, Autentique::fromPath('/tmp/contract.pdf'));
 Autentique::fromUpload($request->file('contract'));
 
+// The signers of an existing document.
+Autentique::signers()->add($document->id, Signer::email('late@example.com'));
+Autentique::signers()->resend([$signature->publicId]);
+
 // Who the token belongs to, their plan and their organization.
 $user = Autentique::account()->me();
 $user->subscription?->documents;

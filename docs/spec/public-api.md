@@ -14,7 +14,7 @@ src/
 ├── LaravelAutentiqueServiceProvider.php   # merges the config, binds the contract
 ├── AutentiqueManager.php                  # the Autentique implementation
 ├── Contracts/                             # Autentique, GraphQLClient, FileSource
-├── Api/                                   # one class per area of the API: Account, Documents, PendingDocument
+├── Api/                                   # one class per area of the API: Account, Documents, PendingDocument, Signers
 ├── Commands/                              # CheckCommand, SchemaCommand
 ├── Facades/Autentique.php
 ├── Data/                                  # value objects returned: Document, Signature, User, …
@@ -40,6 +40,7 @@ through the `Autentique` facade, which is auto discovered.
 |---|---|---|
 | `account()` | `Api\Account` | `me()` returns `Data\User` |
 | `documents()` | `Api\Documents` | `create()`, `find()`, `update()`, `block()` return `Data\Document`; `list()` returns `Data\Page<Document>`; `delete()`, `sign()`, `transfer()`, `moveToFolder()` return `bool` |
+| `signers()` | `Api\Signers` | `add()`, `approveBiometric()`, `rejectBiometric()` return `Data\Signature`; `link()` returns `Data\Link`; `remove()`, `resend()` return `bool` |
 | `newDocument($name)` | `Api\PendingDocument` | the builder; `send()` returns `Data\Document` |
 | `fromPath($path, ?$name)`, `fromUpload($file, ?$name)`, `fromDisk($disk, $path, ?$name)` | `Contracts\FileSource` | **Laravel only**: uploads and disks stream |
 | `query($graphql, $variables)` | `array<string, mixed>`, the response's `data` | the escape hatch; values as variables, the document is the caller's |
@@ -113,11 +114,12 @@ is abstract.
 
 | Exception | When |
 |---|---|
-| `RequestFailed` (abstract) | base of the six below; carries `$operation`, `$status`, `$requestId`, `$errors` |
+| `RequestFailed` (abstract) | base of the seven below; carries `$operation`, `$status`, `$requestId`, `$errors` |
 | `Unauthenticated` | HTTP 401, or `Unauthorized` with 200 |
 | `RateLimited` | HTTP 429 after the retries; carries `$retryAfter` |
 | `ValidationFailed` | `message: "validation"`; `violations()`, `messages()` |
 | `NotFound` | a `*_not_found` code, or a `… not found` message |
+| `ResendThrottled` | `too_many_resent_emails` on `resendSignatures`; wraps the `GraphQLError` |
 | `GraphQLError` | any other error, or no data |
 | `TransportFailed` | the connection failed, or the answer was not GraphQL |
 | `MissingToken` | no token configured, nothing sent |

@@ -19,6 +19,7 @@ You never check a response for errors yourself: a method that returns, succeeded
 | `Unauthenticated` | the token is missing, wrong, expired or revoked (401), or an OAuth token lacks the scope (`Unauthorized` with 200) | after fixing the token |
 | `RateLimited` | Autentique refused the request (429) and the configured retries were spent | yes, after `$retryAfter` seconds |
 | `ValidationFailed` | a value was refused; the codes are per field | after fixing the value |
+| `ResendThrottled` | every signature asked to be resent was resent too recently; nothing was sent | yes, later |
 | `NotFound` | the document, folder or signature does not exist, or is not visible to the token's owner | no |
 | `GraphQLError` | any other error Autentique reported, with its code when the package knows it | depends on the code |
 | `TransportFailed` | the connection failed or timed out, or the answer was not GraphQL (a 5xx, a proxy page) | **only if the operation is safe to repeat** |
@@ -27,7 +28,7 @@ You never check a response for errors yourself: a method that returns, succeeded
 | `InvalidOperation` | an operation file is missing or broken; a defect in the package | no, report it |
 | `UnexpectedResponse` | Autentique answered without a field the package cannot do without; the API and the package disagree about the schema | no, report it |
 
-`Unauthenticated`, `RateLimited`, `ValidationFailed`, `NotFound`, `GraphQLError` and `TransportFailed` extend `RequestFailed`, and carry:
+`Unauthenticated`, `RateLimited`, `ValidationFailed`, `ResendThrottled`, `NotFound`, `GraphQLError` and `TransportFailed` extend `RequestFailed`, and carry:
 
 | Property | |
 |---|---|
