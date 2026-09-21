@@ -7,7 +7,7 @@ namespace LSNepomuceno\LaravelAutentique\GraphQL;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Http\Client\{ConnectionException, Factory, PendingRequest, RequestException, Response};
 use LSNepomuceno\LaravelAutentique\Contracts\{FileSource, GraphQLClient};
-use LSNepomuceno\LaravelAutentique\Exceptions\{AutentiqueException, MissingToken, TransportFailed};
+use LSNepomuceno\LaravelAutentique\Exceptions\{AutentiqueException, MissingToken, OAuthFailed, TransportFailed};
 use Throwable;
 
 /**
@@ -85,6 +85,46 @@ final readonly class Client implements GraphQLClient
         $payload = ['query' => $document, 'variables' => $variables === [] ? new \stdClass() : $variables];
 
         return $this->post(null, fn(PendingRequest $request): Response => $request->asJson()->post($url, $payload));
+    }
+
+    /**
+     * @param  array<string, string>  $form
+     * @return array<string, mixed>
+     *
+     * @throws AutentiqueException
+     */
+    #[\Override]
+    public function oauthToken(#[\SensitiveParameter] array $form): array
+    {
+        $url = rtrim($this->text('autentique.oauth.url'), '/') . '/token';
+
+        try {
+            $response = $this->http
+                ->createPendingRequest()
+                ->acceptJson()
+                ->asForm()
+                ->timeout($this->integer('autentique.timeout', 30))
+                ->post($url, $form);
+        } catch (ConnectionException $exception) {
+            throw new TransportFailed('Could not reach Autentique\'s OAuth token endpoint.', 'oauth', previous: $exception);
+        }
+
+        $body = $this->decode($response);
+
+        if ($response->successful() && is_array($body) && is_string($body['access_token'] ?? null)) {
+            /** @var array<string, mixed> $body */
+            return $body;
+        }
+
+        $error = is_array($body) && is_string($body['error'] ?? null) ? $body['error'] : null;
+        $description = is_array($body) && is_string($body['error_description'] ?? null) ? $body['error_description'] : null;
+
+        throw new OAuthFailed(
+            'Autentique refused the token request' . ($error === null ? '' : ": {$error}") . ($description === null ? '.' : ", {$description}"),
+            $error,
+            $response->status(),
+            $this->header($response, 'X-Attq-Request-Id'),
+        );
     }
 
     #[\Override]
@@ -189,6 +229,13 @@ final readonly class Client implements GraphQLClient
         $url = $this->config->get("autentique.{$endpoint->value}");
 
         return is_string($url) ? $url : '';
+    }
+
+    private function text(string $key): string
+    {
+        $value = $this->config->get($key);
+
+        return is_string($value) ? $value : '';
     }
 
     private function integer(string $key, int $default): int

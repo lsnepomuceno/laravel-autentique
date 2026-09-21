@@ -56,6 +56,11 @@ Autentique::organizations()->emailTemplates();
 // The Corporate plan: child organizations, their members, plans and webhooks.
 $child = Autentique::corporate()->createOrganization(new NewChildOrganization(name: 'Branch office'));
 
+// OAuth: act on behalf of accounts that authorize the application.
+$authorization = Autentique::oauth()->begin([OAuthScope::UserRead, OAuthScope::DocumentsCreate]);
+$tokens = Autentique::oauth()->callback($request, $state, $verifier);
+Autentique::withToken($tokens->accessToken)->account()->me();
+
 // Who the token belongs to, their plan and their organization.
 $user = Autentique::account()->me();
 $user->subscription?->documents;

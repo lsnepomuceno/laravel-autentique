@@ -16,7 +16,9 @@ You never check a response for errors yourself: a method that returns, succeeded
 
 | Exception | When | Safe to send again? |
 |---|---|---|
-| `Unauthenticated` | the token is missing, wrong, expired or revoked (401), or an OAuth token lacks the scope (`Unauthorized` with 200) | after fixing the token |
+| `Unauthenticated` | the token is missing, wrong, expired or revoked (401, or the code `unauthorized`) | after fixing the token |
+| `InsufficientScope` | an OAuth token lacks the scope the operation needs (`Unauthorized` with 200) | after authorizing again with the scope |
+| `OAuthFailed` | an OAuth step failed; `$error` carries the OAuth code | see [OAuth](/guide/oauth#errors) |
 | `RateLimited` | Autentique refused the request (429) and the configured retries were spent | yes, after `$retryAfter` seconds |
 | `ValidationFailed` | a value was refused; the codes are per field | after fixing the value |
 | `ResendThrottled` | every signature asked to be resent was resent too recently; nothing was sent | yes, later |
@@ -24,12 +26,13 @@ You never check a response for errors yourself: a method that returns, succeeded
 | `GraphQLError` | any other error Autentique reported, with its code when the package knows it | depends on the code |
 | `TransportFailed` | the connection failed or timed out, or the answer was not GraphQL (a 5xx, a proxy page) | **only if the operation is safe to repeat** |
 | `MissingToken` | no token is configured; nothing was sent | after configuring it |
+| `MissingOAuthCredentials` | OAuth is used without a client id, secret or redirect URI | after configuring them |
 | `MissingWebhookSecret` | a webhook arrived and no secret is configured to verify it | after configuring it |
 | `InvalidInput` | a value the package refused before sending, because Autentique documents it would refuse or silently change it | after fixing the value |
 | `InvalidOperation` | an operation file is missing or broken; a defect in the package | no, report it |
 | `UnexpectedResponse` | Autentique answered without a field the package cannot do without; the API and the package disagree about the schema | no, report it |
 
-`Unauthenticated`, `RateLimited`, `ValidationFailed`, `ResendThrottled`, `NotFound`, `GraphQLError` and `TransportFailed` extend `RequestFailed`, and carry:
+`Unauthenticated`, `InsufficientScope`, `OAuthFailed`, `RateLimited`, `ValidationFailed`, `ResendThrottled`, `NotFound`, `GraphQLError` and `TransportFailed` extend `RequestFailed`, and carry:
 
 | Property | |
 |---|---|

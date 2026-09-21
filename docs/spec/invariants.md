@@ -12,9 +12,9 @@ each rule names which.
 ## 1. Every request goes through the one injected HTTP client
 
 The package reaches Autentique through a single class built on
-`Illuminate\Http\Client\Factory`, resolved from the container. Nothing else in
-`src/` opens a connection: not the `Http` facade, not Guzzle, not cURL, not a
-socket.
+`Illuminate\Http\Client\Factory`, resolved from the container: GraphQL on both
+endpoints and the OAuth token endpoint alike. Nothing else in `src/` opens a
+connection: not the `Http` facade, not Guzzle, not cURL, not a socket.
 
 **A request that bypasses the client cannot be faked.** A consuming
 application tests its own signing flow with `Http::fake()` and refuses anything

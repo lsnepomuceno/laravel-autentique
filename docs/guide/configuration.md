@@ -24,6 +24,8 @@ That writes `config/autentique.php` into the application.
 | `webhooks.middleware` | | `[]` | middleware for that route besides the signature check; never `web` |
 | `webhooks.deduplicate` | `AUTENTIQUE_WEBHOOK_DEDUPLICATE` | none | seconds to remember each event id and drop a repeat |
 | `webhooks.cache_store` | `AUTENTIQUE_WEBHOOK_CACHE_STORE` | the default | the cache store remembering them |
+| `oauth.client_id`, `oauth.client_secret`, `oauth.redirect_uri` | `AUTENTIQUE_OAUTH_CLIENT_ID`, `…_CLIENT_SECRET`, `…_REDIRECT_URI` | none | the OAuth application; see [OAuth](/guide/oauth) |
+| `oauth.url` | `AUTENTIQUE_OAUTH_URL` | `https://api.autentique.com.br/oauth` | where `authorize` and `token` live |
 | `retry.sleep` | `AUTENTIQUE_RETRY_SLEEP` | `1000` | milliseconds to wait, times the attempt number, when Autentique sends no `Retry-After` |
 
 Keys are added by the features that read them, and each is listed here when it

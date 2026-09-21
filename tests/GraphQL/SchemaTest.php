@@ -112,6 +112,8 @@ function unmirroredEnums(): array
         Enums\WebhookEventType::class,
         // The keys of the member permissions input, not an enum.
         Enums\MemberPermission::class,
+        // OAuth scopes are strings of the authorization URL, not of the schema.
+        Enums\OAuthScope::class,
     ];
 }
 
