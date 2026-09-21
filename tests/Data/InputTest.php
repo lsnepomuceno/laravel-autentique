@@ -68,6 +68,7 @@ describe('SecurityVerification', function () {
             SecurityVerification::upload(),
             SecurityVerification::live(),
             SecurityVerification::pfFacial(),
+            SecurityVerification::pfFacialMatch(),
             SecurityVerification::biometricAndTextExtraction(),
             SecurityVerification::livenessAndTextExtraction(),
         ]);

@@ -15,8 +15,11 @@ enum DocumentStatus: string
     /** Signed by everyone. */
     case Signed = 'SIGNED';
 
-    /** Refused by a signer. */
+    /** Not signed, and no longer waiting. */
     case NotSigned = 'NOT_SIGNED';
+
+    /** Refused by a signer. */
+    case Rejected = 'REJECTED';
 
     /** In the trash. */
     case Deleted = 'DELETED';

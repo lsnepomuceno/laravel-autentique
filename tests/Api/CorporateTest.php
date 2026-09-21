@@ -189,6 +189,18 @@ it('registers a webhook endpoint and returns its secret', function () {
         ]);
 });
 
+it('registers the two events the Corporate documentation leaves out of its list', function () {
+    answerValue(Operation::CorporateCreateEndpoint, ['secret' => 's', 'webhook_endpoint' => ['id' => 'e1']]);
+
+    Autentique::corporate()->createWebhookEndpoint(1, 'https://x.test', 'x', WebhookEndpointType::Signature, [
+        WebhookEventType::SignatureDeliveryFailed,
+        WebhookEventType::SignatureBiometricReset,
+    ], WebhookFormat::UrlEncoded);
+
+    expect(sentVariables()['events'])->toBe(['SIGNATURE_DELIVERY_FAILED', 'SIGNATURE_BIOMETRIC_RESET'])
+        ->and(sentVariables()['format'])->toBe('URLENCODED');
+});
+
 it('refuses an endpoint the API would refuse or ignore', function (Closure $create, string $message) {
     Http::fake();
 
@@ -200,10 +212,6 @@ it('refuses an endpoint the API would refuse or ignore', function (Closure $crea
     'another resource' => [
         fn() => Autentique::corporate()->createWebhookEndpoint(1, 'https://x.test', 'x', WebhookEndpointType::Member, [WebhookEventType::DocumentCreated]),
         'cannot listen to document.created',
-    ],
-    'an event it does not register' => [
-        fn() => Autentique::corporate()->createWebhookEndpoint(1, 'https://x.test', 'x', WebhookEndpointType::Signature, [WebhookEventType::SignatureDeliveryFailed], WebhookFormat::UrlEncoded),
-        'cannot be registered',
     ],
 ]);
 

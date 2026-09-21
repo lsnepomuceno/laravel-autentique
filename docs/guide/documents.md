@@ -147,7 +147,7 @@ is billed. Every filter the API takes is a named argument:
 | `status` | `Pending`, `Signed`, `NotSigned`, `Deleted` |
 | `search`, `name`, `signer` | the document's name and its signers |
 | `folderId`, `context` | a folder, or the user's, group's or organization's documents |
-| `from`, `until` | the creation date ([#38](https://github.com/lsnepomuceno/laravel-autentique/issues/38) tracks confirming its format) |
+| `from`, `until` | the creation date, inclusive, in the account's timezone |
 | `includeDeleted`, `includeArchived` | documents normally left out |
 | `orderBy`, `direction` | any field, ascending or descending |
 | `sandbox`, `onlySandbox` | see below |
@@ -156,6 +156,13 @@ is billed. Every filter the API takes is a named argument:
 `AUTENTIQUE_SANDBOX=true` they are included by default, as they are created by
 default; `sandbox: false` leaves them out, and `onlySandbox: true` lists nothing
 else.
+
+Autentique documents an `onlySandbox` argument and does not honour it: measured
+against the live API, it filters nothing. The package asks for sandbox documents
+and filters the page itself, so `onlySandbox: true` returns only sandbox
+documents, and the page's `total` and `lastPage` stay Autentique's, counting the
+documents it paged. A page can then hold fewer items than `perPage`, or none,
+with more pages after it.
 
 ## Changing one
 

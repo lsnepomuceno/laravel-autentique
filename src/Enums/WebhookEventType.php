@@ -36,14 +36,11 @@ enum WebhookEventType: string
     }
 
     /**
-     * The name the Corporate endpoint's `createEndpoint` takes for this event,
-     * or null for the two it does not list.
+     * The name `createEndpoint` takes for this event, `SIGNATURE_ACCEPTED`: the
+     * API schema's `WebhookEventTypeEnum`, which lists all seventeen.
      */
-    public function endpointName(): ?string
+    public function endpointName(): string
     {
-        return match ($this) {
-            self::SignatureBiometricReset, self::SignatureDeliveryFailed => null,
-            default => strtoupper(str_replace('.', '_', $this->value)),
-        };
+        return strtoupper(str_replace('.', '_', $this->value));
     }
 }

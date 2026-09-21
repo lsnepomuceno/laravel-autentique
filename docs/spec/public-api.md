@@ -92,7 +92,7 @@ omit is nullable.
 | `Data\User` | `me` |
 | `Data\Subscription`, `Data\Organization`, `Data\Group` | nested in the above, and in `organization` |
 | `Data\Document` | `createDocument` and every operation returning a document |
-| `Data\Page<T>` | every listing; countable and iterable |
+| `Data\Page<T>` | every listing; countable, iterable, and `filter()` keeps Autentique's counts |
 | `Data\Folder`, `Data\FolderSummary`, `Data\FolderShare` | the folder operations |
 | `Data\EmailTemplate` | `emailTemplates` |
 | `Data\ChildOrganization`, `Data\OrganizationMember`, `Data\OrganizationPlan`, `Data\CorporatePlan`, `Data\ApiUsage`, `Data\ApiUsageItems`, `Data\WebhookEndpoint` | the Corporate operations. `OrganizationMember::$apiToken` and `WebhookEndpoint::$secret` are credentials |

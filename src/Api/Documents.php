@@ -98,7 +98,8 @@ final readonly class Documents
      *
      * @param  ?string  $search  Matches the document's name and its signers.
      * @param  ?bool  $sandbox  True includes sandbox documents, false leaves them out.
-     * @param  bool  $onlySandbox  Lists sandbox documents and nothing else.
+     * @param  bool  $onlySandbox  Lists sandbox documents and nothing else. Autentique does not honour
+     *                            the flag, so the page is filtered here, and its counts stay Autentique's.
      * @return Page<Document>
      *
      * @throws InvalidInput
@@ -142,16 +143,21 @@ final readonly class Documents
             'include_deleted' => $includeDeleted,
             'include_archived' => $includeArchived,
             'orderBy' => $orderBy === null ? null : ['field' => $orderBy, 'direction' => $direction->value],
-            'showSandbox' => $onlySandbox ? null : ($sandbox ? true : null),
+            // `onlySandbox` alone is ignored by the API, and beside
+            // `showSandbox` it filters nothing (measured on 2026-09-21), so the
+            // sandbox documents are asked for and the page is filtered here.
+            'showSandbox' => $onlySandbox || $sandbox ? true : null,
             'onlySandbox' => $onlySandbox ? true : null,
         ], fn(mixed $value): bool => $value !== null);
 
         $data = Payload::of($this->client->send(Operation::Documents, $variables));
 
-        return Page::fromPayload(
+        $page = Page::fromPayload(
             $data->object(Operation::Documents->field()) ?? Payload::of([]),
             Document::fromPayload(...),
         );
+
+        return $onlySandbox ? $page->filter(fn(Document $document): bool => $document->sandbox === true) : $page;
     }
 
     /**

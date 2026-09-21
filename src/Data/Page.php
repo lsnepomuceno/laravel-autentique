@@ -57,6 +57,25 @@ final readonly class Page implements Countable, IteratorAggregate
         );
     }
 
+    /**
+     * The same page with only the items the callback keeps. The counts stay
+     * Autentique's, since they describe the listing it paged, not this page.
+     *
+     * @param  \Closure(T): bool  $keep
+     * @return self<T>
+     */
+    public function filter(Closure $keep): self
+    {
+        return new self(
+            items: array_values(array_filter($this->items, $keep)),
+            total: $this->total,
+            perPage: $this->perPage,
+            currentPage: $this->currentPage,
+            lastPage: $this->lastPage,
+            hasMorePages: $this->hasMorePages,
+        );
+    }
+
     #[\Override]
     public function count(): int
     {

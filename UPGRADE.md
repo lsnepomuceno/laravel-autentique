@@ -118,4 +118,8 @@ $autentique->assertDocumentSent();
 
 ## Unreleased
 
-Nothing yet.
+### From `1.0.0-rc.1`
+
+`Autentique::folders()->create($name, $parentId, $type)` loses its third
+argument: the live API has no such argument. Drop it; a folder shared with the
+organization or a group is shared after it is created, with `share()`.

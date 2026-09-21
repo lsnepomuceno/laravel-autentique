@@ -99,12 +99,16 @@ it('includes sandbox documents when the configuration makes them the default', f
     expect(sentVariables()['showSandbox'] ?? null)->toBeTrue();
 });
 
-it('lists only sandbox documents when asked', function () {
-    answerValue(Operation::Documents, ['data' => []]);
+it('lists only sandbox documents when asked, filtering what Autentique does not', function () {
+    $sandbox = [...responseFixture('objects/document'), 'id' => 'sandbox-doc', 'sandbox' => true];
+    $real = [...responseFixture('objects/document'), 'id' => 'real-doc', 'sandbox' => false];
+    answerValue(Operation::Documents, ['total' => 2, 'data' => [$real, $sandbox]]);
 
-    Autentique::documents()->list(onlySandbox: true);
+    $page = Autentique::documents()->list(onlySandbox: true);
 
-    expect(sentVariables())->toBe(['limit' => 20, 'page' => 1, 'onlySandbox' => true]);
+    expect(sentVariables())->toBe(['limit' => 20, 'page' => 1, 'showSandbox' => true, 'onlySandbox' => true])
+        ->and(array_map(fn(Document $document): string => $document->id, $page->items))->toBe(['sandbox-doc'])
+        ->and($page->total)->toBe(2);
 });
 
 it('works out whether there are more pages when Autentique does not say', function () {

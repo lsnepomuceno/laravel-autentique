@@ -205,8 +205,7 @@ final readonly class Corporate
      * with its secret, which Autentique shows only here.
      *
      * An endpoint listens to one kind of resource, and only that resource's
-     * events reach it; two signature events Autentique documents are not
-     * offered for registration.
+     * events reach it.
      *
      * @param  list<WebhookEventType>  $events
      *
@@ -233,7 +232,7 @@ final readonly class Corporate
                 throw new InvalidInput("An endpoint for {$type->value} events cannot listen to {$event->value}.");
             }
 
-            $names[] = $event->endpointName() ?? throw new InvalidInput("{$event->value} cannot be registered through the API.");
+            $names[] = $event->endpointName();
         }
 
         $data = $this->send(Operation::CorporateCreateEndpoint, [

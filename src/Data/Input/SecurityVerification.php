@@ -63,6 +63,15 @@ final readonly class SecurityVerification
         return new self(VerificationType::PfFacial);
     }
 
+    /**
+     * Present in the API's schema beside `PF_FACIAL`; the documentation does
+     * not describe it.
+     */
+    public static function pfFacialMatch(): self
+    {
+        return new self(VerificationType::PfFacialMatch);
+    }
+
     public static function biometricAndTextExtraction(): self
     {
         return new self(VerificationType::BiometricAndTextExtraction);

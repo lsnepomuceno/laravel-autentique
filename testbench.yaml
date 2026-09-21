@@ -1,0 +1,4 @@
+# Lets `vendor/bin/testbench` run the package's commands during development,
+# `autentique:schema` above all (docs/spec/graphql-operations.md).
+providers:
+  - LSNepomuceno\LaravelAutentique\LaravelAutentiqueServiceProvider

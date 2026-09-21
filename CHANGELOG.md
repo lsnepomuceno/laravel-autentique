@@ -11,6 +11,31 @@ a minor release; changing it is a major one.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+What the first run against the live API found, on 2026-09-21, with the standard
+schema now introspected rather than assembled.
+
+### Changed
+
+- **Breaking against `1.0.0-rc.1`:** `Api\Folders::create()` no longer takes
+  `$type`. The live API's `createFolder` has no such argument, and sending it
+  failed.
+- `onlySandbox: true` on `documents()->list()` and `folders()->documents()` now
+  lists only sandbox documents: Autentique ignores the flag, so the page is
+  filtered by the package. The counts stay Autentique's.
+- `Api\Corporate::createWebhookEndpoint()` accepts `signature.delivery_failed`
+  and `signature.biometric_reset`, which the API's schema lists and the Corporate
+  documentation left out.
+
+### Added
+
+- Enum cases the live schema has and the documentation never mentions:
+  `DocumentStatus::Rejected`, `EmailTemplateType::SignatureCompleted`,
+  `PositionElement::Radio`, `PositionElement::SquareInitials`,
+  `VerificationType::PfFacialMatch`, with `SecurityVerification::pfFacialMatch()`.
+- `Data\Page::filter()`.
+
 ## [1.0.0-rc.1] - 2026-09-21
 
 The first release of `lsnepomuceno/laravel-autentique`, a new package replacing

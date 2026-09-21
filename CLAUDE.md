@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 It replaces `lsnepomuceno/laravel-autentique-v2`, unfinished since 2021 and to be archived. What that package got wrong is recorded in `docs/history/from-laravel-autentique-v2.md`, and most of the rules below exist because of it.
 
-**`1.0.0-rc.1` is the first release.** Promoting it to `1.0.0` waits on a run against the sandbox and on the real introspected schemas, which need a token (#48, #34). Work is tracked one issue per deliverable; read the issue before starting one.
+**`1.0.0-rc.1` is the first release.** Promoting it to `1.0.0` waits on what #48 still lists. Work is tracked one issue per deliverable; read the issue before starting one.
 
 The invariants are imported rather than summarised, so they are in context for every session:
 
@@ -86,7 +86,7 @@ Autentique::newDocument('Agreement')->file($file)->signer(Signer::email('a@examp
 
 Sandbox is per call with the default in the config (0006).
 
-**The committed schemas are assembled from the documentation, not introspected** (#34), so a green `SchemaTest` is only as good as they are.
+**The standard schema is introspected** (`tests/Resources/schema.graphql`, 2026-09-21); **the Corporate one is assembled** from the documentation, since its endpoint needs the Corporate plan. Refresh the standard one with `vendor/bin/testbench autentique:schema` and `composer schema:print`.
 
 ## Quality gates
 

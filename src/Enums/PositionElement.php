@@ -14,4 +14,10 @@ enum PositionElement: string
     case Initials = 'INITIALS';
     case Date = 'DATE';
     case Cpf = 'CPF';
+
+    /** Present in the API's schema; the documentation does not describe it. */
+    case Radio = 'RADIO';
+
+    /** Present in the API's schema; the documentation does not describe it. */
+    case SquareInitials = 'SQUARE_INITIALS';
 }

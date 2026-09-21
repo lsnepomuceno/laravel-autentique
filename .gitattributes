@@ -22,3 +22,4 @@
 /pint.json          export-ignore
 /composer-dependency-analyser.php export-ignore
 /.graphqlconfig     export-ignore
+/testbench.yaml     export-ignore
