@@ -11,7 +11,6 @@ $folders = Autentique::folders();
 ```php
 $contracts = $folders->create('Contracts');
 $signed = $folders->create('Signed', parentId: $contracts->id);
-$shared = $folders->create('Legal', type: FolderType::Organization);   // shared with the whole organization
 
 $folders->rename($signed->id, 'Signed contracts');
 $folders->delete($signed->id);        // the documents in it stay, in no folder
@@ -45,6 +44,10 @@ $page = $folders->documents($folderId, status: DocumentStatus::Pending);
 
 The same page size, billing and sandbox rules as
 [listing documents](/guide/documents#listing).
+
+**A document moved into a folder takes a second or two to be listed in it**:
+Autentique's folder listing is eventually consistent. A test that moves and then
+lists at once finds nothing; `documents()->find()` sees the move immediately.
 
 ## Sharing
 

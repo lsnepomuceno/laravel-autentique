@@ -1,6 +1,10 @@
 # Autentique API v2, Corporate endpoint (/v2/graphql/corporate).
 #
-# ASSEMBLED, NOT INTROSPECTED. Built on 2026-09-21 from the Corporate space of
+# ASSEMBLED, NOT INTROSPECTED: the endpoint answers `no_enterprise_access` to an
+# account without the Corporate plan, and none was available. Where the
+# standard schema, introspected, shares a type with this one, it wins: the
+# WebhookEventTypeEnum below lists all seventeen events as the standard one does,
+# where the Corporate documentation lists fifteen. Built on 2026-09-21 from the Corporate space of
 # Autentique's documentation, which shows every operation and most types but
 # names few of them. Every type name below that the documentation does not
 # give is a guess, and #34 covers replacing this file with an introspection as
@@ -305,6 +309,8 @@ enum WebhookEventTypeEnum {
   SIGNATURE_BIOMETRIC_APPROVED
   SIGNATURE_BIOMETRIC_UNAPPROVED
   SIGNATURE_BIOMETRIC_REJECTED
+  SIGNATURE_DELIVERY_FAILED
+  SIGNATURE_BIOMETRIC_RESET
   MEMBER_CREATED
   MEMBER_DELETED
 }

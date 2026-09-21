@@ -87,6 +87,8 @@ it('ships none of the development tooling', function () {
         'package.json',
         'package-lock.json',
         'phpunit.xml',
+        'testbench.yaml',
+        '.graphqlconfig',
     ] as $path) {
         expect($shipped)->not->toContain($path);
     }

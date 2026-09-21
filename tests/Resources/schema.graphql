@@ -1,298 +1,370 @@
 # Autentique API v2, standard endpoint.
 #
-# ASSEMBLED, NOT INTROSPECTED. Built on 2026-09-21 from the types, arguments and
-# enum values Autentique's documentation shows (English, Portuguese and
-# Corporate spaces), and from a partial third party introspection of August
-# 2023 for nullability. Introspection needs a token this repository does not
-# hold; replacing this file with the real schema is #34, which lists every name
-# below that is a guess.
-#
-# Only what the package's operations touch is declared. Every operation file in
-# src/Resources/graphql is validated against this file by
-# tests/GraphQL/SchemaTest.php.
+# INTROSPECTED on 2026-09-21 with `autentique:schema`, then printed with
+# `composer schema:print`. Every operation file in src/Resources/graphql is
+# validated against this file by tests/GraphQL/SchemaTest.php.
 
-scalar UUID
-scalar EmailScalar
-scalar Timestamp
-scalar Date
-scalar CPF
-scalar CNPJ
-scalar Upload
-scalar JSON
-
-type Query {
-  me: User
-  organization: Organization
-  organizations: [Organization]
-  # Nullable: Autentique's own OAuth collection declares `$id: UUID` for it, and
-  # its request test expects no errors (tests/Resources/collections/README.md).
-  document(id: UUID): Document
-  documents(
-    limit: Int! = 60
-    page: Int! = 1
-    status: DocumentStatusEnum
-    search: String
-    name: String
-    signer: String
-    member_id: UUID
-    folder_id: UUID
-    group_uuid: String
-    context: ContextEnum
-    start_date: String
-    end_date: String
-    include_deleted: Boolean
-    include_archived: Boolean
-    orderBy: OrderBy
-    showSandbox: Boolean
-    onlySandbox: Boolean
-  ): DocumentPagination
-  documentsByFolder(
-    folder_id: UUID!
-    limit: Int! = 60
-    page: Int! = 1
-    status: DocumentStatusEnum
-    search: String
-    orderBy: OrderBy
-    showSandbox: Boolean
-    onlySandbox: Boolean
-  ): DocumentPagination
-  folder(id: UUID!): Folder
-  folders(
-    limit: Int!
-    page: Int!
-    display_children: Boolean = true
-    type: FolderTypeEnum
-    search: String
-    orderBy: OrderBy
-  ): FolderPagination
-  emailTemplates(limit: Int! = 60, page: Int! = 1): EmailTemplatesPagination
+schema {
+  query: Query
+  mutation: Mutation
 }
-
-type Mutation {
-  createDocument(
-    document: DocumentInput!
-    signers: [SignerInput!]!
-    file: Upload!
-    sandbox: Boolean = false
-    folder_id: UUID
-    organization_id: Int
-    type: DocumentTypeEnum = DEFAULT
-  ): Document
-  updateDocument(id: UUID!, document: UpdateDocumentInput!): Document
-  deleteDocument(id: UUID!, folder_id: UUID): Boolean
-  signDocument(id: UUID!, organization_id: Int): Boolean
-  transferDocument(
-    id: UUID!
-    organization_id: Int!
-    group_id: Int!
-    current_group_id: Int
-    context: ContextEnum
-  ): Boolean
-  moveDocumentToFolder(
-    document_id: UUID!
-    folder_id: UUID
-    current_folder_id: UUID
-    context: ContextEnum = ORGANIZATION
-  ): Boolean
-  createSigner(document_id: UUID!, signer: SignerInput!): Signature
-  deleteSigner(public_id: UUID!, document_id: UUID!): Boolean
-  resendSignatures(public_ids: [UUID]): Boolean
-  createLinkToSignature(public_id: UUID!): Link
-  approveBiometric(verification_id: Int!, public_id: UUID!): Signature
-  rejectBiometric(verification_id: Int!, public_id: UUID!): Signature
-  createFolder(folder: FolderInput!, parent_id: UUID, type: FolderTypeEnum): Folder
-  updateFolder(id: UUID!, folder: FolderInput!): Folder
-  deleteFolder(id: UUID!): Boolean
-  shareFolder(folder_id: String!, shares: [ShareFolderInput], email_message: String): Folder
-  updateSharing(
-    folder_id: String!
-    sharing_id: String
-    role: FolderRoleEnum
-    share_by_link: Boolean
-    password: String
-    remove_password: Boolean
-  ): Folder
-}
-
-# Account
 
 type User {
   id: UUID!
-  name: String
+  name: FullNameScalar
   email: EmailScalar
   phone: String
-  cpf: CPF
-  cnpj: CNPJ
+  email_verified_at: TimestampScalar
+  cpf: CPFScalar
+  cnpj: CNPJScalar
   company: String
-  birthday: Date
-  subscription: Subscription
+  birthday: DateScalar
+  founder: Boolean!
+  user_hash: String
+  nolt: String
+  escavador: String
   organization: Organization
-  created_at: Timestamp
+  member: Member
+  created_at: TimestampScalar!
+  updated_at: TimestampScalar
+  auth_methods: [Provider] @deprecated(reason: "Deprecated in this version.")
+  settings: Setting
+  locale: Locale
+  mfa: [MfaEnum]!
+  statistics: Statistic! @deprecated(reason: "Deprecated in this version.")
+  subscription: Subscription
+  group: Group @deprecated(reason: "Deprecated in this version.")
+  permissions: Permission @deprecated(reason: "Deprecated in this version.")
+  customer_id: String @deprecated(reason: "Deprecated in this version.")
+
+  "Autentique's Privacy"
+  emails: [EmailType]
+
+  "Autentique's Privacy"
+  socials: [Social]
+
+  "Autentique's Privacy"
+  sessions: [Session]
+
+  referred_by: UUID
+  additional_configs: UserAdditionalConfigs
+  hp_set: Boolean
+  biometric_required: Boolean
+  can_manage_referral: Boolean
 }
 
-type Subscription {
-  name: String
-  documents: Int!
-  credits: Int
-  has_premium_features: Boolean!
-  expires_at: Timestamp
+type Member {
+  id: String! @deprecated(reason: "Deprecated in this version.")
+  name: String @deprecated(reason: "Deprecated in this version.")
+  email: EmailScalar @deprecated(reason: "Deprecated in this version.")
+  role: Role @deprecated(reason: "Deprecated in this version.")
+  user: User
+
+  "Autentique's Privacy"
+  organization: Organization
+
+  group: Group
+  permissions: Permission
+  configs: MemberConfigs
+  created_at: TimestampScalar
+  deleted_at: TimestampScalar
+}
+
+type MemberConfigs {
+  notification_signed: Boolean
+  notification_finished: Boolean
+  email_template: Int
+  whatsapp_template: WhatsappTemplateEnum
+  locked_signers: [LockSignature]
+  locked_cc: [EmailScalar]
+  locked_reply_to: EmailScalar
+  locked_watchers: [EmailScalar]
+  folder: Folder
+  ignore_cpf: Boolean
+  locale: Locale
+  ignore_birthdate: Boolean
+  ordered_signatures: Boolean
+  signature_type: DocumentSignatureTypeEnum
 }
 
 type Organization {
   id: Int!
   uuid: String
   name: String
-  cnpj: CNPJ
+  cnpj: CNPJScalar
+  type: OrganizationTypeEnum
+  customer_id: String @deprecated(reason: "Deprecated after stripe integration.")
+  settings: Setting
+  parent: ParentOrganization
+  overwrite_email: Boolean! @deprecated(reason: "Deprecated in this version.")
+  overwrite_template: Boolean! @deprecated(reason: "Deprecated in this version.")
+  overwrite_name: Boolean! @deprecated(reason: "Deprecated in this version.")
+
+  "Autentique's Privacy"
   groups: [Group]
+
+  subscription: Subscription
+  billing_customer: Customer
+  country: String @deprecated(reason: "Use locale.country instead.")
+  locale: Locale
+  created_at: TimestampScalar
+  deleted_at: TimestampScalar
 }
 
 type Group {
   id: Int!
   uuid: String
   name: String
+  company: String
+  cnpj: CNPJScalar
+  overwrite_template_group: Boolean
+  overwrite_template: Boolean
+  email_template: EmailTemplates @deprecated(reason: "Use email_templates instead.")
+  email_templates: [EmailTemplates]
+  permissions: Permission
+  styles: GroupStyle
+
+  "Autentique's Privacy"
+  members: [Member]
+
+  members_count: Int
+  is_default: Boolean
+  config_template: ConfigTemplate
 }
 
-# Documents
+type GroupStyle {
+  overwrite_email: Boolean
+  overwrite_name: Boolean
+}
+
+type Permission {
+  overwrite_permissions: Boolean
+  create_documents: Boolean
+  sign_documents: Boolean
+  delete_documents: Boolean
+  archive_documents: Boolean
+  view_documents_gr: Boolean
+  view_folders_gr: Boolean
+  actions_folders_gr: Boolean
+  actions_documents_gr: Boolean
+  actions_templates_gr: Boolean
+  actions_members_oz: Boolean
+  actions_groups_oz: Boolean
+  actions_webhooks_oz: Boolean
+  actions_applications_oz: Boolean
+  view_documents_oz: Boolean
+  view_member_documents_oz: Boolean
+  view_group_documents_oz: Boolean
+  view_folders_oz: Boolean
+  view_member_folders_oz: Boolean
+  view_group_folders_oz: Boolean
+  actions_documents_oz: Boolean
+  view_invoices_oz: Boolean
+  change_plan_oz: Boolean
+  actions_folders_oz: Boolean
+  change_appearances_oz: Boolean
+  change_whitelabel_oz: Boolean
+  enterprise_access: Boolean
+  validate_biometry: Boolean
+}
+
+type Role {
+  id: ID!
+  name: String!
+  description: String!
+}
 
 type Document {
   id: UUID!
   name: String!
-  message: String
-  reminder: ReminderEnum
   refusable: Boolean
-  sortable: Boolean
-  qualified: Boolean
-  sandbox: Boolean
-  ignore_cpf: Boolean
-  is_blocked: Boolean
   stop_on_rejected: Boolean
-  new_signature_style: Boolean
-  show_audit_page: Boolean
-  footer: FooterEnum
+  qualified: Boolean
+  ignore_cpf: Boolean
+  ignore_birthdate: Boolean
+  sortable: Boolean
+  is_blocked: Boolean @deprecated(reason: "Use deadline_at instead of this attribute")
+  is_dynamic_document: Boolean
+  sandbox: Boolean
+  scrolling_required: Boolean
+  signers_history: [SignerHistory]
+  locale: Locale
+  created_at: TimestampScalar!
+  deleted_at: TimestampScalar
+  deadline_at: TimestampScalar
+  lifecycle_in: TimestampScalar
   email_template_id: Int
+  whatsapp_template: WhatsappTemplateEnum
+  updated_at: TimestampScalar!
+  processed_at: TimestampScalar
+  expiration_at: TimestampScalar
+  notify_in: Int
+  reminder: ReminderEnum
+  message: String
+  footer: FooterEnum
+  footer_type: FooterTypeEnum
   cc: [EmailScalar]
-  created_at: Timestamp!
-  updated_at: Timestamp
-  deleted_at: Timestamp
-  deadline_at: Timestamp
-  expiration_at: Timestamp
+  reply_to: EmailScalar
   configs: DocumentConfig
-  files: File!
+  signatures_count: Int
+  signed_count: Int
+  rejected_count: Int
+  is_from_api: Boolean
   signatures: [Signature]
   watchers: [Watcher]
+  author: Author!
+  files: File
+  hashes: Hash
+  new_signature_style: Boolean
+  show_audit_page: Boolean
 }
 
-type DocumentConfig {
-  notification_finished: Boolean
-  notification_signed: Boolean
-  signature_appearance: SignatureAppearanceEnum
+type Folder {
+  id: UUID!
+  name: String!
+  slug: String!
+  type: FolderTypeEnum! @deprecated(reason: "Deprecated due to use of context field.")
+  context: ContextEnum!
+  parentFolder: Folder
+  path: String
+  subfolders: [Folder]
+  children_counter: Int
+  is_editor: Boolean
+  shares: [FolderShare]
+  link_identifier: String
+  has_password: Boolean
+  created_at: TimestampScalar!
+  updated_at: TimestampScalar!
 }
 
-type File {
-  original: String
-  signed: String
-  certified: String
-  pades: String
+type FolderShare {
+  id: String
+  user: User
+  group: Group
+  role: FolderRoleEnum
+  is_by_link: Boolean
+  created_at: TimestampScalar
+  updated_at: TimestampScalar
 }
 
-# Guessed name: see #34.
-type Watcher {
-  email: String
-  user_id: String
-  organization_id: Int
-  group_id: Int
-  folder_id: String
+type Share {
+  id: String
+  user: User
+  group: Group
+  role: ShareRoleEnum
+  is_by_link: Boolean
+  created_at: TimestampScalar
+  updated_at: TimestampScalar
 }
-
-type DocumentPagination {
-  data: [Document]
-  total: Int
-  per_page: Int!
-  current_page: Int!
-  last_page: Int
-  from: Int
-  to: Int
-  has_more_pages: Boolean
-}
-
-# Signatures
 
 type Signature {
   public_id: UUID
+  dynamic_ids: [Int]
   name: String
   email: EmailScalar
   delivery_method: DeliveryMethodEnum
   type: SignerTypeEnum
-  created_at: Timestamp
+  email_events: EmailEvent
+  email_history: [EmailEvent]
+  positions: [SignaturePosition]
+  configs: SignatureConfig
+  organization_id: Int
+  group_id: Int
+  created_at: TimestampScalar
+  updated_at: TimestampScalar
+  archived_at: TimestampScalar
   action: Action
   link: Link
-  user: User
-  email_events: EmailEvent
-  positions: [SignaturePosition]
-  verifications: [SecurityVerificationType]
+  certificate: SignedCertificate
   viewed: Event
   signed: Event
   rejected: Event
   signed_unapproved: Event
   biometric_approved: Event
   biometric_rejected: Event
+  fields_filled: Event
+  biometric_auto_rejected: Event
+  biometric_reset: Event
+  user: User
+  user_data: UserData
+  parent: String
+  verifications: [SecurityVerificationType]
+  folder: Folder
+
+  "Autentique's Privacy"
+  organization: Organization
+}
+
+type Watcher {
+  email: EmailScalar
+  user_id: UUID
+  organization_id: Int
+  group_id: Int
+  folder_id: UUID
+}
+
+type LockSignature {
+  name: String
+  email: EmailScalar
+  phone: PhoneScalar
+  delivery_method: String
+  configs: LockSignatureConfig
+  security_verifications: [SecurityVerificationType]
+  action: ActionEnum
+  show_options: Boolean
+  show_sms_verification: Boolean
+  show_security_verifications: Boolean
+  show_cpf_verification: Boolean
+  qualified_signature: Boolean
+}
+
+type LockSignatureConfig {
+  cpf: String
+  cnpj: String
+  prefilled_fields: PrefilledFields
+}
+
+type Subscription {
+  name: String
+  documents: Int!
+  credits: Int
+  credits_bonus: Int
+  bonus: Int!
+  has_premium_features: Boolean!
+  has_corporate_features: Boolean
+  gateway_name: String
+  gateway_id: String
+  plan_id: String
+  first_invoice_due_at: InternationalDateScalar
+  due_day: Int
+  iugu_id: String @deprecated(reason: "Use `gateway_id` field instead.")
+  iugu_plan: String @deprecated(reason: "Use `plan_id` field instead.")
+  created_at: TimestampScalar!
+  ends_at: TimestampScalar
+  bought_at: TimestampScalar
+  expires_at: TimestampScalar
+  renew_at: TimestampScalar
 }
 
 type Action {
-  name: ActionEnum
-}
-
-type Link {
-  id: String!
-  short_link: String
-}
-
-type EmailEvent {
-  sent: String
-  opened: String
-  delivered: String
-  refused: String
-  reason: String
-}
-
-type SignaturePosition {
-  x: String!
-  y: String!
-  z: Int!
-  angle: Float
-  element: PositionElementEnum
-}
-
-type SecurityVerificationType {
-  id: Int
-  type: SecurityVerificationEnum
-  verify_phone: String
-  fallback_behavior: FallbackBehaviorEnum
-  payload: SecurityVerificationPayload
-  user: SecurityVerificationUser
-  verified_at: Timestamp
-  max_attempt: Int
-}
-
-# Guessed name: see #34.
-type SecurityVerificationPayload {
-  url: String
-  reference: String
-}
-
-type SecurityVerificationUser {
-  # An object of image URLs in the documented example, [String] in 2023: see #34.
-  images: JSON
-  confidence: Int
+  name: ActionEnum!
 }
 
 type Event {
+  user: UserData
   ip: String
   port: Int
+  ipv4: String @deprecated(reason: "Use ip intead.")
+  ipv6: String @deprecated(reason: "Use ip intead.")
   reason: String
-  user_agent: String
-  created_at: Timestamp
   geolocation: Geolocation
+  field_values: [String]
+  radio_choice: SignaturePosition
+
+  "Autentique's Privacy"
+  user_agent: String
+
+  created_at: TimestampScalar
 }
 
 type Geolocation {
@@ -306,63 +378,39 @@ type Geolocation {
   longitude: String
 }
 
-# Folders
-
-type Folder {
-  id: UUID!
-  name: String!
-  slug: String
-  path: String
-  type: FolderTypeEnum @deprecated(reason: "Deprecated due to use of context field.")
-  context: ContextEnum!
-  children_counter: Int
-  is_editor: Boolean
-  has_password: Boolean
-  link_identifier: String
-  created_at: Timestamp!
-  updated_at: Timestamp!
-  parentFolder: Folder
-  subfolders: [Folder]
-  shares: [FolderShare]
+type Token {
+  access_token: String!
+  token_type: String!
+  env: String!
+  parent_organization_id: Int
+  parent_organization_name: String
+  created_at: TimestampScalar!
 }
 
-# Guessed name: see #34.
-type FolderShare {
-  id: String
-  role: FolderRoleEnum
-  is_by_link: Boolean
-  user: User
-  group: Group
-}
-
-type FolderPagination {
-  data: [Folder]
-  total: Int
-  per_page: Int!
-  current_page: Int!
-  last_page: Int
-  from: Int
-  to: Int
-  has_more_pages: Boolean
-}
-
-# Email templates
-
-# Guessed name: see #34.
-type EmailTemplatesPagination {
-  data: [EmailTemplates]
-  total: Int
-  per_page: Int
-  current_page: Int
-  last_page: Int
-  has_more_pages: Boolean
-}
-
-type EmailTemplates {
-  id: Int!
+type Setting {
   name: String
-  type: EmailTemplateTypeEnum
   email: EmailTemplate
+  format: String
+  webhook_url: String
+  webhook_format: WebhookFormatEnum
+  signature: String
+  signature_draw: String
+  initials_format: String
+  initials: String
+  initials_draw: String
+  initials_text: String
+  font: String
+  signature_text: String
+  has_signature_appearance: Boolean
+  has_initials_appearance: Boolean
+  developer: Boolean
+}
+
+type Locale {
+  country: String
+  language: String
+  timezone: String
+  date_format: DateFormatEnum
 }
 
 type EmailTemplate {
@@ -373,190 +421,1316 @@ type EmailTemplate {
   colors: [String]
   image: String
   template: String
-  type: EmailTemplateTypeEnum
+  footer: String
 }
 
-# Inputs
-
-input DocumentInput {
-  name: String!
-  message: String
-  reminder: ReminderEnum
-  sortable: Boolean
-  footer: FooterEnum
-  footer_type: FooterTypeEnum
-  refusable: Boolean
-  qualified: Boolean = false
-  scrolling_required: Boolean
-  stop_on_rejected: Boolean
-  new_signature_style: Boolean = false
-  show_audit_page: Boolean = true
-  ignore_cpf: Boolean = false
-  ignore_birthdate: Boolean
-  email_template_id: Int
-  deadline_at: String
-  reply_to: String
-  whatsapp_template: WhatsappTemplateEnum
-  watchers: [String!]
-  cc: [EmailInput]
-  expiration: ExpirationInput
-  configs: DocumentConfigInput
-  locale: LocaleInput
-}
-
-input UpdateDocumentInput {
+type EmailTemplates {
+  id: Int
   name: String
-  message: String
-  reminder: ReminderEnum
-  sortable: Boolean
-  footer: FooterEnum
-  refusable: Boolean
-  stop_on_rejected: Boolean
-  scrolling_required: Boolean
-  new_signature_style: Boolean
-  show_audit_page: Boolean
-  ignore_cpf: Boolean
-  email_template_id: Int
-  deadline_at: String
-  watchers: [String!]
-  cc: [EmailInput]
-  expiration: ExpirationInput
-  configs: DocumentConfigInput
+  type: EmailTemplateTypeEnum
+  email: EmailTemplate @deprecated(reason: "Use attributes referring to the specific language instead.")
+  ptBR: EmailTemplate
+  enUS: EmailTemplate
+  esMX: EmailTemplate
 }
 
-input DocumentConfigInput {
+type DefaultEmailTemplates {
+  ptBR: EmailTemplate
+  enUS: EmailTemplate
+  esMX: EmailTemplate
+}
+
+type Statistic {
+  documents: Int!
+  sent: Int!
+  signatures: Int!
+}
+
+type Link {
+  id: String!
+  short_link: String
+}
+
+type Contact {
+  id: Int
+  name: String
+  email: EmailScalar
+  cpf: String
+  phone: String
+  birthday: String
+}
+
+type Template {
+  id: UUID!
+  user: User!
+  name: String!
+  text: String
+  created_at: TimestampScalar!
+  updated_at: TimestampScalar!
+  attributes: [Attribute]
+}
+
+type DynamicTemplate {
+  id: String
+  user: User!
+  name: String!
+  path: String
+  content: String
+  description: String
+  lang: LanguageEnum
+  theme: DynamicTemplateThemeEnum
+  category: String
+  keywords: [String]
+  is_private: Boolean
+  created_at: TimestampScalar!
+  updated_at: TimestampScalar!
+  variables: [DynamicTemplateVariable]
+  signers: [Signer]
+}
+
+type Attribute {
+  id: UUID!
+  name: String!
+  position: String
+  type: String
+  required: Boolean
+}
+
+type DynamicTemplateVariable {
+  name: String!
+  signer_identifier: String
+  data_signer_id: Int
+  type: String
+  style: Style
+  help_text: String
+  show_help: Boolean
+  required: Boolean
+  regex: String
+}
+
+type Referral {
+  id: String
+  full_name: String
+  email: EmailScalar
+  referral_code: String
+  referral_to: String
+  total_amount: Float
+  is_receiving_payments: Boolean
+  created_at: TimestampScalar
+  affiliates: [Affiliate]
+  referral_configuration: String
+  payment_info: String
+  monthly_amount: String
+  recent_extracts: String
+}
+
+type Affiliate {
+  id: String
+  full_name: String
+  email: EmailScalar
+  referral_code: String
+  referred_to: String
+  is_receiving_payments: Boolean
+  created_at: TimestampScalar
+  referral_configuration: String
+  payment_info: String
+}
+
+type Invoice {
+  id: Int
+  description: String
+  due_date: TimestampScalar
+  price: String
+  currency: String
+  status: String
+  payment_method: String
+  type: InvoiceTypeEnum
+  url_payment: String
+  url_nfse: String
+}
+
+type Author {
+  id: UUID!
+  organization_id: Int
+  name: String
+  email: EmailScalar
+  company: String
+}
+
+type File {
+  original: String
+  signed: String
+  certified: String
+  pades: String
+}
+
+type Hash {
+  md5: String
+  sha1: String
+  sha2: String
+}
+
+type HashToSign {
+  hash: String!
+}
+
+type DataSource {
+  name: String
+  voucher: String
+  birthday: DateScalar
+}
+
+type Escavador {
+  body: String
+}
+
+type Provider {
+  name: String!
+}
+
+type EmailEvent {
+  id: String
+  sent: String
+  opened: String
+  refused: String
+  delivered: String
+  reason: String
+  user: User
+  author: User
+  type: EmailTypeEnum
+}
+
+type SignatureHistory {
+  id: String
+  type: DeliveryMethodEnum
+  sent: String
+  delivered: String
+  opened: String
+  refused: String
+  reason: String
+  email: EmailScalar
+  email_type: EmailTypeEnum
+  phone: PhoneScalar
+  user: PublicUser
+}
+
+type DocumentSignature {
+  document_id: UUID!
+  signature_id: UUID!
+  signature_public_id: UUID!
+  action: Action
+  type: SignerTypeEnum
+}
+
+type SignaturePosition {
+  x: String!
+  y: String!
+  z: Int!
+  angle: Float
+  element: PositionElementEnum
+  scale: Float
+}
+
+type SignatureConfig {
+  overwrite_name: String
+  overwrite_date: DateScalar
+  cpf: String
+  cnpj: String
+  prefilled_fields: PrefilledFields
+  name: String
+  birthdate: InternationalDateScalar
+  session_behavior: SignatureSessionBehaviorEnum
+}
+
+type SignedCertificate {
+  type: SignatureTypesEnum
+  name: String
+
+  "Document number (TAX ID)"
+  document: String
+
+  email: EmailScalar
+
+  "Certificate payload in PEM format."
+  payload: String
+}
+
+type DocumentConfig {
   notification_finished: Boolean
   notification_signed: Boolean
   signature_appearance: SignatureAppearanceEnum
+  reply_to: EmailScalar
   keep_metadata: Boolean
   lock_user_data: Boolean
-  notify_watchers: Boolean
-  pdfa: Boolean
-}
-
-input LocaleInput {
   country: String
   language: String
   timezone: String
   date_format: DateFormatEnum
+  pdfa: PDFAEnum
+  notify_watchers: Boolean
+  require_field_interaction: Boolean
 }
 
-input ExpirationInput {
-  days_before: Int!
-  notify_at: Date!
+type Notification {
+  signature_you: Boolean!
+  signature_others: Boolean!
+  signature_approval: Boolean!
 }
 
-input EmailInput {
-  email: String!
+type SignerHistory {
+  created_at: TimestampScalar
+  user: PublicSignature
+  author: PublicSignature
+  category: SignerHistoryEnum
 }
 
-input SignerInput {
-  email: EmailScalar
+type Invitation {
+  id: Int
+  user: User
+  group: Group
+  permissions: Permission
+}
+
+type EmailType {
+  email: String
+  has_password: Boolean
+  email_verified_at: TimestampScalar
+  created_at: TimestampScalar
+  deleted_at: TimestampScalar
+}
+
+type Social {
+  email: String
+  provider: String
+  provider_id: Int
+  created_at: TimestampScalar
+  deleted_at: TimestampScalar
+}
+
+type Session {
+  ip_address: String
+  user_agent: String
+  created_at: TimestampScalar
+}
+
+type SecurityVerificationExtractedDataType {
+  first_name: String
+  last_name: String
+  cpf: String
+  date_of_birth: DateScalar
+  nationality: String
+  city: String
+}
+
+type SecurityVerificationType {
+  id: Int
+  type: SecurityVerificationEnum
+  verify_phone: String
+  payload: SecurityVerificationPayloadType
+  user: SecurityVerificationUserType
+  verified_at: TimestampScalar
+  max_attempt: Int
+  logs_attempt: ArrayScalar
+  fallback_behavior: FallbackBehaviorEnum
+}
+
+type SecurityVerificationPayloadType {
+  url: String
+  reference: String
+  session_id: String
+  message: String
+  expiry: TimestampScalar
+  failcode: Int
+  code: String
+}
+
+type SecurityVerificationUserType {
+  images: JSONScalar
+  confidence: Float
+  extracted_data: SecurityVerificationExtractedDataType
+  verified: Boolean
+}
+
+type CreditType {
+  value: String
+  cost: Int
+}
+
+type CreditPackType {
   name: String
+  description: String
+  best: Boolean
+  quantity: Int
+  amount: Float
+  amount_promo: Float
+  is_promo: Boolean
+}
+
+type CreditLogType {
+  id: ID!
+  amount: Float!
+  verifications: String
+  user_email: EmailScalar
+  user_phone: String
+  url_nfse: String
+  document_id: UUID
+  created_at: TimestampScalar!
+}
+
+"Result payload for cloud certificate authorization."
+type AuthorizeAppType {
+  redirect_url: String
+  status: Boolean
+}
+
+type UserCloudCert {
+  "The serial number of the certificate"
+  serial_number: String
+
+  "The type of the certificate"
+  type: CloudSignaturesEnum
+}
+
+type UserData {
+  name: String
+  email: EmailScalar
+  phone: String
+  cpf: CPFScalar
+  cnpj: CNPJScalar
+  company: String
+  birthday: DateScalar
+  signature_format: String
+  initials_format: String
+  signature_url: String
+  initials_url: String
+  font: FontEnum
+}
+
+type UserAdditionalConfigs {
+  refusable: Boolean
+  footer: FooterEnum
+  footer_type: FooterTypeEnum
+  reminder: ReminderEnum
+  lock_user_data: Boolean
+  signature_appearance: SignatureAppearanceEnum
+  new_signature_style: Boolean
+  scrolling_required: Boolean
+  show_audit_page: Boolean
+  stop_on_rejected: Boolean
+  days_before: Int
+  email_section: Boolean
+  appearance_section: Boolean
+  reminder_section: Boolean
+  miscellaneous_section: Boolean
+  locale_section: Boolean
+  notify_watchers: Boolean
+}
+
+type Block {
+  id: Int!
+  keyword: String
+  keyword_type: BlockedKeywordTypeEnum
+  reason: String
+  public_reason: String
+  created_at: TimestampScalar
+}
+
+type BlockedUser {
+  id: UUID!
+  name: FullNameScalar
+  email: EmailScalar
+  phone: String
+  cpf: CPFScalar
+  cnpj: CNPJScalar
+  company: String
+  created_at: TimestampScalar!
+  is_blocked: Boolean
+  blocked: Block
+}
+
+"User biometric verification record"
+type UserBiometricValidation {
+  "record ID"
+  id: String!
+
+  "Biometrique operation ID"
+  operation_id: String!
+
+  "Liveness session ID"
+  session_id: String
+
+  "Number of attempts used"
+  tries: Int!
+
+  "Remaining attempts before waiting approval"
+  max_attempts: Int!
+
+  "Verification status"
+  status: UserBiometricValidationStatusEnum!
+
+  "Verification result"
+  result: BiometriqueResultEnum
+
+  "When verification succeeded"
+  verified_at: String
+
+  payload: UserBiometricValidationPayload
+  logs_attempt: ArrayScalar
+
+  "The user who owns this verification"
+  user: BlockedUser
+
+  updated_at: TimestampScalar!
+  created_at: TimestampScalar!
+}
+
+"Payload data for a user biometric verification record"
+type UserBiometricValidationPayload {
+  "Biometrique operation ID"
+  operation_id: String
+
+  "Biometrique operation type"
+  operation_type: String
+
+  "HTTP status from Biometrique"
+  status: Int
+
+  "Document type detected by Biometrique"
+  document_type: String
+
+  "Whether identity was verified"
+  verified: Boolean
+
+  "Confidence score from Biometrique"
+  confidence: Float
+
+  "Error or status code"
+  code: String
+
+  "When operation was created at Biometrique"
+  created_at: String
+
+  "Image URLs stored in the payload"
+  image: UserBiometricValidationPayloadImage
+
+  "Extracted data JSON from document"
+  extracted_data: String
+}
+
+"Image URLs inside a user biometric validation payload"
+type UserBiometricValidationPayloadImage {
+  "Selfie image URL"
+  selfie: String
+
+  "Document front image URL"
+  front: String
+
+  "Document back image URL"
+  back: String
+}
+
+type OrgApiDailyUsage {
+  day: TimestampScalar
+  items: ApiUsageItems
+}
+
+type ApiUsagePricing {
+  pricing: [ApiPricing]
+  usage: [OrgApiDailyUsage]
+}
+
+type ApiPricing {
+  valid_since: TimestampScalar
+  currency: String
+  items: ApiUsageItems
+}
+
+type ApiUsageItems {
+  create_document: Float
+  email: Float
+  sms: Float
+  whatsapp: Float
+  whatsapp_otp: Float
+  documents_query: Float
+  link: Float
+  sign_phone_security_verification: Float
+  webhook: Float
+}
+
+type ApiUsageLimit {
+  alert_threshold: Float
+  max_limit: Float
+}
+
+type Signer {
+  name: String
+  email: EmailScalar
   phone: String
   delivery_method: DeliveryMethodEnum
-  action: ActionEnum!
-  positions: [PositionInput]
-  configs: SignerConfigInput
-  security_verifications: [SecurityVerificationInput]
-  type: SignerTypeEnum = STANDARD
+  positions: [PositionType]
+  action: ActionEnum
+  configs: SignerConfig
+  variable_id: Int
+  security_verifications: [SecurityVerificationType]
 }
 
-# Guessed name: see #34.
-input SignerConfigInput {
-  cpf: String
-  session_behavior: SessionBehaviorEnum
-  prefilled_fields: PrefilledFieldsInput
-}
-
-# Guessed name: see #34.
-input PrefilledFieldsInput {
+type SignerConfig {
   name: String
-  phone: String
-  email: String
-  cpf: String
-  birthdate: String
+  cpf: CPFScalar
+  birthdate: InternationalDateScalar
+  prefilled_fields: PrefilledFields
+}
+
+type PositionType {
+  x: String!
+  y: String!
+  z: Int!
+  angle: Float
+  element: PositionElementEnum
+}
+
+type PrefilledFields {
+  name: String
+  email: EmailScalar
+  phone: PhoneScalar
+  cpf: CPFScalar
+  birthdate: InternationalDateScalar
   country: String
   language: String
 }
 
-input PositionInput {
-  x: String!
-  y: String!
-  z: Int!
-  angle: Float = 0
-  scale: Float
-  element: PositionElementEnum = SIGNATURE
+type BiometriqueSignedUrls {
+  "Signed URL for the selfie image"
+  selfie: URLScalar
+
+  "Signed URL for the front side of the document"
+  front_side: URLScalar
+
+  "Signed URL for the back side of the document"
+  back_side: URLScalar
 }
 
-input SecurityVerificationInput {
-  type: SecurityVerificationEnum!
-  verify_phone: String
-  fallback_behavior: FallbackBehaviorEnum
+type FaceLivenessResult {
+  status: LivenessStatusEnum
+  confidence: Float
 }
 
-input FolderInput {
+type Whitelabel {
+  domain: String
+  sendgrid_domain: String
+  sendgrid_email_user: String
+  is_darkmode: Boolean
+  main_color: String
+  logo: String
+  pdf_logo: String
+  pdf_logo_mini: String
+  og_title: String
+  og_description: String
+  og_image: String
+}
+
+type WhitelabelSendgridDns {
+  valid: Boolean
+  dns: [WhitelabelSendgridDnsRecord]
+}
+
+type WhitelabelSendgridDnsRecord {
+  valid: Boolean
+  type: String
+  host: String
+  data: String
+  reason: String
+}
+
+type WhitelabelSendgrid {
+  whitelabel: Whitelabel
+  sendgrid_dns: WhitelabelSendgridDns
+}
+
+type Style {
+  block: Int
+  bold: Boolean
+  italic: Boolean
+  decoration: String
+}
+
+type AuthType {
+  access_token: String!
+  token_type: String!
+  expires_in: Int!
+}
+
+type PublicUser {
+  id: UUID!
+  name: String
+  email: EmailScalar
+  phone: String
+  email_verified_at: TimestampScalar
+  hp_set: Boolean
+  cpf: CPFScalar
+  company: String
+  birthday: DateScalar
+  escavador: String
+  organization: Organization
+  member: Member
+  created_at: TimestampScalar!
+  auth_methods: [Provider] @deprecated(reason: "Deprecated in this version.")
+  settings: Setting
+  group: Group @deprecated(reason: "Deprecated in this version.")
+}
+
+type PublicSignature {
+  public_id: UUID
+  dynamic_ids: [Int]
+  name: String
+  email: EmailScalar
+  delivery_method: DeliveryMethodEnum
+  type: SignerTypeEnum
+  email_events: EmailEvent
+  email_history: [EmailEvent]
+  signature_history: [SignatureHistory]
+  positions: [SignaturePosition]
+  configs: SignatureConfig
+  created_at: TimestampScalar
+  updated_at: TimestampScalar
+  archived_at: TimestampScalar
+  certificate: SignedCertificate
+  viewed: Event
+  signed: Event
+  fields_filled: Event
+  rejected: Event
+  signed_unapproved: Event
+  biometric_approved: Event
+  biometric_rejected: Event
+  biometric_auto_rejected: Event
+  biometric_reset: Event
+  parent: String
+  action: Action
+  document: PublicDocument!
+  user: PublicUser
+  user_data: UserData
+  verifications: [SecurityVerificationType]
+}
+
+type PublicDocument {
+  id: UUID!
   name: String!
+  refusable: Boolean
+  stop_on_rejected: Boolean
+  qualified: Boolean
+  ignore_cpf: Boolean
+  ignore_birthdate: Boolean
+  sortable: Boolean
+  is_blocked: Boolean
+  is_dynamic_document: Boolean
+  sandbox: Boolean
+  scrolling_required: Boolean
+  signers_history: [SignerHistory]
+  created_at: TimestampScalar!
+  deadline_at: TimestampScalar
+  lifecycle_in: TimestampScalar
+  email_template_id: Int
+  updated_at: TimestampScalar!
+  expiration_at: TimestampScalar
+  notify_in: Int
+  reminder: ReminderEnum
+  footer: FooterEnum
+  footer_type: FooterTypeEnum
+  configs: DocumentConfig
+  is_from_api: Boolean
+  signatures: [PublicSignature]
+  author: Author!
+  files: File
+  hashes: Hash
+  new_signature_style: Boolean
+  show_audit_page: Boolean
+  locale: Locale
 }
 
-input ShareFolderInput {
+type PublicFolder {
+  id: UUID!
+  name: String!
+  link_identifier: String
+  has_password: Boolean
+  is_allowed_user: Boolean
+}
+
+type Plan {
+  id: String
+  name: String
+  amount: Int
+  api_credit_threshold: Int
+  extra_features_price: Int
+  extra_features_installments: Int
+  document_amount: Int
+  credit_amount: Int
+  interval: Int
+  active: Boolean
+  interval_type: IntervalTypeEnum
+  currency: String
+  stripe_id: String
+  iugu_id: String
+}
+
+type Customer {
+  id: Int
+  name: String
+  email: EmailScalar
+  cpf: CPFScalar
+  cnpj: CNPJScalar
+  country: String
+  state: String
+  city: String
+  zip_code: String
+  number: String
+  street: String
+  district: String
+  complement: String
+  ibge_code: String
+  stripe_id: String
+  iugu_id: String
+  created_at: TimestampScalar
+  updated_at: TimestampScalar
+  deleted_at: TimestampScalar
+}
+
+type Order {
+  plan_id: String
+  plan_name: String
+  price: Int
+  active: Boolean
+  suspended: Boolean
+  payment_method: PaymentMethodsEnum
+  card_data: CardData
+  subitems: [OrderSubItem]
+  latest_invoice: Invoice
+  coupon: Coupon
+  coupon_phase_id: Int
+  coupon_discount_percentage: Float
+  cycled_at: TimestampScalar
+  expires_at: TimestampScalar
+  gateway: PaymentGatewayEnum
+}
+
+type OrderSubItem {
+  price: Int
+  quantity: Int
+  description: String
+}
+
+type CardData {
+  last_digits: String
+  month: Int
+  year: Int
+}
+
+type Coupon {
+  name: String
+  amount_off: Int
+  percent_off: Float
+}
+
+type WebhookEndpoint {
+  id: String
+  has_authorization_token: Boolean
+  url: String
+  name: String
+  active: Boolean
+  blocked: Boolean
+  type: WebhookEndpointTypeEnum
+  format: WebhookFormatEnum
+  organization: Organization
+  folder: Folder
+  events: [WebhookEventTypeEnum]
+  block_at: TimestampScalar
+  updated_at: TimestampScalar
+  created_at: TimestampScalar
+  successful_attempts: Int
+  failed_attempts: Int
+  success_rate: Float
+  requires_static_ip: Boolean
+}
+
+type CreateEndpointResponse {
+  secret: String!
+  webhook_endpoint: WebhookEndpoint
+}
+
+type WebhookEvent {
+  name: String!
+  enum_key: String!
+}
+
+type WebhookEventGroup {
+  object: WebhookEndpointTypeEnum!
+  events: [WebhookEvent]
+}
+
+type FailedWebhook {
+  id: String
+  webhook_id: String
+  payload: JSONScalar
+  response_body: JSONScalar
+  status_code: String
+  reason: String
+  ip: String
+  error_class: String
+  error_message: String
+  attempts: Int
+  resolved_at: TimestampScalar
+  failed_at: TimestampScalar
+  next_attempt_at: TimestampScalar
+  ttl: TimestampScalar
+  webhook_endpoint: WebhookEndpoint
+}
+
+type IuguPlan {
+  id: String!
+  name: String
+  price: String
+  documents: Int
+  hidden: Boolean
+  interval: String
+  identifier: String
+}
+
+type IuguOrder {
+  active: Boolean
+  suspended: Boolean
+  cycled_at: TimestampScalar
+  expires_at: TimestampScalar
+  payable_with: IuguPaymentEnum
+  plan_identifier: String
+  plan_name: String
+  price_cents: Int
+  recent_invoices: JSONScalar
+  subitems: [JSONScalar]
+}
+
+type IuguCustomer {
+  id: String
   email: String
-  group_id: String
-  role: FolderRoleEnum
+  name: String
+  created_at: TimestampScalar
+  updated_at: TimestampScalar
+  cc_emails: String
+  cpf_cnpj: String
+  zip_code: String
+  number: String
+  complement: String
+  phone: String
+  phone_prefix: String
+  city: String
+  state: String
+  district: String
+  street: String
+  default_payment: IuguCard
 }
 
-input OrderBy {
-  field: String!
-  direction: OrderByEnum!
+type IuguInvoice {
+  id: String
+  due_date: String
+  status: String
+  total: String
+  total_paid: String
+  total_cents: Int
+  total_paid_cents: Int
+  paid_at: TimestampScalar
+  payable_with: IuguPaymentEnum
+  secure_url: String
+  created_at: TimestampScalar
+  updated_at: TimestampScalar
 }
 
-# Enums
+type IuguCard {
+  id: String
+  description: String
+  item_type: String
+  customer_id: String
+  data: IuguCardData
+}
+
+type IuguCardData {
+  brand: String
+  holder_name: String
+  display_number: String
+  bin: String
+  year: Int
+  month: Int
+  last_digits: String
+  first_digits: String
+  masked_number: String
+}
+
+type IuguCharge {
+  id: String
+  url: String
+  pdf: String
+  method: String
+  bank_slip: IuguChargeBankSlip
+  credit_card: IuguChargeCreditCard
+  pix: IuguChargePix
+  errors: String
+}
+
+type IuguChargeBankSlip {
+  digitable_line: String
+  barcode_data: String
+  barcode: String
+  status: String
+  bank_slip_bank: Int
+  bank_slip_error_code: String
+  bank_slip_error_message: String
+}
+
+type IuguChargeCreditCard {
+  success: Boolean
+  brand: String
+  bin: String
+  message: String
+  status: String
+  info_message: String
+}
+
+type IuguChargePix {
+  qrcode: String
+  qrcode_text: String
+  status: String
+  payer_name: String
+  payer_cpf_cnpj: Int
+}
+
+type SpamIncident {
+  id: Int
+  user: User
+  action: SpamIncidentActionEnum
+  signers_today: Int
+  created_at: TimestampScalar
+}
+
+type ParentOrganization {
+  id: Int
+  name: String
+}
+
+type OrganizationUsageReport {
+  documents: Int
+  credits: Int
+}
+
+type EnterpriseChildOrganization {
+  id: Int!
+  uuid: String
+  name: String
+  cnpj: CNPJScalar
+  plan: PipefyPlansEnum!
+  default_email_templates_ids: [Int]
+  settings: Setting
+  groups: [Group]
+  created_at: TimestampScalar
+}
+
+type EnterpriseMember {
+  id: Int!
+  user: User
+  group: Group
+  permissions: Permission
+  api_token: Token
+  created_at: TimestampScalar
+}
+
+type CorporateChildOrganization {
+  id: Int!
+  uuid: String
+  name: String
+  cnpj: CNPJScalar
+  type: OrganizationTypeEnum
+  default_email_templates_ids: [Int]
+  settings: Setting
+  groups: [Group]
+  subscription: CorporateChildSubscription
+  created_at: TimestampScalar
+}
+
+type CorporateChildOrganizationsFeatures {
+  organization_id: Int!
+  subscription: CorporateChildSubscription
+}
+
+type CorporateChildSubscription {
+  plan_id: Int
+  name: String
+  documents: Int!
+  bonus: Int!
+  credits: Int
+  credits_bonus: Int
+  has_premium_features: Boolean!
+  created_at: TimestampScalar!
+  ends_at: TimestampScalar
+  bought_at: TimestampScalar
+  expires_at: TimestampScalar
+  renew_at: TimestampScalar
+}
+
+type CorporateMember {
+  id: Int!
+  user: User
+  group: Group
+  permissions: Permission
+  api_token: Token
+  created_at: TimestampScalar
+}
+
+type CorporatePlan {
+  id: String
+  display_name: String
+  document_amount: Int
+  credit_amount: Int
+  credits_recurrence_method: CreditsRecurrenceEnum
+  interval: Int
+  interval_type: IntervalTypeEnum
+  tier: TierEnum
+}
+
+type CorporateOrganizationPlan {
+  organization: Organization
+  plan: Plan
+  subscription: Subscription
+  extra_groups: ExtraGroupsConfig
+  api_child_organizations: ChildOrganizationsConfig
+  application_child_organizations: ChildOrganizationsConfig
+  customer: Customer
+  api_usage: ApiUsageConfig
+  enable_whitelabel: Boolean
+  enable_sub_orgs: Boolean
+}
+
+type TOTP {
+  secret: String!
+  qr_code: String!
+}
+
+type AuthenticationResult {
+  access_token: String!
+  token_type: String!
+  expires_in: Int!
+  mfa: [MfaEnum]!
+}
+
+type VerifyBiometricAuthCombinedType {
+  authentication: AuthenticationResult
+  security_verification: SecurityVerificationType
+}
+
+type ExtraGroupsConfig {
+  price: Int
+  free_count: Int
+}
+
+type ChildOrganizationsConfig {
+  price: Int
+  free_count: Int
+}
+
+type ApiUsageConfig {
+  is_active: Boolean
+  prices: ApiUsageItems
+}
+
+type CampsoftISP {
+  identifier: Int
+  name: String
+}
+
+type OAuthToken {
+  id: String!
+  client_id: String!
+  client_name: String!
+  client_icon_url: String
+  created_at: TimestampScalar!
+  expires_at: TimestampScalar
+  granted_scopes: [String!]!
+}
+
+type OAuthClient {
+  id: String!
+  name: String!
+  description: String
+  icon_url: String
+  redirect_uris: [URLScalar!]!
+  scopes: [String!]!
+  client_secret: String
+  created_at: TimestampScalar
+}
+
+type OAuthScope {
+  id: String!
+  description: String!
+}
+
+type CouponPhase {
+  phase: Int!
+  duration_months: Int!
+  discount_percentage: Int!
+  referrer_commission: Int!
+  earned_value: Int!
+}
+
+type ReferralAffiliate {
+  id: UUID!
+  name: String!
+  referred_by: String
+  total_earned: Float!
+  plan_name: String
+  hired_at: TimestampScalar
+  code: String
+}
+
+type ReferralCoupon {
+  id: Int!
+  name: String!
+  code: String!
+  is_active: Boolean!
+  earned_value: Float!
+  created_at: TimestampScalar
+  phases: [CouponPhase]!
+}
+
+type ReferralExtract {
+  amount: Int!
+  currency: CurrencyEnum!
+  created_at: TimestampScalar!
+}
+
+type ReferralMetrics {
+  from: DateScalar
+  to: DateScalar
+  total_by_coupon: JSONScalar
+  total_by_link: JSONScalar
+  series: JSONScalar
+}
+
+type ReferralSummary {
+  referral_code: String
+  total_earned: JSONScalar
+  available: JSONScalar
+  monthly_average: JSONScalar
+  currencies: [CurrencyEnum!]!
+  has_multi_currency: Boolean!
+}
+
+type Storage {
+  path: String!
+  pdfa: PDFAEnum
+  size: Int
+}
+
+type IdentityDocumentUpload {
+  success: Boolean!
+  size: Int!
+}
+
+type ConfigTemplate {
+  id: String
+  name: String
+  configs: DocumentAdditionalConfigs
+  allow_customization: Boolean
+  shares: [Share]
+  created_at: TimestampScalar
+  updated_at: TimestampScalar
+}
+
+type DocumentAdditionalConfigs {
+  refusable: Boolean
+  footer: FooterEnum
+  footer_type: FooterTypeEnum
+  reminder: ReminderEnum
+  lock_user_data: Boolean
+  signature_appearance: SignatureAppearanceEnum
+  new_signature_style: Boolean
+  scrolling_required: Boolean
+  show_audit_page: Boolean
+  stop_on_rejected: Boolean
+  days_before: Int
+  email_section: Boolean
+  appearance_section: Boolean
+  reminder_section: Boolean
+  miscellaneous_section: Boolean
+  locale_section: Boolean
+  notify_watchers: Boolean
+  notification_signed: Boolean
+  notification_finished: Boolean
+  email_template: Int
+  whatsapp_template: WhatsappTemplateEnum
+  locked_signers: [LockSignature]
+  locked_cc: [EmailScalar]
+  locked_reply_to: EmailScalar
+  locked_watchers: [EmailScalar]
+  folder: Folder
+  ignore_cpf: Boolean
+  locale: Locale
+  ignore_birthdate: Boolean
+  ordered_signatures: Boolean
+  signature_type: DocumentSignatureTypeEnum
+  qualified_signature: Boolean
+  require_field_interaction: Boolean
+}
+
+union AcceptSignatureUnion = HashToSign | Signature
+
+union VerifyBiometricAuthUnion = AuthenticationResult | SecurityVerificationType | VerifyBiometricAuthCombinedType
+
+scalar UUID
+
+scalar DateScalar
+
+scalar TimestampScalar
+
+scalar FullNameScalar
+
+scalar EmailScalar
+
+scalar PhoneScalar
+
+scalar CPFScalar
+
+"CNPJ is represented as a string type in the format 00.000.000/0000-00"
+scalar CNPJScalar
+
+scalar JSONScalar
+
+scalar ArrayScalar
+
+scalar URLScalar
+
+"A SQID (Short Query ID) is a string with the format \"AAA_0123456789\""
+scalar SQIDScalar
+
+scalar InternationalDateScalar
+
+"6 digit code in string format"
+scalar OTPScalar
 
 enum ActionEnum {
   SIGN
   APPROVE
   RECOGNIZE
+  SIGN_AS_PART @deprecated(reason: "Sign as part has been deprecated.")
   SIGN_AS_A_WITNESS
+  SIGN_AS_INTERVENER @deprecated(reason: "Sign as intervener has been deprecated.")
   ACKNOWLEDGE_RECEIPT
   ENDORSE_IN_BLACK
   ENDORSE_IN_WHITE
-  SIGN_AS_PART @deprecated(reason: "Sign as part has been deprecated.")
-  SIGN_AS_INTERVENER @deprecated(reason: "Sign as intervener has been deprecated.")
-}
-
-enum DeliveryMethodEnum {
-  DELIVERY_METHOD_EMAIL
-  DELIVERY_METHOD_LINK
-  DELIVERY_METHOD_SMS
-  DELIVERY_METHOD_WHATSAPP
-}
-
-enum SecurityVerificationEnum {
-  SMS
-  MANUAL
-  UPLOAD
-  LIVE
-  PF_FACIAL
-  BIOMETRIC_AND_TEXT_EXTRACTION
-  LIVENESS_AND_TEXT_EXTRACTION
-}
-
-# Guessed name: see #34.
-enum FallbackBehaviorEnum {
-  DISABLE_FALLBACK
-}
-
-enum PositionElementEnum {
-  SIGNATURE
-  NAME
-  INITIALS
-  DATE
-  CPF
 }
 
 enum ReminderEnum {
   DAILY
   WEEKLY
+}
+
+enum OrderByEnum {
+  ASC
+  DESC
 }
 
 enum FooterEnum {
@@ -565,18 +1739,82 @@ enum FooterEnum {
   RIGHT
 }
 
-# Guessed name: see #34.
 enum FooterTypeEnum {
+  "STANDARD"
   STANDARD
+
+  "MINI"
   MINI
 }
 
-# Guessed name: see #34.
-enum WhatsappTemplateEnum {
-  STANDARD
-  FORMAL
-  CASUAL
-  DIRECT
+enum RoleEnum {
+  ADMIN
+  USER
+}
+
+enum TypeEnum {
+  LINK
+  SIGNATURE
+}
+
+enum FolderTypeEnum {
+  DEFAULT
+  ORGANIZATION
+  GROUP
+}
+
+enum ContextEnum {
+  USER
+  ORGANIZATION
+  GROUP
+}
+
+enum DocumentStatusEnum {
+  PENDING
+  SIGNED
+  NOT_SIGNED
+  DELETED
+  REJECTED
+}
+
+enum IuguPaymentEnum {
+  CREDIT_CARD
+  BANK_SLIP
+  PIX
+  ALL
+}
+
+enum PositionElementEnum {
+  SIGNATURE
+  NAME
+  INITIALS
+  DATE
+  CPF
+  RADIO
+  SQUARE_INITIALS
+}
+
+enum FontEnum {
+  AUTOGRAF
+  FATHUR
+  ROBERTSON
+}
+
+enum DataSourceEnum {
+  CPF
+  CNPJ
+}
+
+enum EmailTypeEnum {
+  SOLICITATION
+  REMINDER
+  RESEND
+}
+
+enum SignerHistoryEnum {
+  CREATE
+  DELETE
+  GENERATE_LINK
 }
 
 enum SignatureAppearanceEnum {
@@ -586,38 +1824,147 @@ enum SignatureAppearanceEnum {
   IMAGE
 }
 
-enum DocumentTypeEnum {
-  DEFAULT
-  WHATSAPP_FLOW
+enum DocumentReportColumnEnum {
+  NAME
+  CREATED_AT
+  EXPIRATION_AT
+  SIGNATURES
+  STATUS
+  SHA
+  AUTHOR
+  LINK
+  SIGNER_NAME
+  SIGNER_EMAIL
+  SIGNER_PHONE
+  SIGNER_CPF
 }
 
-enum DocumentStatusEnum {
+enum EmailTemplateTypeEnum {
+  SOLICITATION
+  COMPLETED
+  SIGNATURE_COMPLETED
+}
+
+enum PadesActionEnum {
+  START
+  COMPLETE
+}
+
+enum SignatureTypesEnum {
+  A1
+  A3
+  SAFEID
+  VIDAAS
+  BIRDID
+  DSCLOUD
+}
+
+enum SignatureSessionBehaviorEnum {
+  "KEEP_SESSION"
+  KEEP_SESSION
+
+  "EPHEMERAL_SESSION"
+  EPHEMERAL_SESSION
+}
+
+enum SecurityVerificationEnum {
+  SMS
+  UPLOAD
+  LIVE
+  PF_FACIAL
+  PF_FACIAL_MATCH
+  MANUAL
+  BIOMETRIC_AND_TEXT_EXTRACTION
+  LIVENESS_AND_TEXT_EXTRACTION
+}
+
+enum UserBiometricValidationStatusEnum {
+  "DRAFT"
+  DRAFT
+
+  "PROCESSING"
+  PROCESSING
+
+  "COMPLETED"
+  COMPLETED
+
+  "FAILED"
+  FAILED
+
+  "WAITING_APPROVAL"
+  WAITING_APPROVAL
+
+  "APPROVED"
+  APPROVED
+
+  "REJECTED"
+  REJECTED
+}
+
+enum BiometriqueResultEnum {
+  "SUCCESS"
+  SUCCESS
+
+  "FAILED"
+  FAILED
+
+  "QUEUED"
+  QUEUED
+}
+
+enum SecurityVerificationFileTypeEnum {
+  SELFIE
+  FRONT
+  BACK
+}
+
+enum BiometricProvidersEnum {
+  "ID_ANALYZER"
+  ID_ANALYZER
+
+  "BIOMETRIQUE"
+  BIOMETRIQUE
+
+  "DATAVALID"
+  DATAVALID
+}
+
+enum FallbackBehaviorEnum {
+  "DISABLE_FALLBACK"
+  DISABLE_FALLBACK
+}
+
+enum DeliveryMethodEnum {
+  DELIVERY_METHOD_EMAIL
+  DELIVERY_METHOD_LINK
+  DELIVERY_METHOD_SMS
+  DELIVERY_METHOD_WHATSAPP
+}
+
+enum CloudSignaturesEnum {
+  SAFEID
+  VIDAAS
+  BIRDID
+  DSCLOUD
+}
+
+enum PaymentMethodsEnum {
+  CREDIT_CARD
+  BOLETO
+  PIX
+  ALL
+}
+
+enum SpamIncidentActionEnum {
   PENDING
-  SIGNED
-  NOT_SIGNED
-  DELETED
+  IGNORE
+  ALLOW_ALL
+  BLOCK_USER
 }
 
-enum ContextEnum {
-  USER
-  ORGANIZATION
-  GROUP
-}
-
-enum FolderTypeEnum {
-  DEFAULT
-  ORGANIZATION
-  GROUP
-}
-
-enum FolderRoleEnum {
-  VIEWER
-  EDITOR
-}
-
-enum OrderByEnum {
-  ASC
-  DESC
+enum WebhookFormatEnum {
+  URLENCODED
+  JSON
 }
 
 enum DateFormatEnum {
@@ -625,18 +1972,1016 @@ enum DateFormatEnum {
   MM_DD_YYYY
 }
 
-enum SignerTypeEnum {
+enum WebhookEventTypeEnum {
+  DOCUMENT_CREATED
+  DOCUMENT_UPDATED
+  DOCUMENT_DELETED
+  DOCUMENT_FINISHED
+  SIGNATURE_CREATED
+  SIGNATURE_UPDATED
+  SIGNATURE_DELETED
+  SIGNATURE_VIEWED
+  SIGNATURE_ACCEPTED
+  SIGNATURE_REJECTED
+  SIGNATURE_BIOMETRIC_APPROVED
+  SIGNATURE_BIOMETRIC_UNAPPROVED
+  SIGNATURE_BIOMETRIC_REJECTED
+  SIGNATURE_DELIVERY_FAILED
+  SIGNATURE_BIOMETRIC_RESET
+  MEMBER_CREATED
+  MEMBER_DELETED
+}
+
+enum WebhookEndpointTypeEnum {
+  DOCUMENT
+  SIGNATURE
+  MEMBER
+}
+
+enum PipefyPlansEnum {
+  FREE
+  UNLIMITED
+}
+
+enum CustomPlansEnum {
+  FREE
+  PROFESSIONAL
+}
+
+enum WhatsappTemplateEnum {
   STANDARD
+  FORMAL
+  CASUAL
+  DIRECT
+}
+
+enum MfaEnum {
+  totp
+}
+
+"The type of document being created"
+enum DocumentTypeEnum {
+  "Standard document type"
+  DEFAULT
+
+  "WhatsApp flow document type that requires .md files"
+  WHATSAPP_FLOW
+}
+
+enum BiometricModelEnum {
+  "AWS_FACE_REKOGNITION"
+  AWS_FACE_REKOGNITION
+}
+
+enum LLMModelEnum {
+  "GEMINI_2_5_FLASH"
+  GEMINI_2_5_FLASH
+
+  "GEMINI_2_5_FLASH_LITE"
+  GEMINI_2_5_FLASH_LITE
+}
+
+enum OCREngineEnum {
+  "DOCUMENT_AI"
+  DOCUMENT_AI
+}
+
+enum LivenessStatusEnum {
+  "CREATED"
+  CREATED
+
+  "IN_PROGRESS"
+  IN_PROGRESS
+
+  "SUCCEEDED"
+  SUCCEEDED
+
+  "FAILED"
+  FAILED
+
+  "EXPIRED"
+  EXPIRED
+}
+
+enum DocumentSignatureTypeEnum {
+  ADVANCED
+  QUALIFIED
+  UNLOCKED
+}
+
+enum IntervalTypeEnum {
+  "DAY"
+  DAY
+
+  "WEEK"
+  WEEK
+
+  "MONTH"
+  MONTH
+
+  "YEAR"
+  YEAR
+}
+
+enum TierEnum {
+  "FREE"
+  FREE
+
+  "PROFESSIONAL"
+  PROFESSIONAL
+}
+
+enum CreditsRecurrenceEnum {
+  "DETACHED"
+  DETACHED
+
+  "OVERRIDE"
+  OVERRIDE
+}
+
+enum PDFAEnum {
+  "V_1A"
+  V_1A
+
+  "V_1B"
+  V_1B
+
+  "V_2A"
+  V_2A
+
+  "V_2B"
+  V_2B
+
+  "V_2U"
+  V_2U
+
+  "V_3A"
+  V_3A
+
+  "V_3B"
+  V_3B
+
+  "V_3U"
+  V_3U
+}
+
+enum CurrencyEnum {
+  "BRL"
+  BRL
+
+  "USD"
+  USD
+}
+
+enum LanguageEnum {
+  "PT_BR"
+  PT_BR
+
+  "EN_US"
+  EN_US
+
+  "ES_MX"
+  ES_MX
+}
+
+enum DynamicTemplateThemeEnum {
+  "CLASSIC"
+  CLASSIC
+
+  "MIXED"
+  MIXED
+
+  "MODERN"
+  MODERN
+}
+
+enum OrganizationTypeEnum {
+  "API_ONLY"
+  API_ONLY
+}
+
+enum InvoiceTypeEnum {
+  "SUBSCRIPTION"
+  SUBSCRIPTION
+
+  "CREDITS"
+  CREDITS
+
+  "API"
+  API
+
+  "CORPORATE"
+  CORPORATE
+}
+
+enum PaymentGatewayEnum {
+  IUGU
+  STRIPE
+}
+
+enum SignerTypeEnum {
+  "STANDARD"
+  STANDARD
+
+  "QUALIFIED"
   QUALIFIED
 }
 
-# Guessed name: see #34.
-enum SessionBehaviorEnum {
-  EPHEMERAL_SESSION
-  KEEP_SESSION
+enum BlockedKeywordTypeEnum {
+  "COMPANY"
+  COMPANY
+
+  "COMPANY_OVERWRITE"
+  COMPANY_OVERWRITE
+
+  "CNPJ"
+  CNPJ
+
+  "CPF"
+  CPF
+
+  "EMAIL"
+  EMAIL
+
+  "EMAIL_DOMAIN"
+  EMAIL_DOMAIN
+
+  "NAME"
+  NAME
+
+  "PHONE"
+  PHONE
+
+  "DISPOSABLE_DOMAIN"
+  DISPOSABLE_DOMAIN
+
+  "FRAUD_DETECTION"
+  FRAUD_DETECTION
 }
 
-enum EmailTemplateTypeEnum {
-  SOLICITATION
-  COMPLETED
+enum FolderRoleEnum {
+  "EDITOR"
+  EDITOR
+
+  "VIEWER"
+  VIEWER
 }
+
+enum ShareRoleEnum {
+  "EDITOR"
+  EDITOR
+
+  "VIEWER"
+  VIEWER
+}
+
+input DocumentInput {
+  name: String!
+  message: String
+  refusable: Boolean
+  ignore_cpf: Boolean = false
+  ignore_birthdate: Boolean = false
+  stop_on_rejected: Boolean
+  qualified: Boolean = false
+  sortable: Boolean
+  scrolling_required: Boolean
+  reminder: ReminderEnum
+  new_signature_style: Boolean = false
+  show_audit_page: Boolean = true
+
+  "Your datetime should be in ISO-8601 format"
+  deadline_at: String
+  email_template_id: Int
+  whatsapp_template: WhatsappTemplateEnum
+  expiration: ExpirationInput
+  footer: FooterEnum
+  footer_type: FooterTypeEnum
+  cc: [EmailInput]
+  reply_to: EmailScalar
+  locale: LocaleInput
+  configs: DocumentConfigInput
+
+  "An array of emails to set as watchers to the document"
+  watchers: [String!]
+}
+
+input SignerInput {
+  name: String
+  email: EmailScalar
+  phone: String
+  delivery_method: DeliveryMethodEnum
+  positions: [PositionInput]
+  action: ActionEnum!
+  type: SignerTypeEnum = STANDARD
+  configs: SignerConfigInput
+  variable_id: Int
+  security_verifications: [SecurityVerificationInput]
+}
+
+input SignerFieldsInput {
+  public_id: UUID!
+  field_values: [String]!
+}
+
+input SignerConfigInput {
+  name: FullNameScalar
+  cpf: String
+  cnpj: CNPJScalar
+  birthdate: InternationalDateScalar
+  prefilled_fields: PrefilledFieldsInput
+  session_behavior: SignatureSessionBehaviorEnum
+}
+
+input FolderInput {
+  name: String!
+}
+
+input TokenInput {
+  name: String!
+}
+
+input EmailInput {
+  "inputs.Email.fields.name"
+  email: String!
+}
+
+input PositionInput {
+  x: String!
+  y: String!
+  z: Int!
+  angle: Float = 0
+  element: PositionElementEnum = SIGNATURE
+  scale: Float = 1
+}
+
+input ExpirationInput {
+  days_before: Int!
+  notify_at: DateScalar!
+}
+
+input OrderBy {
+  field: String!
+  direction: OrderByEnum!
+}
+
+input OrganizationInput {
+  name: String
+  cnpj: CNPJScalar
+  locale: LocaleInput
+}
+
+input GroupInput {
+  name: String
+  overwrite_template_group: Boolean
+  overwrite_template: Boolean
+}
+
+input EmailTemplatesInput {
+  name: String
+  type: EmailTemplateTypeEnum = SOLICITATION
+  ptBR: EmailTemplatesContentInput
+  enUS: EmailTemplatesContentInput
+  esMX: EmailTemplatesContentInput
+}
+
+input EmailTemplatesContentInput {
+  title: String
+  text: String
+  subject: String
+  sender: String
+  colors: [String]
+  template: String
+  image: Upload
+  footer: String
+}
+
+input PermissionInput {
+  overwrite_permissions: Boolean
+  create_documents: Boolean
+  sign_documents: Boolean
+  delete_documents: Boolean
+  archive_documents: Boolean
+  view_documents_gr: Boolean
+  view_folders_gr: Boolean
+  actions_folders_gr: Boolean
+  actions_documents_gr: Boolean
+  actions_templates_gr: Boolean
+  actions_members_oz: Boolean
+  actions_groups_oz: Boolean
+  actions_webhooks_oz: Boolean
+  actions_applications_oz: Boolean
+  view_documents_oz: Boolean
+  view_member_documents_oz: Boolean
+  view_group_documents_oz: Boolean
+  view_folders_oz: Boolean
+  view_member_folders_oz: Boolean
+  view_group_folders_oz: Boolean
+  actions_documents_oz: Boolean
+  view_invoices_oz: Boolean
+  change_plan_oz: Boolean
+  actions_folders_oz: Boolean
+  change_appearances_oz: Boolean
+  validate_biometry: Boolean
+}
+
+input UserInput {
+  name: FullNameScalar
+  email: EmailScalar
+  password: String
+  cpf: String
+  birthday: String
+  organization: OrganizationInput
+}
+
+input TemplateInput {
+  id: UUID
+  name: String!
+  text: String!
+}
+
+input DynamicTemplateInput {
+  id: SQIDScalar
+  name: String!
+  content: String!
+  description: String
+  lang: LanguageEnum
+  theme: DynamicTemplateThemeEnum
+  keywords: [String]
+  category: String
+  is_private: Boolean
+}
+
+input AttributeInput {
+  id: UUID
+  name: String!
+  position: Int!
+  type: String!
+  required: Boolean!
+}
+
+input DynamicTemplateVariableInput {
+  name: String!
+  data_signer_id: Int
+  type: String!
+  required: Boolean!
+  show_help: Boolean
+  help_text: String
+  style: StyleInput
+  regex: String
+}
+
+input MemberInput {
+  email: EmailScalar
+  group_id: Int
+  permissions: PermissionInput
+}
+
+input UpdateDocumentInput {
+  name: String
+  message: String
+  refusable: Boolean
+  ignore_cpf: Boolean = false
+  ignore_birthdate: Boolean = false
+  stop_on_rejected: Boolean
+  sortable: Boolean
+  scrolling_required: Boolean
+  reminder: ReminderEnum
+  new_signature_style: Boolean = false
+  show_audit_page: Boolean
+  expiration: ExpirationInput
+  footer: FooterEnum
+  footer_type: FooterTypeEnum
+  cc: [EmailInput]
+  locale: UpdateDocumentLocaleInput
+  configs: DocumentConfigInput
+
+  "Your datetime should be in ISO-8601 format"
+  deadline_at: String
+  email_template_id: Int
+  whatsapp_template: WhatsappTemplateEnum
+
+  "An array of emails to set as watchers to the document"
+  watchers: [String]
+}
+
+input ApiOptionsInput {
+  webhook_url: String
+  webhook_format: WebhookFormatEnum! = URLENCODED
+}
+
+input SignatureInput {
+  email: EmailScalar
+  positions: [PositionInput]
+  configs: SignatureConfigInput
+}
+
+input LockSignerInput {
+  name: String
+  email: EmailScalar
+  phone: PhoneScalar
+  delivery_method: String
+  configs: SignerConfigInput
+  security_verifications: [SecurityVerificationInput]
+  action: ActionEnum
+  show_options: Boolean
+  show_sms_verification: Boolean
+  show_security_verifications: Boolean
+  show_cpf_verification: Boolean
+  qualified_signature: Boolean
+}
+
+input SignatureConfigInput {
+  overwrite_name: String
+  overwrite_date: String
+  session_behavior: SignatureSessionBehaviorEnum
+}
+
+input StyleInput {
+  block: Int
+  bold: Boolean
+  italic: Boolean
+  decoration: String
+}
+
+input DocumentConfigInput {
+  notification_finished: Boolean = false
+  notification_signed: Boolean = true
+  signature_appearance: SignatureAppearanceEnum = null
+  pdfa: Boolean = false
+  keep_metadata: Boolean = false
+  lock_user_data: Boolean = false
+  notify_watchers: Boolean = false
+  require_field_interaction: Boolean = false
+}
+
+input NotificationInput {
+  signature_you: Boolean!
+  signature_others: Boolean!
+  signature_approval: Boolean!
+}
+
+input PasswordInput {
+  current: String
+  new: String
+  new_confirmation: String
+}
+
+input UserDetailInput {
+  email: EmailScalar!
+  password: String!
+}
+
+input UserSignatureInput {
+  format: String!
+  file_image: Upload
+  file_draw: Upload
+  font: FontEnum! = AUTOGRAF
+  text: String
+}
+
+input GroupStyleInput {
+  company: String
+  cnpj: CNPJScalar
+  overwrite_email: Boolean
+  email_templates_ids: [Int]
+  overwrite_name: Boolean
+  config_template_id: String
+}
+
+input SecurityVerificationInput {
+  type: SecurityVerificationEnum
+  verify_phone: PhoneScalar
+  fallback_behavior: FallbackBehaviorEnum
+  max_attempts: Int
+}
+
+input ContactInput {
+  id: Int
+  name: FullNameScalar
+  email: EmailScalar
+  cpf: String = null
+  phone: PhoneScalar = null
+
+  "Your datetime should be in ISO-8601 format"
+  birthday: String = null
+}
+
+input LocaleInput {
+  country: String
+  language: String
+  timezone: String
+  date_format: DateFormatEnum
+}
+
+input UpdateDocumentLocaleInput {
+  timezone: String
+  date_format: DateFormatEnum
+}
+
+input FormInput {
+  field_id: String
+  name: String
+  required: Boolean = false
+}
+
+input PrefilledFieldsInput {
+  name: String
+  email: EmailScalar
+  phone: PhoneScalar
+  cpf: CPFScalar
+  birthdate: InternationalDateScalar
+  country: String
+  language: String
+}
+
+input BiometriqueConfigsInput {
+  biometric_model: BiometricModelEnum
+  llm_model: LLMModelEnum
+  ocr_engine: OCREngineEnum
+}
+
+input OAuthClientInput {
+  name: String
+  description: String
+  icon: Upload
+  redirect_uris: [URLScalar!]
+  scopes: [String!]
+}
+
+input UserAdditionalConfigsInput {
+  refusable: Boolean
+  footer: FooterEnum
+  footer_type: FooterTypeEnum
+  reminder: ReminderEnum
+  lock_user_data: Boolean
+  signature_appearance: SignatureAppearanceEnum
+  new_signature_style: Boolean
+  scrolling_required: Boolean
+  show_audit_page: Boolean
+  stop_on_rejected: Boolean
+  days_before: Int
+  email_section: Boolean
+  appearance_section: Boolean
+  reminder_section: Boolean
+  miscellaneous_section: Boolean
+  locale_section: Boolean
+  notify_watchers: Boolean
+}
+
+input MemberConfigsInput {
+  email_template: Int
+  whatsapp_template: WhatsappTemplateEnum
+  locked_signers: [LockSignerInput!]
+  notification_signed: Boolean
+  notification_finished: Boolean
+  locale: LocaleInput
+  ignore_cpf: Boolean
+  folder_id: String
+  ignore_birthdate: Boolean
+  locked_cc: [EmailScalar]
+  locked_reply_to: EmailScalar
+  locked_watchers: [EmailScalar]
+  ordered_signatures: Boolean
+  signature_type: DocumentSignatureTypeEnum
+}
+
+input WhitelabelAppearanceInput {
+  main_color: String
+  is_darkmode: Boolean
+  logo: Upload
+  pdf_logo: Upload
+  pdf_logo_mini: Upload
+}
+
+input WhitelabelSendgridInput {
+  sendgrid_domain: String
+  sendgrid_email_user: String
+}
+
+input WhitelabelOpengraphInput {
+  og_title: String
+  og_description: String
+  og_image: URLScalar
+}
+
+input IuguOrderInput {
+  plan: String!
+  payable: IuguPaymentEnum!
+}
+
+input IuguCardInput {
+  set_as_default: Boolean!
+  token: String!
+  description: String!
+}
+
+input CustomerInput {
+  name: String
+  email: EmailScalar
+  cpf: CPFScalar
+  cnpj: CNPJScalar
+}
+
+input AddressInput {
+  country: String
+  state: String
+  city: String
+  zip_code: String
+  number: String
+  street: String
+  district: String
+  complement: String
+  ibge_code: String
+}
+
+input ChildOrganizationInput {
+  name: String
+  cnpj: CNPJScalar
+  locale: LocaleInput
+  default_email_templates_ids: [Int]
+}
+
+input EnterpriseMemberInput {
+  name: FullNameScalar
+  email: EmailScalar
+  birthday: String
+  cpf: String
+  cnpj: CNPJScalar
+  company: String
+  group_id: Int
+  permissions: PermissionInput
+  locale: LocaleInput
+}
+
+input CorporateMemberInput {
+  name: FullNameScalar
+  email: EmailScalar
+  birthday: InternationalDateScalar
+  cpf: CPFScalar
+  cnpj: CNPJScalar
+  company: String
+  group_id: Int
+  permissions: PermissionInput
+  locale: LocaleInput
+}
+
+input SubscriptionPlanInput {
+  display_name: String
+  document_amount: Int
+  credit_amount: Int
+  interval: Int = 1
+  interval_type: IntervalTypeEnum = MONTH
+  tier: TierEnum = FREE
+  credits_recurrence_method: CreditsRecurrenceEnum = DETACHED
+}
+
+input APIPricesInput {
+  create_document: Float
+  email: Float
+  sms: Float
+  whatsapp: Float
+  whatsapp_otp: Float
+  documents_query: Float
+  link: Float
+  sign_phone_security_verification: Float
+  webhook: Float
+}
+
+input ApiUsageConfigInput {
+  is_active: Boolean = true
+  prices: APIPricesInput
+}
+
+input ChildOrganizationsConfigInput {
+  price: Int
+  free_count: Int
+}
+
+input ExtraGroupsConfigInput {
+  price: Int = 1990
+  free_count: Int
+}
+
+input ConfigTemplateInput {
+  name: String
+  configs: DocumentAdditionalConfigsInput
+  allow_customization: Boolean
+}
+
+input DocumentAdditionalConfigsInput {
+  refusable: Boolean
+  footer: FooterEnum
+  footer_type: FooterTypeEnum
+  reminder: ReminderEnum
+  lock_user_data: Boolean
+  signature_appearance: SignatureAppearanceEnum
+  new_signature_style: Boolean
+  scrolling_required: Boolean
+  show_audit_page: Boolean
+  stop_on_rejected: Boolean
+  days_before: Int
+  email_section: Boolean
+  appearance_section: Boolean
+  reminder_section: Boolean
+  miscellaneous_section: Boolean
+  locale_section: Boolean
+  notify_watchers: Boolean
+  email_template: Int
+  whatsapp_template: WhatsappTemplateEnum
+  locked_signers: [LockSignerInput!]
+  notification_signed: Boolean
+  notification_finished: Boolean
+  locale: LocaleInput
+  ignore_cpf: Boolean
+  folder_id: String
+  ignore_birthdate: Boolean
+  locked_cc: [EmailScalar]
+  locked_reply_to: EmailScalar
+  locked_watchers: [EmailScalar]
+  ordered_signatures: Boolean
+  signature_type: DocumentSignatureTypeEnum
+  qualified_signature: Boolean
+  require_field_interaction: Boolean
+}
+
+input ShareFolderInput {
+  email: EmailScalar
+  group_id: Int
+  role: FolderRoleEnum! = VIEWER
+}
+
+input ShareInput {
+  email: EmailScalar
+  group_id: Int
+  role: ShareRoleEnum! = VIEWER
+}
+
+input CouponPhaseInput {
+  phase: Int
+  duration_months: Int
+  discount_percentage: Int
+  referrer_commission: Int
+}
+
+"""
+The `Upload` special type represents a file to be uploaded in the same HTTP request as specified by
+ [graphql-multipart-request-spec](https://github.com/jaydenseric/graphql-multipart-request-spec).
+"""
+scalar Upload
+
+type AdminPermission {
+  permissionName: String!
+  enabled: Boolean!
+  requires: [String!]!
+}
+
+type AdminPermissionUser {
+  id: UUID!
+  name: String
+  email: String
+}
+
+type GroupPagination {
+  "List of Groups on the current page"
+  data: [Group]
+
+  "Number of total Groups selected by the query"
+  total: Int
+
+  "Number of Groups returned per page"
+  per_page: Int!
+
+  "Current page of the cursor"
+  current_page: Int!
+
+  "Last page of Groups"
+  last_page: Int
+
+  "Number of the first Groups returned"
+  from: Int
+
+  "Number of the last Group returned"
+  to: Int
+
+  "Determines if cursor has more pages after the current page"
+  has_more_pages: Boolean!
+}
+
+type DocumentPagination {
+  "List of Documents on the current page"
+  data: [Document]
+
+  "Number of total Documents selected by the query"
+  total: Int
+
+  "Number of Documents returned per page"
+  per_page: Int!
+
+  "Current page of the cursor"
+  current_page: Int!
+
+  "Last page of Documents"
+  last_page: Int
+
+  "Number of the first Documents returned"
+  from: Int
+
+  "Number of the last Document returned"
+  to: Int
+
+  "Determines if cursor has more pages after the current page"
+  has_more_pages: Boolean!
+}
+
+type EmailTemplatesPagination {
+  "List of EmailTemplates on the current page"
+  data: [EmailTemplates]
+
+  "Number of total EmailTemplates selected by the query"
+  total: Int
+
+  "Number of EmailTemplates returned per page"
+  per_page: Int!
+
+  "Current page of the cursor"
+  current_page: Int!
+
+  "Last page of EmailTemplates"
+  last_page: Int
+
+  "Number of the first EmailTemplates returned"
+  from: Int
+
+  "Number of the last EmailTemplates returned"
+  to: Int
+
+  "Determines if cursor has more pages after the current page"
+  has_more_pages: Boolean!
+}
+
+type FolderPagination {
+  "List of Folders on the current page"
+  data: [Folder]
+
+  "Number of total Folders selected by the query"
+  total: Int
+
+  "Number of Folders returned per page"
+  per_page: Int!
+
+  "Current page of the cursor"
+  current_page: Int!
+
+  "Last page of Folders"
+  last_page: Int
+
+  "Number of the first Folders returned"
+  from: Int
+
+  "Number of the last Folder returned"
+  to: Int
+
+  "Determines if cursor has more pages after the current page"
+  has_more_pages: Boolean!
+}
+
+type Query {
+  me: User
+  organization: Organization
+  organizations: [Organization]
+  organizationGroups(organization_id: Int = null, limit: Int! = 10, page: Int! = 1, search: String = null): GroupPagination
+  document(id: UUID, public_id: UUID): Document
+  documents(member_id: UUID = null, folder_id: UUID = null, group_uuid: String = null, context: ContextEnum = USER, status: DocumentStatusEnum = null, limit: Int! = 60, page: Int! = 1, name: String = null, signer: String = null, search: String, start_date: String = null, end_date: String = null, include_deleted: Boolean = null, include_archived: Boolean = null, orderBy: OrderBy, showSandbox: Boolean = null, onlySandbox: Boolean, organization_id: Int = null): DocumentPagination
+  documentsByFolder(member_id: UUID = null, folder_id: UUID = null, group_uuid: String = null, context: ContextEnum = USER, status: DocumentStatusEnum = null, limit: Int! = 60, page: Int! = 1, name: String = null, signer: String = null, search: String, start_date: String = null, end_date: String = null, include_deleted: Boolean = null, include_archived: Boolean = null, orderBy: OrderBy, showSandbox: Boolean = null, onlySandbox: Boolean, organization_id: Int = null): DocumentPagination
+  emailTemplates(limit: Int = 10, page: Int = 1, search: String = "", orderBy: OrderBy = null, type: EmailTemplateTypeEnum = null): EmailTemplatesPagination
+  folder(id: UUID!): Folder
+  folders(display_children: Boolean! = true, limit: Int!, page: Int!, type: FolderTypeEnum, search: String, orderBy: OrderBy): FolderPagination
+  folderFromDocument(id: UUID!): Folder
+}
+
+type Mutation {
+  createDocument(document: DocumentInput!, signers: [SignerInput!]!, file: Upload!, sandbox: Boolean = false, organization_id: Int, folder_id: UUID = null, type: DocumentTypeEnum = DEFAULT): Document
+  updateDocument(id: UUID!, document: UpdateDocumentInput!): Document
+  deleteDocument(id: UUID!, member_id: String = null, group_uuid: String, context: ContextEnum = ORGANIZATION, folder_id: UUID = null): Boolean
+  moveDocumentToFolder(document_id: UUID!, folder_id: UUID = null, current_folder_id: UUID = null, context: ContextEnum = ORGANIZATION): Boolean
+  moveDocumentsToFolder(documents_ids: [UUID!]!, folder_id: UUID = null, current_folder_id: UUID = null, context: ContextEnum = ORGANIZATION): Boolean
+  moveDocumentToRoot(document_id: UUID!, folder_id: UUID!): Boolean @deprecated(reason: "Use mutation moveDocumentToFolder with (folder_id: null) to do the same as this mutation.")
+  transferDocument(id: UUID!, organization_id: Int!, group_id: Int!, current_group_id: Int = null, context: ContextEnum = USER): Boolean
+  signDocument(id: UUID!, organization_id: Int = null): Boolean
+  createSigner(document_id: UUID!, signer: SignerInput!): Signature
+  deleteSigner(public_id: UUID!, document_id: UUID!): Boolean
+  createFolder(parent_id: UUID = null, folder: FolderInput!): Folder
+  updateFolder(id: UUID!, folder: FolderInput!): Folder
+  deleteFolder(id: UUID!): Boolean
+  moveFolder(source_folder_id: UUID!, target_folder_id: UUID): Boolean
+  shareFolder(folder_id: String!, shares: [ShareFolderInput], email_message: String): Folder
+  removeFolderSharing(folder_id: String!, sharing_id: String!): Boolean
+  updateSharing(folder_id: String!, sharing_id: String = null, role: FolderRoleEnum = null, share_by_link: Boolean = null, password: String = null, remove_password: Boolean = null): Folder
+  approveBiometric(verification_id: Int, public_id: UUID): Signature
+  rejectBiometric(verification_id: Int, public_id: UUID, reason: String = null): Signature
+  rejectDocument(id: UUID!, organization_id: Int = null, reason: String = null): Boolean
+  resendSignatures(public_ids: [UUID]): Boolean
+  resetBiometricAttempts(security_verification_id: Int!, max_attempt: Int = 3): SecurityVerificationType
+  createLinkToSignature(public_id: UUID!): Link
+}
+

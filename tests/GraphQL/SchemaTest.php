@@ -19,9 +19,9 @@ require_once __DIR__ . '/../Support/schema.php';
  * request is the thing that finds a mismatch
  * (docs/decisions/0003-operations-live-in-graphql-files.md).
  *
- * The schema is tests/Resources/schema.graphql. Until #34 replaces it with a
- * real introspection, it is assembled from the documentation, and its header
- * says so.
+ * The standard schema, tests/Resources/schema.graphql, is introspected from the
+ * live API; the Corporate one is assembled from the documentation, and its
+ * header says why.
  */
 
 /**
@@ -68,7 +68,7 @@ function mirroredEnums(): array
         Enums\PositionElement::class => 'PositionElementEnum',
         Enums\Reminder::class => 'ReminderEnum',
         Enums\SignatureAppearance::class => 'SignatureAppearanceEnum',
-        Enums\SessionBehavior::class => 'SessionBehaviorEnum',
+        Enums\SessionBehavior::class => 'SignatureSessionBehaviorEnum',
         Enums\SignerType::class => 'SignerTypeEnum',
         Enums\VerificationType::class => 'SecurityVerificationEnum',
         Enums\WhatsappTemplate::class => 'WhatsappTemplateEnum',
@@ -280,22 +280,18 @@ it('lists every enum that mirrors the API', function () {
     expect(array_values($unmapped))->toBe([]);
 });
 
-it('names every webhook event the Corporate endpoint registers, and knows the two it does not', function () {
-    $type = endpointSchema(Endpoint::Corporate)->getType('WebhookEventTypeEnum');
+it('names every webhook event as the schema does', function () {
+    foreach ([Endpoint::Standard, Endpoint::Corporate] as $endpoint) {
+        $type = endpointSchema($endpoint)->getType('WebhookEventTypeEnum');
 
-    expect($type)->toBeInstanceOf(EnumType::class);
+        expect($type)->toBeInstanceOf(EnumType::class);
 
-    /** @var EnumType $type */
-    $registrable = array_map(fn($value): string => $value->name, $type->getValues());
+        /** @var EnumType $type */
+        $registrable = array_map(fn($value): string => $value->name, $type->getValues());
 
-    $names = array_values(array_filter(
-        array_map(fn(Enums\WebhookEventType $event): ?string => $event->endpointName(), Enums\WebhookEventType::cases()),
-        fn(?string $name): bool => $name !== null,
-    ));
-
-    expect($names)->toEqualCanonicalizing($registrable)
-        ->and(Enums\WebhookEventType::SignatureBiometricReset->endpointName())->toBeNull()
-        ->and(Enums\WebhookEventType::SignatureDeliveryFailed->endpointName())->toBeNull();
+        expect(array_map(fn(Enums\WebhookEventType $event): string => $event->endpointName(), Enums\WebhookEventType::cases()))
+            ->toEqualCanonicalizing($registrable);
+    }
 });
 
 it('prints an introspection back into the schema it came from', function () {

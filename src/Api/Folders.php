@@ -69,20 +69,18 @@ final readonly class Folders
     }
 
     /**
-     * Creates a folder, inside `$parentId` when given, or shared with the
-     * organization or a group when `$type` says so.
+     * Creates a folder, inside `$parentId` when given.
      *
      * @throws InvalidInput
      * @throws AutentiqueException
      */
-    public function create(string $name, ?string $parentId = null, ?FolderType $type = null): Folder
+    public function create(string $name, ?string $parentId = null): Folder
     {
         $this->guardName($name);
 
         return $this->folder(Operation::CreateFolder, array_filter([
             'folder' => ['name' => $name],
             'parent_id' => $parentId,
-            'type' => $type?->value,
         ], fn(mixed $value): bool => $value !== null));
     }
 
@@ -206,14 +204,19 @@ final readonly class Folders
             'status' => $status?->value,
             'search' => $search,
             'orderBy' => $orderBy === null ? null : ['field' => $orderBy, 'direction' => $direction->value],
-            'showSandbox' => $onlySandbox ? null : ($sandbox ? true : null),
+            // `onlySandbox` alone is ignored by the API, and beside
+            // `showSandbox` it filters nothing (measured on 2026-09-21), so the
+            // sandbox documents are asked for and the page is filtered here.
+            'showSandbox' => $onlySandbox || $sandbox ? true : null,
             'onlySandbox' => $onlySandbox ? true : null,
         ], fn(mixed $value): bool => $value !== null)));
 
-        return Page::fromPayload(
+        $page = Page::fromPayload(
             $data->object(Operation::DocumentsByFolder->field()) ?? Payload::of([]),
             Document::fromPayload(...),
         );
+
+        return $onlySandbox ? $page->filter(fn(Document $document): bool => $document->sandbox === true) : $page;
     }
 
     /**

@@ -7,10 +7,11 @@ procedure.
 The files, the enum naming them and the loader shipped with #7, and the check
 against the schema with #9.
 
-**The committed schema is assembled, not introspected**, until #34 replaces it:
-the documentation never names some of the types its examples select, and
-introspection needs a token this repository does not hold. The schema's header
-says so, and #34 lists every name in it that is a guess.
+The standard schema, `tests/Resources/schema.graphql`, is **introspected** from
+the live API (2026-09-21), with `tests/Resources/introspection.json` beside it.
+The Corporate one is still assembled from the documentation: its endpoint
+answers `no_enterprise_access` to an account without the Corporate plan, and its
+header says so.
 
 ## Where things live
 
@@ -81,8 +82,8 @@ new one cannot skip the comparison.
 `tests/GraphQL/SchemaTest.php`:
 
 - every operation validates against the schema of its endpoint:
-  `tests/Resources/schema.graphql` for the standard one,
-  `tests/Resources/schema-corporate.graphql` for Corporate, both assembled;
+  `tests/Resources/schema.graphql` for the standard one, introspected, and
+  `tests/Resources/schema-corporate.graphql` for Corporate, assembled;
 - the check fails on an unknown field and on a variable of the wrong type;
 - every GraphQL example in Autentique's own collections, the two Postman ones
   and the one its Altair build embeds, validates against the standard schema
@@ -115,6 +116,9 @@ AUTENTIQUE_TOKEN=… vendor/bin/testbench autentique:schema --output=tests/Resou
 composer schema:print
 composer test
 ```
+
+`testbench.yaml` registers the package's provider, so `vendor/bin/testbench` runs
+its commands. The token stays in the environment of that one command.
 
 `autentique:schema` writes the introspection as JSON, and needs no development
 dependency, so it ships ([the command](../guide/commands.md)).

@@ -51,9 +51,9 @@ it('lists folders with their subfolders by default', function () {
 it('creates a folder, inside another when asked', function () {
     answerWith(Operation::CreateFolder, 'folder');
 
-    Autentique::folders()->create('Signed contracts', parentId: 'parent-1', type: FolderType::Group);
+    Autentique::folders()->create('Signed contracts', parentId: 'parent-1');
 
-    expect(sentVariables())->toBe(['folder' => ['name' => 'Signed contracts'], 'parent_id' => 'parent-1', 'type' => 'GROUP']);
+    expect(sentVariables())->toBe(['folder' => ['name' => 'Signed contracts'], 'parent_id' => 'parent-1']);
 });
 
 it('renames a folder', function () {
@@ -128,13 +128,14 @@ it('changes sharing: a role, the link, its password', function (Closure $call, a
 ]);
 
 it('lists the documents in a folder', function () {
-    answerValue(Operation::DocumentsByFolder, ['has_more_pages' => false, 'data' => [responseFixture('objects/document')]]);
+    answerValue(Operation::DocumentsByFolder, ['has_more_pages' => false, 'data' => [responseFixture('objects/document'), [...responseFixture('objects/document'), 'sandbox' => false]]]);
 
     $page = Autentique::folders()->documents('f1', status: DocumentStatus::Signed, onlySandbox: true);
 
     expect($page->items[0])->toBeInstanceOf(Document::class)
+        ->and($page->items)->toHaveCount(1)
         ->and(sentOperation())->toBe('documentsByFolder')
-        ->and(sentVariables())->toBe(['folder_id' => 'f1', 'limit' => 20, 'page' => 1, 'status' => 'SIGNED', 'onlySandbox' => true]);
+        ->and(sentVariables())->toBe(['folder_id' => 'f1', 'limit' => 20, 'page' => 1, 'status' => 'SIGNED', 'showSandbox' => true, 'onlySandbox' => true]);
 });
 
 it('includes sandbox documents in a folder when the configuration makes them the default', function () {

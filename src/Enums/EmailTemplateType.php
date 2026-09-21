@@ -14,4 +14,7 @@ enum EmailTemplateType: string
 
     /** The notice that everyone has signed. */
     case Completed = 'COMPLETED';
+
+    /** The notice a signer receives after signing. */
+    case SignatureCompleted = 'SIGNATURE_COMPLETED';
 }

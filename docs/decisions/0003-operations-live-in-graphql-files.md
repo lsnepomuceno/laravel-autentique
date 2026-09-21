@@ -89,8 +89,17 @@ record did not foresee. Introspection needs a token, and a repository that must
 never hold one cannot introspect in CI or anywhere else on its own. The schema
 was built from the documentation and a partial 2023 dump, and eleven type names
 in it are guesses. The validation is real against that schema, and exactly as
-good as the schema is: #34 replaces it with an introspection run by the
+good as the schema is: #34 replaced it with an introspection run by the
 maintainer.
+
+**The introspection, on 2026-09-21, found two defects in 27 operations**, which
+the assembled schema had hidden: `createFolder` no longer takes `type`, and
+five enums had values the documentation never mentions (`DocumentStatus`,
+`EmailTemplateType`, `PositionElement`, `VerificationType`, and the webhook
+events registrable on an endpoint). Nine of the eleven guessed type names were
+right. Each defect failed `composer test` the moment the real schema was
+committed, which is the case this record was written for. The Corporate schema
+stays assembled: the endpoint needs the Corporate plan to answer.
 
 **Introspection is itself an operation file**, `queries/introspection.graphql`,
 so `autentique:schema` obeys the same rule as everything else: no GraphQL
