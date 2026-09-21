@@ -4,9 +4,13 @@ How an operation is added to the package, or changed. The reasoning is in
 [0003](../decisions/0003-operations-live-in-graphql-files.md); this page is the
 procedure.
 
-The files, the enum naming them and the loader shipped with #7. The check
-against the schema is built by #9, and until it lands step 3 below is the
-specification it is built against.
+The files, the enum naming them and the loader shipped with #7, and the check
+against the schema with #9.
+
+**The committed schema is assembled, not introspected**, until #34 replaces it:
+the documentation never names some of the types its examples select, and
+introspection needs a token this repository does not hold. The schema's header
+says so, and #34 lists every name in it that is a guess.
 
 ## Where things live
 
@@ -39,9 +43,12 @@ src/Resources/graphql/
    whose value is the file's path without the extension. Whether it is a query
    or a mutation, which endpoint it targets and the field its answer arrives
    under all follow from that path.
-3. **Validate it against the schema.** The suite parses and validates every file
-   against the committed SDL, so a misspelled field or a wrong argument type
-   fails `composer test`.
+3. **Validate it against the schema.** `tests/GraphQL/SchemaTest.php` parses and
+   validates every file against `tests/Resources/schema.graphql` with
+   `webonyx/graphql-php`, a development dependency only, so a misspelled field
+   or a wrong argument type fails `composer test`. If the API has something the
+   committed schema lacks, refresh the schema first (below); never edit it to
+   make an operation pass.
 4. **Model the answer.** Every field the file selects becomes a typed property
    of a value object ([0008](../decisions/0008-responses-are-typed-value-objects.md)).
    A field selected and not modelled is a field nobody can read.
@@ -50,6 +57,14 @@ src/Resources/graphql/
    sent as well as the object returned.
 6. **Document it** in the guide page for its area, and in
    [the public API](public-api.md).
+
+## Enums
+
+A package enum that mirrors an API enum (`ActionEnum`, `DeliveryMethodEnum`, …)
+is listed in `mirroredEnums()` in `tests/GraphQL/SchemaTest.php`, and the suite
+compares their values: every non deprecated value of the schema's enum, and
+nothing else. An enum in `src/Enums` that is not listed fails the suite, so a
+new one cannot skip the comparison.
 
 ## What the suite checks today
 
@@ -61,6 +76,13 @@ src/Resources/graphql/
 - no argument in any file is a literal, only a variable;
 - the loader appends each fragment once, recursively, fails on a fragment no
   file defines, leaves inline fragments alone, and reads each file once.
+
+`tests/GraphQL/SchemaTest.php`:
+
+- every operation validates against the schema of its endpoint;
+- the check fails on an unknown field and on a variable of the wrong type;
+- every mirrored enum has exactly the schema's non deprecated values;
+- an introspection prints back into a schema the operations validate against.
 
 ## Changing an operation
 
@@ -79,5 +101,19 @@ deliberately, not by CI:
 - when an operation fails against the API while passing against the committed
   schema.
 
+```bash
+AUTENTIQUE_TOKEN=… vendor/bin/testbench autentique:schema --output=tests/Resources/introspection.json
+composer schema:print
+composer test
+```
+
+`autentique:schema` writes the introspection as JSON, and needs no development
+dependency, so it ships ([the command](../guide/commands.md)).
+`composer schema:print` turns that JSON into `tests/Resources/schema.graphql`
+with `webonyx/graphql-php`, and stamps the date in its header. Commit both.
+
 A refresh that makes an operation invalid fails the suite, which is the point:
 the change is seen here before a consumer's request fails.
+
+`.graphqlconfig` points an IDE's GraphQL support at the same schema, so the
+operation files are completed and checked as they are written.

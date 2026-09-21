@@ -67,7 +67,8 @@ it('knows how each operation travels', function () {
         ->and(Operation::CreateDocument->uploadsAFile())->toBeTrue()
         ->and(Operation::CreateSigner->uploadsAFile())->toBeFalse()
         ->and(Operation::Documents->endpoint())->toBe(Endpoint::Standard)
-        ->and(Operation::Documents->field())->toBe('documents');
+        ->and(Operation::Documents->field())->toBe('documents')
+        ->and(Operation::Introspection->field())->toBe('__schema');
 });
 
 it('appends the fragments an operation spreads, recursively, each once', function () {

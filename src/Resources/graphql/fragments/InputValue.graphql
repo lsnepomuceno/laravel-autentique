@@ -1,0 +1,8 @@
+fragment InputValue on __InputValue {
+  name
+  description
+  type {
+    ...TypeRef
+  }
+  defaultValue
+}
