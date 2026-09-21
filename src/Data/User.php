@@ -26,6 +26,11 @@ final readonly class User
         public ?CarbonImmutable $birthday,
         public ?Subscription $subscription,
         public ?Organization $organization,
+        /**
+         * The user's group in their organization. Read here because Autentique
+         * answers an organization's own `groups` with null.
+         */
+        public ?Group $group = null,
     ) {}
 
     /**
@@ -34,6 +39,7 @@ final readonly class User
     public static function fromPayload(Payload $payload): self
     {
         $subscription = $payload->object('subscription');
+        $group = $payload->object('member.group');
         $organization = $payload->object('organization');
 
         return new self(
@@ -46,6 +52,7 @@ final readonly class User
             birthday: $payload->date('birthday'),
             subscription: $subscription === null ? null : Subscription::fromPayload($subscription),
             organization: $organization === null ? null : Organization::fromPayload($organization),
+            group: $group === null || ! $group->has('id') ? null : Group::fromPayload($group),
         );
     }
 }

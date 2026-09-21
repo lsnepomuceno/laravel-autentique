@@ -18,6 +18,9 @@
         "uuid": "91155c91-a411-4d93-b2a4-92e37548256b",
         "name": "Autentique",
         "cnpj": "29.423.653/0001-65"
+      },
+      "member": {
+        "group": { "id": 7, "uuid": "g-7", "name": "Administrador" }
       }
     }
   }

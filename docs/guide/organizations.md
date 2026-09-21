@@ -16,8 +16,15 @@ foreach (Autentique::organizations()->list() as $organization) {
 The organization's `$id` is an integer; its `$uuid` is a string. Operations take
 the integer.
 
-Groups are read through their organization. The API documents no way to create,
-change or remove them.
+**Autentique answers an organization's `groups` with null**, measured against the
+live API, although the dashboard lists them; `$organization->groups` is then
+empty. The token owner's own group arrives through the account instead:
+
+```php
+Autentique::account()->me()->group?->name;   // 'Administrador'
+```
+
+The API documents no way to create, change or remove groups.
 
 ## Email templates
 

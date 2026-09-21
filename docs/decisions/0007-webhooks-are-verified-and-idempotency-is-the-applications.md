@@ -85,3 +85,12 @@ Three details the record did not settle:
   so typing them would have been a second, drifting copy of guesses.
 - **A signed body that is not an event answers 400**, so a misrouted request is
   distinguishable from a forged one.
+
+**Checked against real deliveries on 2026-09-21.** An endpoint registered in the
+dashboard received four events from a sandbox document; every one verified with
+the endpoint's secret, went through the middleware and the controller, and was
+dispatched with the right type, document id and previous attributes, while the
+same body with one byte changed answered 401. The live API sends the flat shape,
+the resource at `event.data`, which settles which of the documentation's two
+examples is current; both are still read. One delivery is kept, with its
+personal data replaced, as `tests/Resources/responses/webhooks/live-document-finished.json`.
