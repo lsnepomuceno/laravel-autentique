@@ -211,6 +211,26 @@ is a scalar ([invariant 4](invariants.md)).
 Adding a key is a minor release. Removing or renaming one is a major release,
 because an application's published config file keeps the old name.
 
+## Experimental
+
+Promised by nothing above until it has run against Autentique itself:
+
+- `Api\Corporate`, the operations under `src/Resources/graphql/corporate/`, and
+  the value objects, inputs and enums only it uses;
+- `Api\OAuth`, `Data\Authorization`, `Data\OAuthTokens`, `Enums\OAuthScope`,
+  and how `Exceptions\InsufficientScope` is recognised.
+
+The Corporate endpoint needs an account on the Corporate plan, and OAuth a
+registered application; the maintainer's account had neither for 1.0.0, so the
+Corporate schema is still assembled from the documentation. The first run
+against the standard endpoint changed a signature and five enums, and the same
+may happen here. **Until that run, these change in a minor release**, recorded
+in the changelog and in `UPGRADE.md`, and this section shrinks as each is
+verified ([#48](https://github.com/lsnepomuceno/laravel-autentique/issues/48)).
+
+`Autentique::corporate()`, `Autentique::oauth()` and `Autentique::withToken()`
+themselves are stable.
+
 ## What is not public
 
 - The private methods of the manager and the provider.

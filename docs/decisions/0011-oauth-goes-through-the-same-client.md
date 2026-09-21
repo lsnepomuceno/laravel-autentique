@@ -70,3 +70,8 @@ The verifier is 96 characters from `Str::random()`, inside RFC 7636's 43 to 128,
 and the challenge is checked against the RFC's own example. The fake answers the
 token endpoint too, so an application's OAuth flow is testable without
 Autentique.
+
+**Experimental in 1.0.0.** No OAuth application was registered for the release,
+so the flow, and the capitalised `Unauthorized` that tells `InsufficientScope`
+apart, have not run against Autentique. It stays outside the semantic versioning
+promise until they have ([public API](../spec/public-api.md#experimental)).

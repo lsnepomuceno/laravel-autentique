@@ -1,5 +1,11 @@
 # Corporate
 
+::: warning Experimental
+The Corporate area has not yet run against Autentique itself, and until it has it may change
+in a minor release. [The public API](/spec/public-api#experimental) says what
+that covers.
+:::
+
 The Corporate plan extends the API with a second endpoint, for accounts that
 manage organizations of their own: child organizations, their members, their
 plans, their webhook endpoints and what their use of the API costs. The package

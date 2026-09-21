@@ -62,3 +62,8 @@ foresee. The Corporate enum of registrable events lacks two events the webhook
 table documents, and an endpoint listening to one kind of resource ignores the
 others' events. Both are refused with `InvalidInput`, so an endpoint is never
 created listening to less than it was asked to.
+
+**Experimental in 1.0.0.** The maintainer's account answers the Corporate
+endpoint with `no_enterprise_access`, so its schema is still assembled and none
+of it has run against Autentique. It stays outside the semantic versioning
+promise until it has ([public API](../spec/public-api.md#experimental)).

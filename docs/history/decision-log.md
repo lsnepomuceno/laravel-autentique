@@ -31,7 +31,7 @@ when the work was started on it.
 
 | # | Question | Needed by |
 |---|---|---|
-| 7 | A sandbox token to introspect the schema once, run by the maintainer so it never leaves the machine | #34. #9 shipped against a schema assembled from the documentation in the meantime |
+| 7 | A sandbox token to introspect the schema once, run by the maintainer so it never leaves the machine | Answered for the standard endpoint on 2026-09-21 (#34); the Corporate one still needs the Corporate plan |
 
 ## Superseded during the work
 
@@ -44,4 +44,4 @@ when the work was started on it.
 | # | Question | Decision |
 |---|---|---|
 | 8 | Tag 1.0.0 with the schemas assembled and no run against Autentique? | **No: `1.0.0-rc.1`.** A stable major promises its API, and eleven type names and one exception's trigger rest on the documentation's spelling. Everything else on #19's checklist was done; the rest needs a token and the maintainer's Packagist account, and is #48 |
-
+| 9 | Tag 1.0.0 with Corporate and OAuth never run against Autentique? | **Yes, with both experimental.** The standard endpoint ran against the live API and its schema is introspected; the Corporate plan and an OAuth application were not available. Holding the whole package back for two areas few applications use would cost more than excluding them from the semantic versioning promise until they run ([public API](../spec/public-api.md#experimental)) |

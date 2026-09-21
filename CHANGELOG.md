@@ -11,10 +11,17 @@ a minor release; changing it is a major one.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [1.0.0] - 2026-09-21
 
-What the first run against the live API found, on 2026-09-21, with the standard
-schema now introspected rather than assembled.
+The first stable release. Against `1.0.0-rc.1`, it carries what the first run
+against the live API found, with the standard schema now introspected rather
+than assembled.
+
+**Corporate and OAuth are experimental.** Neither has run against Autentique:
+the Corporate endpoint needs the Corporate plan, and OAuth a registered
+application. `Api\Corporate`, `Api\OAuth` and what only they use are outside the
+semantic versioning promise until they have, and may change in a minor release
+([public API](docs/spec/public-api.md#experimental)).
 
 ### Changed
 

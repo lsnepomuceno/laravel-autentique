@@ -22,11 +22,12 @@ features:
     details: Signers, positions and verifications are built as value objects, and every answer comes back as one, with enums and dates rather than nested arrays.
 ---
 
-## A release candidate
+## Stable, with two areas experimental
 
-`1.0.0-rc.1` carries everything planned for 1.0.0. It has not yet run against
-Autentique itself, which `1.0.0` waits for
-([#48](https://github.com/lsnepomuceno/laravel-autentique/issues/48)).
+`1.0.0` has run against Autentique itself. The Corporate area and OAuth have
+not, for lack of a Corporate account and a registered application, and may
+change in a minor release until they have
+([public API](/spec/public-api#experimental)).
 
 `lsnepomuceno/laravel-autentique` replaces
 [`lsnepomuceno/laravel-autentique-v2`](https://github.com/lsnepomuceno/laravel-autentique-v2),

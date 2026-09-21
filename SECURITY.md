@@ -4,7 +4,7 @@
 
 | Version | Supported |
 |---|---|
-| 1.x, from `1.0.0-rc.1` | yes |
+| 1.x | yes |
 
 The latest minor of the current major receives security fixes.
 

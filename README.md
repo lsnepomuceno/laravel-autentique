@@ -1,10 +1,42 @@
-# Laravel Autentique
+<h1 align="center">Laravel Autentique</h1>
 
-[![CI](https://github.com/lsnepomuceno/laravel-autentique/actions/workflows/main_action.yml/badge.svg)](https://github.com/lsnepomuceno/laravel-autentique/actions/workflows/main_action.yml)
+<p align="center">
+  A Laravel client for the <a href="https://www.autentique.com.br">Autentique</a> GraphQL API v2: electronic signatures,
+  <br>documents, signers, folders, organizations, webhooks, the Corporate endpoint and OAuth.
+  <br><br>Every operation is a <code>.graphql</code> file validated against the API's schema, every answer a typed value object,
+  <br>and every request goes through Laravel's HTTP client, so <code>Http::fake()</code> and <code>Autentique::fake()</code> reach it.
+</p>
 
-A Laravel client for the [Autentique](https://www.autentique.com.br) GraphQL
-API v2: electronic signatures, documents, signers, folders, organizations,
-webhooks, the Corporate endpoint and OAuth.
+<p align="center">
+  <a href="https://packagist.org/packages/lsnepomuceno/laravel-autentique"><img alt="Latest version" src="https://img.shields.io/packagist/v/lsnepomuceno/laravel-autentique?style=flat-square&color=1f7a3d&label=packagist"></a>
+  <a href="https://packagist.org/packages/lsnepomuceno/laravel-autentique/stats"><img alt="Downloads" src="https://img.shields.io/packagist/dt/lsnepomuceno/laravel-autentique?style=flat-square&color=1f7a3d"></a>
+  <a href="https://github.com/lsnepomuceno/laravel-autentique/actions/workflows/main_action.yml"><img alt="Tests" src="https://img.shields.io/github/actions/workflow/status/lsnepomuceno/laravel-autentique/main_action.yml?branch=main&style=flat-square&label=tests"></a>
+  <a href="https://github.com/lsnepomuceno/laravel-autentique/blob/main/LICENSE.md"><img alt="License" src="https://img.shields.io/packagist/l/lsnepomuceno/laravel-autentique?style=flat-square&color=555"></a>
+</p>
+
+<p align="center">
+  <img alt="PHP" src="https://img.shields.io/badge/php-8.4.1%20%E2%80%93%208.5-777bb4?style=flat-square&logo=php&logoColor=white">
+  <img alt="Laravel" src="https://img.shields.io/badge/laravel-13-ff2d20?style=flat-square&logo=laravel&logoColor=white">
+  <img alt="Autentique API" src="https://img.shields.io/badge/autentique%20api-v2-1f7a3d?style=flat-square">
+  <img alt="PHPStan" src="https://img.shields.io/badge/phpstan-level%20max-2a2a2a?style=flat-square">
+  <img alt="Type coverage" src="https://img.shields.io/badge/type%20coverage-100%25-1f7a3d?style=flat-square">
+</p>
+
+<p align="center">
+  <a href="https://lsnepomuceno.github.io/laravel-autentique/"><b>Documentation</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://lsnepomuceno.github.io/laravel-autentique/guide/getting-started">Getting started</a>
+  &nbsp;·&nbsp;
+  <a href="https://lsnepomuceno.github.io/laravel-autentique/spec/public-api">Public API</a>
+  &nbsp;·&nbsp;
+  <a href="UPGRADE.md">Upgrading</a>
+  &nbsp;·&nbsp;
+  <a href="CHANGELOG.md">Changelog</a>
+</p>
+
+---
+
+## What it does
 
 - **Every operation is a `.graphql` file** in the package, sent with variables
   and validated against the API's schema, never a string built at runtime.
@@ -14,21 +46,14 @@ webhooks, the Corporate endpoint and OAuth.
   silently change, is refused before a request.
 - **One transport, Laravel's HTTP client**, so `Http::fake()` reaches every
   request, and `Autentique::fake()` makes testing your own code trivial.
-
-**Documentation: [lsnepomuceno.github.io/laravel-autentique](https://lsnepomuceno.github.io/laravel-autentique/)**
+- **Webhooks verified** against `X-Autentique-Signature` on the raw body, and
+  delivered as a Laravel event.
 
 It replaces
-[`lsnepomuceno/laravel-autentique-v2`](https://github.com/lsnepomuceno/laravel-autentique-v2);
-[UPGRADE.md](UPGRADE.md) maps every part of it.
+[`lsnepomuceno/laravel-autentique-v2`](https://github.com/lsnepomuceno/laravel-autentique-v2),
+unfinished since 2021; [UPGRADE.md](UPGRADE.md) maps every part of it.
 
-## Compatibility
-
-| | |
-|---|---|
-| PHP | 8.4.1 to 8.5 |
-| Laravel | 13 |
-
-## Installing
+## Installation
 
 ```bash
 composer require lsnepomuceno/laravel-autentique
@@ -41,6 +66,13 @@ AUTENTIQUE_SANDBOX=true          # local and staging only
 
 ```bash
 php artisan autentique:check     # is the token accepted, and whose account is it
+```
+
+Every key has an environment variable and a default, so publishing
+`config/autentique.php` is optional:
+
+```bash
+php artisan vendor:publish --tag=autentique-config
 ```
 
 ## Documents
@@ -121,6 +153,10 @@ before anything runs.
 
 ## Corporate and OAuth
 
+**Experimental:** neither has run against Autentique yet, so both may change in a
+minor release until they have
+([public API](https://lsnepomuceno.github.io/laravel-autentique/spec/public-api#experimental)).
+
 ```php
 // The Corporate plan: child organizations, members, plans, webhook endpoints.
 $child = Autentique::corporate()->createOrganization(new NewChildOrganization(name: 'Branch office'));
@@ -160,16 +196,59 @@ sent.
 $data = Autentique::query('query ($id: UUID!) { document(id: $id) { hashes { sha2 } } }', ['id' => $id]);
 ```
 
+## Compatibility
+
+| Requirement | Version |
+|---|---|
+| PHP | 8.4.1 to 8.5 |
+| Laravel | 13 |
+| PHP extensions | `json`, plus what Laravel itself requires; `curl` recommended |
+
+`json` and `hash` (for the webhook signature) ship enabled in every PHP 8
+build. The HTTP client, Guzzle under Laravel's, uses `curl` when it is loaded
+and PHP streams otherwise, which need `allow_url_fopen` on and `openssl`
+loaded, since Autentique is reached over HTTPS.
+
+`lsnepomuceno/laravel-autentique-v2`, for Laravel 8 and PHP 7.4 to 8.0, is no
+longer maintained; [UPGRADE.md](UPGRADE.md) maps it to this package.
+
+## Verified against Autentique
+
+The suite never reaches Autentique, and needs no token. What it is checked
+against was taken from the live API:
+
+- **The schema.** `tests/Resources/schema.graphql` is introspected from the
+  standard endpoint, and every operation file is validated against it, as are
+  the examples of Autentique's own Postman and Altair collections.
+- **A sandbox run** of documents, signers, folders, organizations and the
+  account, which corrected one signature and five enums the documentation had
+  wrong.
+- **Real webhook deliveries**, whose signatures verified and whose payload is a
+  fixture of the suite.
+
+The Corporate endpoint and OAuth are the exception, and are experimental until
+they run too.
+
 ## Contributing
 
-`composer check` runs everything CI runs: Pint, composer normalize, PHPStan at
-level max, the dependency analyser, the suite and 100% type coverage. See
-[CONTRIBUTING.md](CONTRIBUTING.md), and [SECURITY.md](SECURITY.md) for
-reporting a vulnerability.
+Patches are expected to come with tests. `composer check` runs everything CI
+runs: Pint, composer normalize, PHPStan at level max with no baseline, the
+dependency analyser, the suite and 100% type coverage.
 
 ```bash
 docker compose -f .docker/compose.yaml run --rm php85 composer check
 ```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md), and [ARCHITECTURE.md](ARCHITECTURE.md)
+for how the package is put together and why. The rules that break the product
+when violated are in [docs/spec/invariants.md](docs/spec/invariants.md), and the
+reasoning behind the design is one numbered file per decision in
+[docs/decisions/](docs/decisions/README.md).
+
+## Security
+
+Found a vulnerability? Please follow [SECURITY.md](SECURITY.md) rather than
+opening a public issue.
 
 ## License
 
