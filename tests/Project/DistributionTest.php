@@ -50,7 +50,7 @@ function distributedFiles(): array
 
 it('ships the package and nothing built for testing it', function () {
     // Anything outside these is either a development tool or an oversight.
-    $allowed = ['src/', 'config/'];
+    $allowed = ['src/', 'config/', 'lang/'];
     $files = ['composer.json', 'composer.lock', 'LICENSE.md', 'README.md', 'UPGRADE.md'];
 
     $unexpected = [];
@@ -104,5 +104,7 @@ it('still ships the things a consumer needs', function () {
         // The operations are read at runtime, so a release without them is a
         // release that cannot send a single request.
         ->toContain('src/Resources/graphql/mutations/createDocument.graphql')
-        ->toContain('src/Resources/graphql/fragments/DocumentFields.graphql');
+        ->toContain('src/Resources/graphql/fragments/DocumentFields.graphql')
+        ->toContain('lang/en/errors.php')
+        ->toContain('lang/pt_BR/errors.php');
 });

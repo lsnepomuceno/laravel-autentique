@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "message": "Variable \"$folder\" got invalid value null at \"folder.name\"; Expected non-nullable type \"String!\" not to be null.",
+      "locations": [{ "line": 1, "column": 31 }]
+    }
+  ]
+}

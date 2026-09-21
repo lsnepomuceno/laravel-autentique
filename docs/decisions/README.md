@@ -22,9 +22,10 @@ to point at.
 | [0006](0006-sandbox-is-chosen-per-call.md) | Sandbox is chosen per call, with the default in the config |
 | [0007](0007-webhooks-are-verified-and-idempotency-is-the-applications.md) | Webhooks are verified on the raw body, and idempotency is the application's |
 | [0008](0008-responses-are-typed-value-objects.md) | Responses are typed, immutable value objects |
+| [0009](0009-only-a-refused-request-is-retried.md) | Only a request Autentique refused to process is retried |
 
-All eight were decided before the first line of code, and none has an outcome
-yet.
+The first eight were decided before the first line of code. Each gains its
+outcome when the code it decided ships.
 
 When and why each question was put is dated in
 [the decision log](../history/decision-log.md).

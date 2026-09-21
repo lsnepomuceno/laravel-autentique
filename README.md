@@ -18,6 +18,24 @@ which is no longer maintained.
 | PHP | 8.4.1 to 8.5 |
 | Laravel | 13 |
 
+## Usage
+
+The API surface grows with each issue of
+[#1](https://github.com/lsnepomuceno/laravel-autentique/issues/1). What exists
+today:
+
+```php
+use LSNepomuceno\LaravelAutentique\Facades\Autentique;
+
+// The escape hatch: any GraphQL document, with variables, for what the
+// package does not model yet. Returns the response's `data`.
+$data = Autentique::query('query { me { id name } }');
+```
+
+Every failure is an `LSNepomuceno\LaravelAutentique\Exceptions\AutentiqueException`,
+narrowed to the fault: `Unauthenticated`, `RateLimited`, `ValidationFailed`,
+`NotFound`, `GraphQLError`, `TransportFailed`, `MissingToken`.
+
 ## Development
 
 ```bash

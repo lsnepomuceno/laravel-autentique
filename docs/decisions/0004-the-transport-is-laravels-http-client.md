@@ -52,5 +52,14 @@ an argument.
 
 ## Outcome
 
-Not yet written: this section is filled in when the code that depends on this
-record ships.
+Shipped in #8 as decided. `GraphQL\Client` builds every request from the
+injected `Illuminate\Http\Client\Factory`, JSON through `asJson()` and uploads
+through three `attach()` calls in the order the specification requires. The
+contract `Contracts\GraphQLClient` sits in front of it so the fake can take its
+place.
+
+One detail the record did not anticipate: the response is decoded in the client
+and handed to `GraphQL\ResponseParser` as a status, a body and two headers,
+rather than as a response object. That keeps the parser free of the HTTP layer,
+so the architecture test holding invariant 1 needs no exception for it, and the
+parser is tested without faking HTTP at all.
