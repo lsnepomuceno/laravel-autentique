@@ -59,5 +59,19 @@ reached through the escape hatch, which returns the decoded `data`.
 
 ## Outcome
 
-Not yet written: this section is filled in when the code that depends on this
-record ships.
+Shipped with the first operations, #10 and #11, and every later area follows
+it.
+
+**One helper carries the narrowing**, `Support\Payload`, rather than each value
+object repeating it: a string that arrives as a number, a boolean webhooks send
+as `0`, the two date formats. The record did not foresee it, and without it the
+type checks would have been written thirty times.
+
+**An enum value the package does not know becomes `null`, not an exception.**
+The record said closed sets are enums, and they are; it did not say what to do
+when Autentique adds a value. Failing the whole answer over one new value would
+make every addition on Autentique's side a breaking change on this one.
+
+**The builder is the one mutable class.** `Api\PendingDocument` returns itself
+from every method, as Laravel's own builders do; what it builds,
+`Data\Input\NewDocument`, is immutable and holds the rules.

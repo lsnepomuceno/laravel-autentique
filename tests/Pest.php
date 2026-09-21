@@ -173,11 +173,49 @@ function multipartParts(Illuminate\Http\Client\Request $request): array
             continue;
         }
 
+        $contents = $part['contents'] ?? null;
+
+        // A file source sends a stream, which has been read once already.
+        if (is_resource($contents)) {
+            rewind($contents);
+            $contents = stream_get_contents($contents);
+        }
+
         $parts[$part['name']] = [
-            'contents' => is_string($part['contents'] ?? null) ? $part['contents'] : '',
+            'contents' => is_string($contents) ? $contents : '',
             'filename' => is_string($part['filename'] ?? null) ? $part['filename'] : null,
         ];
     }
 
     return $parts;
+}
+
+/**
+ * Autentique answering an operation with an object from
+ * tests/Resources/responses/objects, under the operation's field.
+ */
+function answerWith(LSNepomuceno\LaravelAutentique\GraphQL\Operation $operation, string $object): void
+{
+    Illuminate\Support\Facades\Http::fake([
+        '*' => Illuminate\Support\Facades\Http::response(['data' => [$operation->field() => responseFixture("objects/{$object}")]]),
+    ]);
+}
+
+/**
+ * The variables of the last request, whether it was JSON or multipart.
+ *
+ * @return array<string, mixed>
+ */
+function sentVariables(): array
+{
+    $request = lastRequest();
+
+    $payload = $request->isMultipart()
+        ? json_decode(multipartParts($request)['operations']['contents'] ?? '', true)
+        : $request->data();
+
+    $variables = is_array($payload) ? ($payload['variables'] ?? []) : [];
+
+    /** @var array<string, mixed> */
+    return is_array($variables) ? $variables : [];
 }

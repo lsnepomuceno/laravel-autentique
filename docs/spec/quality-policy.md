@@ -24,9 +24,11 @@ only CI said so.
 
 There has never been a baseline.
 
-`phpunit.xml` raises `memory_limit` to 1G, because type coverage runs PHPStan
-inside the Pest process and outgrew PHP's 128M default. It is set there rather
-than in a command so CI, which calls `vendor/bin/pest` directly, gets it too. The gate is "no errors", not "no new errors",
+`composer test:types` runs with `memory_limit=1G`, because type coverage runs
+PHPStan inside the Pest process and outgrew PHP's 128M default. CI's PHP and the
+Docker image already allow that much; a development host with a stock
+`php.ini` did not. Setting it in `phpunit.xml` was tried first and does not
+work: type coverage runs before PHPUnit applies that file. The gate is "no errors", not "no new errors",
 and the only ignores are for Pest's untypeable fluent API, scoped to `tests/*`.
 
 `config/` is outside PHPStan's paths: Larastan reads it as a file outside the

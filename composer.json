@@ -27,6 +27,7 @@
         "php": ">=8.4.1 <8.6",
         "ext-json": "*",
         "illuminate/console": "^13",
+        "illuminate/contracts": "^13",
         "illuminate/filesystem": "^13",
         "illuminate/http": "^13",
         "illuminate/support": "^13",
@@ -90,7 +91,7 @@
         "schema:print": "@php tests/Support/print-schema.php",
         "test": "vendor/bin/pest --fail-on-skipped",
         "test:cov": "vendor/bin/pest --coverage",
-        "test:types": "vendor/bin/pest --type-coverage --min=100"
+        "test:types": "@php -d memory_limit=1G vendor/bin/pest --type-coverage --min=100"
     },
     "scripts-descriptions": {
         "analyse": "Run PHPStan static analysis.",

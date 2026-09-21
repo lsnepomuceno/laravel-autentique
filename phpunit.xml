@@ -15,10 +15,6 @@
         </include>
     </source>
     <php>
-        <!-- Type coverage runs PHPStan inside the Pest process, and the tree
-             outgrew PHP's 128M default. Set here rather than in the command, so
-             CI, which calls vendor/bin/pest directly, gets it too. -->
-        <ini name="memory_limit" value="1G"/>
         <env name="APP_KEY" value="testing"/>
         <!-- No test reaches Autentique: every request is faked. The token is
              set so the code path that sends it runs, and it opens nothing. -->

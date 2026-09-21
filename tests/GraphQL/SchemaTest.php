@@ -8,6 +8,7 @@ use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\{Introspection, Schema};
 use GraphQL\Utils\BuildSchema;
 use GraphQL\Validator\DocumentValidator;
+use LSNepomuceno\LaravelAutentique\Enums;
 use LSNepomuceno\LaravelAutentique\Enums\ErrorCode;
 use LSNepomuceno\LaravelAutentique\GraphQL\{Endpoint, Operation, OperationLoader};
 
@@ -50,7 +51,38 @@ function endpointSchema(Endpoint $endpoint): Schema
  */
 function mirroredEnums(): array
 {
-    return [];
+    return [
+        Enums\Action::class => 'ActionEnum',
+        Enums\DateFormat::class => 'DateFormatEnum',
+        Enums\DeliveryMethod::class => 'DeliveryMethodEnum',
+        Enums\DocumentType::class => 'DocumentTypeEnum',
+        Enums\FallbackBehavior::class => 'FallbackBehaviorEnum',
+        Enums\Footer::class => 'FooterEnum',
+        Enums\FooterType::class => 'FooterTypeEnum',
+        Enums\PositionElement::class => 'PositionElementEnum',
+        Enums\Reminder::class => 'ReminderEnum',
+        Enums\SignatureAppearance::class => 'SignatureAppearanceEnum',
+        Enums\SignerType::class => 'SignerTypeEnum',
+        Enums\VerificationType::class => 'SecurityVerificationEnum',
+        Enums\WhatsappTemplate::class => 'WhatsappTemplateEnum',
+    ];
+}
+
+/**
+ * Enums that mirror something other than a schema enum: a documentation table,
+ * or a value the schema types as a plain string.
+ *
+ * @return list<class-string<BackedEnum>>
+ */
+function unmirroredEnums(): array
+{
+    return [
+        // The table of codes on the documentation's error page.
+        ErrorCode::class,
+        // LocaleInput.language is a String in the schema; the documentation
+        // lists the three values it accepts.
+        Enums\Language::class,
+    ];
 }
 
 it('validates every operation against the schema of its endpoint', function (Operation $operation) {
@@ -115,7 +147,7 @@ it('lists every enum that mirrors the API', function () {
         $enums[] = 'LSNepomuceno\\LaravelAutentique\\Enums\\' . basename($file, '.php');
     }
 
-    $unmapped = array_diff($enums, array_keys(mirroredEnums()), [ErrorCode::class]);
+    $unmapped = array_diff($enums, array_keys(mirroredEnums()), unmirroredEnums());
 
     expect(array_values($unmapped))->toBe([]);
 });
