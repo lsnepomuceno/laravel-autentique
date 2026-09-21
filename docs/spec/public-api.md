@@ -4,8 +4,8 @@ What this package exposes, as it is built today. Everything here is a promise to
 consumers: adding to it is a minor release, changing or removing it is a major
 one.
 
-This page describes the code on `main`, not the plan. What 1.0.0 will expose is
-tracked in #1, and each part is added here by the pull request that ships it.
+This page describes the code on `main`. A pull request that changes the surface
+changes this page in the same change.
 
 ## Namespace layout
 

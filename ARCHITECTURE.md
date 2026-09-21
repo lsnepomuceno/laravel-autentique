@@ -47,4 +47,5 @@ here: a second index is a second thing to forget.
 ## For consumers, not contributors
 
 [README.md](README.md) is the front door. [CHANGELOG.md](CHANGELOG.md) lists
-every release.
+every release, and [UPGRADE.md](UPGRADE.md) maps what a consumer has to change,
+starting with everything of `lsnepomuceno/laravel-autentique-v2`.
