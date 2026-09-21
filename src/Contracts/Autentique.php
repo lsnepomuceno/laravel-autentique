@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace LSNepomuceno\LaravelAutentique\Contracts;
 
 use Illuminate\Http\UploadedFile;
-use LSNepomuceno\LaravelAutentique\Api\{Account, Documents, PendingDocument, Signers};
+use LSNepomuceno\LaravelAutentique\Api\{Account, Documents, Folders, PendingDocument, Signers};
 use LSNepomuceno\LaravelAutentique\Exceptions\{AutentiqueException, InvalidInput};
 
 /**
@@ -29,6 +29,11 @@ interface Autentique
      * and biometric approval.
      */
     public function signers(): Signers;
+
+    /**
+     * Folders, sharing them, and the documents inside them.
+     */
+    public function folders(): Folders;
 
     /**
      * Starts a document, sent with `->send()`.

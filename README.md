@@ -45,6 +45,10 @@ Autentique::fromUpload($request->file('contract'));
 Autentique::signers()->add($document->id, Signer::email('late@example.com'));
 Autentique::signers()->resend([$signature->publicId]);
 
+// Folders, and sharing them.
+$folder = Autentique::folders()->create('Contracts 2026');
+Autentique::folders()->share($folder->id, [Share::withEmail('legal@example.com', FolderRole::Editor)]);
+
 // Who the token belongs to, their plan and their organization.
 $user = Autentique::account()->me();
 $user->subscription?->documents;
