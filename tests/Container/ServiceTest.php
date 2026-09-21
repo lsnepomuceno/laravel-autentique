@@ -38,6 +38,7 @@ it('keeps only scalars in the config, so config:cache can serialise it', functio
     }
 
     foreach (Illuminate\Support\Arr::dot($config) as $key => $value) {
-        expect($value === null || is_scalar($value))->toBeTrue("autentique.{$key} is not a scalar");
+        // An empty list survives Arr::dot() as itself, and serialises as one.
+        expect($value === null || $value === [] || is_scalar($value))->toBeTrue("autentique.{$key} is not a scalar");
     }
 });

@@ -69,5 +69,19 @@ it.
 
 ## Outcome
 
-Not yet written: this section is filled in when the code that depends on this
-record ships.
+Shipped in #16 as decided: `Webhooks\SignatureVerifier` on the raw body with
+`hash_equals()`, `Webhooks\VerifyAutentiqueSignature` as the middleware,
+`Data\WebhookEvent` reading both shapes, `Events\AutentiqueWebhookReceived`
+dispatched by the route, and the guard keyed on `event.id` through the cache,
+off unless `autentique.webhooks.deduplicate` names a number of seconds.
+
+Three details the record did not settle:
+
+- **A missing secret throws**, `MissingWebhookSecret`, rather than answering
+  401. A misconfiguration answered with 401 looks, from Autentique's side and
+  from the logs, exactly like an attack being refused, and nobody looks.
+- **The resource stays an array**, read through `payload()`. Webhook payloads
+  are shaped differently from the API's answers and differ between event types,
+  so typing them would have been a second, drifting copy of guesses.
+- **A signed body that is not an event answers 400**, so a misrouted request is
+  distinguishable from a forged one.

@@ -90,4 +90,35 @@ return [
         'sleep' => (int) env('AUTENTIQUE_RETRY_SLEEP', 1000),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Webhooks
+    |--------------------------------------------------------------------------
+    |
+    | secret       The endpoint's secret, shown in the dashboard when the
+    |              endpoint is registered. Every webhook is verified against it.
+    |
+    | path         Where the package listens, `webhooks/autentique` for
+    |              example. Null registers no route: put the
+    |              VerifyAutentiqueSignature middleware on your own instead.
+    |
+    | middleware   Middleware for that route, besides the signature check. Not
+    |              `web`: Autentique sends no CSRF token.
+    |
+    | deduplicate  Seconds to remember each event id, dropping a delivery of an
+    |              event already received. Null leaves duplicates to your
+    |              listeners. Autentique retries for about eight minutes.
+    |
+    | cache_store  The cache store remembering them. Null uses the default.
+    |
+    */
+
+    'webhooks' => [
+        'secret' => env('AUTENTIQUE_WEBHOOK_SECRET'),
+        'path' => env('AUTENTIQUE_WEBHOOK_PATH'),
+        'middleware' => [],
+        'deduplicate' => env('AUTENTIQUE_WEBHOOK_DEDUPLICATE'),
+        'cache_store' => env('AUTENTIQUE_WEBHOOK_CACHE_STORE'),
+    ],
+
 ];

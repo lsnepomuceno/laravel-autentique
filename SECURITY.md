@@ -44,7 +44,7 @@ advisory:
 
 - **A webhook can be replayed.** Autentique signs the body with no timestamp, so
   a captured request stays valid, and no client can tell a replay from a retry.
-  Webhook handling (#16) comes with an opt-in guard against repeated event ids
+  The package offers an opt-in guard against repeated event ids
   ([0007](docs/decisions/0007-webhooks-are-verified-and-idempotency-is-the-applications.md)).
 - **Sandbox is off unless configured.** A deployment with no configuration
   creates real, billed documents

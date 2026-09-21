@@ -1,0 +1,26 @@
+{
+  "id": "MjZ8NzY1MjY1NTAtNzg3YS00YjU3LTk2MWYtN2EwMThlOTFkOGRj",
+  "object": "webhook",
+  "name": "memb",
+  "format": "json",
+  "url": "https://this-url-doesnt-exist.autentique.com.br/webhooks",
+  "event": {
+    "id": "76526550-787a-4b57-961f-7a018e91d8dc",
+    "object": "event",
+    "organization": 1519203,
+    "type": "member.created",
+    "data": {
+      "user": {
+        "name": "Felipe Autentique",
+        "email": "felipe@autentique.com.br"
+      },
+      "group": {
+        "uuid": "96d50d5a-b69c-4c84-b2d9-3f37c227cebf",
+        "name": "Administrador",
+        "organization": 1519203
+      }
+    },
+    "previous_attributes": [],
+    "created_at": "2025-01-31T12:24:48.477885Z"
+  }
+}

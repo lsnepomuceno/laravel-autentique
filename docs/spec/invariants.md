@@ -62,7 +62,8 @@ or a log line says is checked at review, and by the tests of each exception.
 
 ## 4. The config file holds scalars, and nothing else
 
-`config/autentique.php` is an array of strings, numbers, booleans and nulls.
+`config/autentique.php` is an array of strings, numbers, booleans and nulls,
+and lists of them.
 Enums and value objects are built from it at resolution time.
 
 **A config file carrying an object cannot be cached.** `config:cache`

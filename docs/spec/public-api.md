@@ -16,6 +16,7 @@ src/
 ├── Contracts/                             # Autentique, GraphQLClient, FileSource
 ├── Api/                                   # one class per area of the API: Account, Documents, Folders, Organizations, PendingDocument, Signers
 ├── Commands/                              # CheckCommand, SchemaCommand
+├── Events/                                # AutentiqueWebhookReceived
 ├── Facades/Autentique.php
 ├── Data/                                  # value objects returned: Document, Signature, User, …
 │   └── Input/                             # value objects sent: NewDocument, Signer, Position, …
@@ -90,6 +91,7 @@ omit is nullable.
 | `Data\Page<T>` | every listing; countable and iterable |
 | `Data\Folder`, `Data\FolderSummary`, `Data\FolderShare` | the folder operations |
 | `Data\EmailTemplate` | `emailTemplates` |
+| `Data\WebhookEvent` | a webhook's body; the resource stays the array Autentique sent |
 | `Data\Signature`, `Data\Link`, `Data\Files`, `Data\Event`, `Data\Geolocation`, `Data\EmailEvents`, `Data\SignaturePosition`, `Data\Verification` | nested in a document |
 
 An enum value the API returns and the package does not know yet becomes `null`
@@ -130,9 +132,25 @@ is abstract.
 | `InvalidOperation` | an operation file is missing or spreads a fragment no file defines. A defect in the package, which the suite exists to prevent |
 | `UnexpectedResponse` | an answer without a field the package requires. The API and the package disagree about the schema |
 | `InvalidInput` | a value refused before sending |
+| `MissingWebhookSecret` | a webhook arrived with no secret to verify it |
 
 `Enums\ErrorCode` lists every code Autentique documents; `Data\ApiError` and
 `Data\Violation` carry what arrived. Adding a case is a minor release.
+
+## Webhooks
+
+| Class | |
+|---|---|
+| `Webhooks\VerifyAutentiqueSignature` | middleware; 401 on a bad signature, `MissingWebhookSecret` without a secret |
+| `Webhooks\SignatureVerifier` | `verify($body, $signature, $secret)`, `sign($body, $secret)` |
+| `Webhooks\WebhookController` | the route's controller; public so an application can reuse it on its own route |
+| `Events\AutentiqueWebhookReceived` | dispatched with a `Data\WebhookEvent` |
+| `Enums\WebhookEventType` | the seventeen types |
+
+The route `autentique.webhook`, registered only when `autentique.webhooks.path`
+is set. Its answers are `200 {"received": true}`, `200 {"received": true,
+"duplicate": true}` for a dropped repeat, `400` for a signed body that is not an
+event, `401` for a bad signature.
 
 ## Commands
 
@@ -156,6 +174,11 @@ is a scalar ([invariant 4](invariants.md)).
 | `timeout` | `AUTENTIQUE_TIMEOUT` | `30` seconds |
 | `retry.times` | `AUTENTIQUE_RETRY_TIMES` | `2` |
 | `retry.sleep` | `AUTENTIQUE_RETRY_SLEEP` | `1000` milliseconds |
+| `webhooks.secret` | `AUTENTIQUE_WEBHOOK_SECRET` | none |
+| `webhooks.path` | `AUTENTIQUE_WEBHOOK_PATH` | none, no route |
+| `webhooks.middleware` | | `[]` |
+| `webhooks.deduplicate` | `AUTENTIQUE_WEBHOOK_DEDUPLICATE` | none, off |
+| `webhooks.cache_store` | `AUTENTIQUE_WEBHOOK_CACHE_STORE` | the default store |
 
 Adding a key is a minor release. Removing or renaming one is a major release,
 because an application's published config file keeps the old name.
