@@ -68,18 +68,25 @@ npm run build                                        # fails on a dead link or a
 
 ## Architecture
 
-Everything resolves through the container. `LaravelAutentiqueServiceProvider` merges `config/autentique.php` and binds `Contracts\Autentique` to `AutentiqueManager` as a singleton, behind the `Autentique` facade.
+Everything resolves through the container. `LaravelAutentiqueServiceProvider` merges `config/autentique.php`, binds `Contracts\GraphQLClient` to `GraphQL\Client` and `Contracts\Autentique` to `AutentiqueManager`, registers the two commands, loads the error translations, and registers the webhook route when `autentique.webhooks.path` is set.
 
-The shape the package is being built towards, each part landing with its issue:
+```php
+Autentique::newDocument('Agreement')->file($file)->signer(Signer::email('a@example.com'))->send();
+```
 
-| Part | Decision |
-|---|---|
-| Operations in `src/Resources/graphql/`, one per file, named by an enum, variables only, validated against the introspected schema | 0003 |
-| One transport, `GraphQL\Client` on Laravel's HTTP client, for JSON and multipart uploads | 0004 |
-| Exceptions per fault under one base, error codes as an enum; GraphQL errors arrive with HTTP 200 | 0005 |
-| Sandbox per call, default from config | 0006 |
-| Webhooks verified on the raw body with HMAC SHA-256, dispatched as a Laravel event | 0007 |
-| Typed, immutable value objects in and out | 0008 |
+| Where | What | Decision |
+|---|---|---|
+| `src/Resources/graphql/` | one operation per file, standard and Corporate, named by `GraphQL\Operation`, loaded with their fragments by `GraphQL\OperationLoader`, validated against `tests/Resources/schema*.graphql` | 0003 |
+| `GraphQL\Client` | the one transport: JSON, multipart uploads and the OAuth token endpoint, on Laravel's HTTP client; retries only a 429 | 0004, 0009 |
+| `GraphQL\ResponseParser`, `Exceptions\` | GraphQL errors arrive with HTTP 200; each fault is its own exception under `AutentiqueException` | 0005 |
+| `Api\` | one class per area: `Account`, `Documents` (+ `PendingDocument`), `Signers`, `Folders`, `Organizations`, `Corporate`, `OAuth` | 0010, 0011 |
+| `Data\`, `Data\Input\` | immutable value objects out and in, read through `Support\Payload`; inputs refuse what Autentique would refuse | 0008 |
+| `Webhooks\`, `Events\` | HMAC on the raw body, both payload shapes, a Laravel event, opt-in deduplication | 0007 |
+| `Testing\` | `Autentique::fake()`, which replaces `Contracts\GraphQLClient`; its `FakeAnswers` match over `Operation` has no default, so a new operation needs an answer | |
+
+Sandbox is per call with the default in the config (0006).
+
+**The committed schemas are assembled from the documentation, not introspected** (#34), so a green `SchemaTest` is only as good as they are.
 
 ## Quality gates
 

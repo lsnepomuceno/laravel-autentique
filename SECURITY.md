@@ -28,8 +28,11 @@ Anything that lets a third party act on an Autentique account through this
 package, or read what it should not. Some specific shapes, because they are the
 ones worth thinking about here:
 
-- the API token or a webhook secret reaching an exception message, a log line, a
-  stack trace or any output that outlives the request;
+- the API token, a webhook secret, an OAuth token or a Corporate member's token
+  reaching an exception message, a log line, a stack trace or any output that
+  outlives the request;
+- an OAuth callback accepted with a `state` that is not the one the session
+  sent;
 - a webhook request accepted without a valid `X-Autentique-Signature`, or a
   signature compared in a way that leaks timing;
 - a value supplied by a caller changing the text of a GraphQL operation rather
@@ -49,9 +52,9 @@ advisory:
 - **Sandbox is off unless configured.** A deployment with no configuration
   creates real, billed documents
   ([0006](docs/decisions/0006-sandbox-is-chosen-per-call.md)).
-- **The escape hatch sends what it is given.** `Autentique::query()`, planned in
-  #8, exists to send an operation the package does not ship. It still sends
-  values as variables, but the operation's text is the caller's.
+- **The escape hatch sends what it is given.** `Autentique::query()` exists to
+  send an operation the package does not ship. It still sends values as
+  variables, but the operation's text is the caller's.
 
 ## Handling of secrets
 

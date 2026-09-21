@@ -37,22 +37,23 @@ export default defineConfig({
   // door. The test asks whether a path exists in the repository; this asks
   // whether it exists as a page.
   //
-  // The `releases/` page climbs out of `docs/` deliberately, to name the
-  // canonical file GitHub renders. It is the only exception, and it is allowed
-  // here rather than by turning the check off.
-  ignoreDeadLinks: [/^(\.\/)?(\.\.\/)+CHANGELOG(\.md)?$/],
+  // The two `releases/` pages climb out of `docs/` deliberately, to name the
+  // canonical file GitHub renders. They are the only exception, and they are
+  // allowed here rather than by turning the check off.
+  ignoreDeadLinks: [/^(\.\/)?(\.\.\/)+(CHANGELOG|UPGRADE)(\.md)?$/],
 
   markdown: {
     config(md) {
-      // The `releases/` page includes CHANGELOG.md from the repository root,
-      // whose links are written from there: `docs/decisions/README.md`.
+      // The `releases/` pages include CHANGELOG.md and UPGRADE.md from the
+      // repository root, whose links are written from there:
+      // `docs/decisions/README.md`.
       // Correct where they are authored, and pointing at nothing once the same
       // text is a page under `/releases/`.
       //
-      // Rewritten as they render, on that page only. This wraps VitePress's own
+      // Rewritten as they render, on those pages only. This wraps VitePress's own
       // link rule rather than replacing it, and rewrites before calling it, so
       // the dead-link check still sees the rewritten target.
-      const included = ['releases/changelog.md']
+      const included = ['releases/changelog.md', 'releases/upgrade.md']
       const previous = md.renderer.rules.link_open
 
       md.renderer.rules.link_open = (tokens, index, options, env, self) => {
@@ -65,6 +66,7 @@ export default defineConfig({
               'href',
               href
                 .replace(/^(\.\/)?CHANGELOG\.md/, '/releases/changelog.md')
+                .replace(/^(\.\/)?UPGRADE\.md/, '/releases/upgrade.md')
                 .replace(/^(\.\/)?docs\//, '/'),
             )
           }
@@ -93,6 +95,7 @@ export default defineConfig({
         activeMatch: '^/releases/',
         items: [
           { text: 'Changelog', link: '/releases/changelog' },
+          { text: 'Upgrading', link: '/releases/upgrade' },
           {
             text: 'All releases',
             link: 'https://github.com/lsnepomuceno/laravel-autentique/releases',
