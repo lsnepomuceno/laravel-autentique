@@ -53,6 +53,9 @@ function mirroredEnums(): array
 {
     return [
         Enums\Action::class => 'ActionEnum',
+        Enums\Context::class => 'ContextEnum',
+        Enums\DocumentStatus::class => 'DocumentStatusEnum',
+        Enums\OrderDirection::class => 'OrderByEnum',
         Enums\DateFormat::class => 'DateFormatEnum',
         Enums\DeliveryMethod::class => 'DeliveryMethodEnum',
         Enums\DocumentType::class => 'DocumentTypeEnum',

@@ -113,3 +113,101 @@ $document->isSigned();                               // every signer has signed
 $document->signature($publicId)?->signed?->at;       // when that one signed
 $document->signatures[1]->link?->shortLink;          // the link to deliver
 ```
+
+## Reading one
+
+```php
+$document = Autentique::documents()->find($id);
+```
+
+**Every document Autentique returns is billed**, one at a time, whether it is
+read here or in a listing. A document that does not exist, or that the token's
+owner cannot see, throws `NotFound`.
+
+## Listing
+
+```php
+use LSNepomuceno\LaravelAutentique\Enums\DocumentStatus;
+
+$page = Autentique::documents()->list(status: DocumentStatus::Pending, search: 'agreement');
+
+foreach ($page as $document) {
+    // …
+}
+
+$page->hasMorePages;     // loop on this, with page: 2, 3, …
+$page->total;            // when Autentique reports it
+```
+
+The page holds 20 documents unless `perPage:` says otherwise, because each one
+is billed. Every filter the API takes is a named argument:
+
+| Argument | Filters by |
+|---|---|
+| `status` | `Pending`, `Signed`, `NotSigned`, `Deleted` |
+| `search`, `name`, `signer` | the document's name and its signers |
+| `folderId`, `context` | a folder, or the user's, group's or organization's documents |
+| `from`, `until` | the creation date ([#38](https://github.com/lsnepomuceno/laravel-autentique/issues/38) tracks confirming its format) |
+| `includeDeleted`, `includeArchived` | documents normally left out |
+| `orderBy`, `direction` | any field, ascending or descending |
+| `sandbox`, `onlySandbox` | see below |
+
+**Sandbox documents are hidden by Autentique unless asked for.** With
+`AUTENTIQUE_SANDBOX=true` they are included by default, as they are created by
+default; `sandbox: false` leaves them out, and `onlySandbox: true` lists nothing
+else.
+
+## Changing one
+
+```php
+use LSNepomuceno\LaravelAutentique\Data\Input\DocumentChanges;
+
+$document = Autentique::documents()->update($id, new DocumentChanges(
+    name: 'Service agreement, revised',
+    reminder: Reminder::Daily,
+    watchers: ['legal@example.com'],
+));
+```
+
+Only what is set is sent, and it returns the document as it is now. The rules
+that apply on creation apply to what is set together. Signers are added and
+removed separately, in [signers](/guide/signers).
+
+## Stopping anyone from signing
+
+```php
+Autentique::documents()->block($id);
+```
+
+It moves the deadline to now. **Deleting does not do this.**
+
+## Deleting
+
+```php
+Autentique::documents()->delete($id);                 // true when Autentique did it
+Autentique::documents()->delete($id, $folderId);      // and every signature filed in that folder
+```
+
+It works as the dashboard's delete: the document goes to the trash, and if
+anyone has already signed, only the caller's copy goes. **Whoever still has the
+link can sign it**; `block()` first if that matters.
+
+## Signing it yourself
+
+```php
+Autentique::documents()->sign($id);
+```
+
+Signs as the token's owner, who has to be one of the document's signers:
+otherwise it fails with `signature_not_found`. It never signs on anyone
+else's behalf.
+
+## Moving it
+
+```php
+Autentique::documents()->moveToFolder($id, $folderId);
+Autentique::documents()->moveToFolder($id, $newFolderId, currentFolderId: $oldFolderId);
+Autentique::documents()->moveToFolder($id, null);                             // out of every folder
+Autentique::documents()->transfer($id, organizationId: 179, groupId: 7);     // to another organization's group
+```
+

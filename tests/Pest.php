@@ -219,3 +219,19 @@ function sentVariables(): array
     /** @var array<string, mixed> */
     return is_array($variables) ? $variables : [];
 }
+
+/**
+ * Autentique answering an operation with a bare value under its field.
+ */
+function answerValue(LSNepomuceno\LaravelAutentique\GraphQL\Operation $operation, mixed $value): void
+{
+    Illuminate\Support\Facades\Http::fake(['*' => Illuminate\Support\Facades\Http::response(['data' => [$operation->field() => $value]])]);
+}
+
+/**
+ * The name of the operation the last request sent.
+ */
+function sentOperation(): mixed
+{
+    return lastRequest()->data()['operationName'] ?? null;
+}
