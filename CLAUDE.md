@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 It replaces `lsnepomuceno/laravel-autentique-v2`, unfinished since 2021 and to be archived. What that package got wrong is recorded in `docs/history/from-laravel-autentique-v2.md`, and most of the rules below exist because of it.
 
-**Nothing is released yet.** The road to 1.0.0 is tracked in issue #1, one issue per deliverable. Read the issue before starting one: each lists its scope, its tests and the documentation it must update.
+**`1.0.0-rc.1` is the first release.** Promoting it to `1.0.0` waits on a run against the sandbox and on the real introspected schemas, which need a token (#48, #34). Work is tracked one issue per deliverable; read the issue before starting one.
 
 The invariants are imported rather than summarised, so they are in context for every session:
 

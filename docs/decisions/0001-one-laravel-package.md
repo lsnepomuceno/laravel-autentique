@@ -55,5 +55,11 @@ implementation beside the Laravel one.
 
 ## Outcome
 
-Not yet written: this section is filled in when the code that depends on this
-record ships.
+Held through `1.0.0-rc.1`. The package requires `illuminate/*` outright, and
+leaned on the framework everywhere the record said it would: `Http::fake()`
+reaching every request including OAuth's, `UploadedFile` and `Storage` disks
+streamed as uploads, a Laravel event for webhooks, the cache for deduplication,
+translations for error codes, and the container for the fake.
+
+Nothing had to be written to work around the framework, which is the
+measurement that answers the question the record put.

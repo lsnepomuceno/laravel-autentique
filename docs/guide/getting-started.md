@@ -1,13 +1,21 @@
 # Getting started
 
-::: warning Not released yet
-The package is being built towards 1.0.0, tracked in
-[#1](https://github.com/lsnepomuceno/laravel-autentique/issues/1). This page
-describes what is on `main` today.
+::: warning A release candidate
+`1.0.0-rc.1` is complete and has not yet run against Autentique itself; `1.0.0`
+follows that run
+([#48](https://github.com/lsnepomuceno/laravel-autentique/issues/48)). Until it
+is on Packagist, install it from GitHub, as below.
 :::
 
 ```bash
 composer require lsnepomuceno/laravel-autentique
+```
+
+Until the package is on Packagist, add the repository first:
+
+```bash
+composer config repositories.laravel-autentique vcs https://github.com/lsnepomuceno/laravel-autentique
+composer require lsnepomuceno/laravel-autentique:^1.0@RC
 ```
 
 Nothing to register: the service provider is discovered and the `Autentique`

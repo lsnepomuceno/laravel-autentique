@@ -51,5 +51,11 @@ The CI matrix is PHP 8.4 and 8.5 against Laravel 13.
 
 ## Outcome
 
-Not yet written: this section is filled in when the code that depends on this
-record ships.
+Shipped as decided, and CI ran PHP 8.4 and 8.5 against Laravel 13 on every pull
+request from #26 onwards. PHP 8.4 syntax is used throughout: `new` without
+parentheses when chaining, typed class constants, `#[\Override]`,
+`#[\SensitiveParameter]`, `array_all()`.
+
+The one thing the record did not foresee is memory: type coverage runs PHPStan
+inside the Pest process and outgrew the 128M a stock `php.ini` allows, so
+`composer test:types` raises it.

@@ -2,8 +2,11 @@
 
 ## Supported versions
 
-Nothing is released yet. From 1.0.0, the latest minor of the current major
-receives security fixes.
+| Version | Supported |
+|---|---|
+| 1.x, from `1.0.0-rc.1` | yes |
+
+The latest minor of the current major receives security fixes.
 
 `lsnepomuceno/laravel-autentique-v2`, the package this one replaces, is not
 supported.

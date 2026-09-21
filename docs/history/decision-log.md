@@ -39,3 +39,9 @@ when the work was started on it.
 |---|---|---|
 | 4 | Corporate endpoint and OAuth in 1.0.0? | **In 1.0.0 after all.** Both were built before the first tag, in #20 and #21, so shipping them as minor releases later would have meant holding finished work back. Entry 4 above stands as what was decided at the time |
 
+## At the release, 2026-09-21
+
+| # | Question | Decision |
+|---|---|---|
+| 8 | Tag 1.0.0 with the schemas assembled and no run against Autentique? | **No: `1.0.0-rc.1`.** A stable major promises its API, and eleven type names and one exception's trigger rest on the documentation's spelling. Everything else on #19's checklist was done; the rest needs a token and the maintainer's Packagist account, and is #48 |
+
