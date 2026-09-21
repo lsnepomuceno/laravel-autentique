@@ -1,0 +1,99 @@
+{
+    "name": "lsnepomuceno/laravel-autentique",
+    "description": "A Laravel client for the Autentique GraphQL API v2: electronic signatures, documents, signers, folders and webhooks",
+    "license": "MIT",
+    "type": "library",
+    "keywords": [
+        "autentique",
+        "electronic signature",
+        "assinatura eletronica",
+        "graphql",
+        "laravel",
+        "webhooks"
+    ],
+    "authors": [
+        {
+            "name": "Lucas Nepomuceno",
+            "email": "lsn.nepomuceno@gmail.com",
+            "homepage": "https://github.com/lsnepomuceno"
+        }
+    ],
+    "homepage": "https://github.com/lsnepomuceno/laravel-autentique",
+    "support": {
+        "issues": "https://github.com/lsnepomuceno/laravel-autentique/issues",
+        "source": "https://github.com/lsnepomuceno/laravel-autentique"
+    },
+    "require": {
+        "php": ">=8.4.1 <8.6",
+        "ext-json": "*",
+        "illuminate/console": "^13",
+        "illuminate/http": "^13",
+        "illuminate/support": "^13"
+    },
+    "require-dev": {
+        "ext-tokenizer": "*",
+        "ergebnis/composer-normalize": "^2.52",
+        "larastan/larastan": "^3.10",
+        "laravel/pint": "^1.30",
+        "nunomaduro/collision": "^8",
+        "orchestra/testbench": "^11",
+        "pestphp/pest": "^5.0",
+        "pestphp/pest-plugin-laravel": "^5.0",
+        "pestphp/pest-plugin-type-coverage": "^5.0",
+        "phpstan/phpstan": "^2.2",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "roave/security-advisories": "dev-latest",
+        "shipmonk/composer-dependency-analyser": "^1.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "LSNepomuceno\\LaravelAutentique\\": "./src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LSNepomuceno\\LaravelAutentique\\Tests\\": "./tests"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true,
+            "pestphp/pest-plugin": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "aliases": {
+                "Autentique": "LSNepomuceno\\LaravelAutentique\\Facades\\Autentique"
+            },
+            "providers": [
+                "LSNepomuceno\\LaravelAutentique\\LaravelAutentiqueServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "analyse": "vendor/bin/phpstan analyse --memory-limit=1G",
+        "check": [
+            "@lint --test",
+            "@analyse",
+            "@deps",
+            "@test",
+            "@test:types"
+        ],
+        "deps": "vendor/bin/composer-dependency-analyser",
+        "lint": "vendor/bin/pint",
+        "test": "vendor/bin/pest --fail-on-skipped",
+        "test:cov": "vendor/bin/pest --coverage",
+        "test:types": "vendor/bin/pest --type-coverage --min=100"
+    },
+    "scripts-descriptions": {
+        "analyse": "Run PHPStan static analysis.",
+        "check": "Run every gate CI runs: Pint, PHPStan, the dependency analyser, the suite and type coverage.",
+        "deps": "Report unused and shadow dependencies.",
+        "lint": "Fix code style with Pint (append --test to only check).",
+        "test": "Run the test suite. A skipped test fails it: every check has to run somewhere, and a skip is how one stops.",
+        "test:cov": "Run the test suite with line coverage (needs pcov or xdebug).",
+        "test:types": "Report type coverage across src/."
+    }
+}

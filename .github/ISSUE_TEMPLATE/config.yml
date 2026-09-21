@@ -1,0 +1,6 @@
+# A vulnerability is reported privately, never as an issue. See SECURITY.md.
+blank_issues_enabled: false
+contact_links:
+  - name: Report a vulnerability
+    url: https://github.com/lsnepomuceno/laravel-autentique/security/advisories/new
+    about: Privately, so nothing is disclosed before a fix ships.
