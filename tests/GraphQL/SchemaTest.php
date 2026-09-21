@@ -127,8 +127,8 @@ it('validates every operation against the schema of its endpoint', function (Ope
 })->with(Operation::cases());
 
 /**
- * Every GraphQL operation in Autentique's Postman collections, by collection
- * and request name.
+ * Every GraphQL operation in Autentique's own collections, Postman's and
+ * Altair's, by collection and request name.
  *
  * @return array<string, array{0: string}>
  */
@@ -165,6 +165,16 @@ function officialExamples(): array
         }
     }
 
+    // Altair's collection: a list of windows, each carrying its query.
+    $altair = json_decode((string) file_get_contents(packageRoot() . '/tests/Resources/collections/autentique-altair.collection.json'), true);
+
+    foreach (is_array($altair) && is_array($altair['queries'] ?? null) ? $altair['queries'] : [] as $window) {
+        if (is_array($window) && is_string($window['query'] ?? null)) {
+            $name = is_string($window['windowName'] ?? null) ? $window['windowName'] : '?';
+            $examples['autentique-altair: ' . $name] = [$window['query']];
+        }
+    }
+
     return $examples;
 }
 
@@ -192,14 +202,14 @@ function officialQuery(array $body): ?string
     return is_array($payload) && is_string($payload['query'] ?? null) ? $payload['query'] : null;
 }
 
-it('validates every example in Autentique\'s own Postman collections', function (string $query) {
+it('validates every example in Autentique\'s own collections', function (string $query) {
     $errors = DocumentValidator::validate(endpointSchema(Endpoint::Standard), Parser::parse($query));
 
     expect(array_map(fn(Error $error): string => $error->getMessage(), $errors))->toBe([]);
 })->with(officialExamples());
 
 it('finds the examples it exists to check', function () {
-    expect(count(officialExamples()))->toBe(17);
+    expect(count(officialExamples()))->toBe(28);
 });
 
 it('refuses an operation that asks for a field the API does not have', function () {

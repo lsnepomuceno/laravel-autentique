@@ -1,12 +1,15 @@
-# Autentique's Postman collections
+# Autentique's collections
 
-The two collections Autentique attaches to its documentation, downloaded on
-2026-09-21 and kept unchanged:
+The collections Autentique publishes for its API, downloaded on 2026-09-21:
 
-| File | Attached to |
+| File | Where it comes from |
 |---|---|
-| `autentique-v2.postman_collection.json` | the API v2 introduction, "Para importar e usar no Postman" |
-| `autentique-oauth.postman_collection.json` | OAuth 2.0, "Obtaining and using tokens" |
+| `autentique-v2.postman_collection.json` | attached to the API v2 introduction, "Para importar e usar no Postman" |
+| `autentique-oauth.postman_collection.json` | attached to OAuth 2.0, "Obtaining and using tokens" |
+| `autentique-altair.collection.json` | embedded in Autentique's Altair build at `altair.autentique.com.br` (built 2025-10-27), where it is loaded into the browser as the "Autentique" collection; extracted from `main.*.js` and written out as JSON, otherwise unchanged |
+
+The Altair build embeds no schema: its Docs tab introspects with the visitor's
+own token, so it cannot stand in for #34.
 
 `tests/GraphQL/SchemaTest.php` validates every GraphQL operation in them against
 the committed schema. They are Autentique's own examples, and the OAuth
