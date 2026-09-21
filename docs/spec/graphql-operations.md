@@ -84,6 +84,11 @@ new one cannot skip the comparison.
   `tests/Resources/schema.graphql` for the standard one,
   `tests/Resources/schema-corporate.graphql` for Corporate, both assembled;
 - the check fails on an unknown field and on a variable of the wrong type;
+- every GraphQL example in Autentique's own Postman collections validates
+  against the standard schema too
+  (`tests/Resources/collections/`): they are the
+  closest thing to ground truth without a token, and a schema they refuse is
+  wrong;
 - every mirrored enum has exactly the schema's non deprecated values;
 - an introspection prints back into a schema the operations validate against.
 

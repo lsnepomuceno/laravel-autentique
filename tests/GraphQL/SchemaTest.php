@@ -126,6 +126,82 @@ it('validates every operation against the schema of its endpoint', function (Ope
     expect(array_map(fn(Error $error): string => $error->getMessage(), $errors))->toBe([]);
 })->with(Operation::cases());
 
+/**
+ * Every GraphQL operation in Autentique's Postman collections, by collection
+ * and request name.
+ *
+ * @return array<string, array{0: string}>
+ */
+function officialExamples(): array
+{
+    $examples = [];
+
+    $files = glob(packageRoot() . '/tests/Resources/collections/*.postman_collection.json');
+
+    foreach ($files === false ? [] : $files as $file) {
+        $collection = json_decode((string) file_get_contents($file), true);
+        $pending = is_array($collection) && is_array($collection['item'] ?? null) ? $collection['item'] : [];
+
+        while ($pending !== []) {
+            $item = array_shift($pending);
+
+            if (! is_array($item)) {
+                continue;
+            }
+
+            if (is_array($item['item'] ?? null)) {
+                $pending = [...$pending, ...$item['item']];
+
+                continue;
+            }
+
+            $request = is_array($item['request'] ?? null) ? $item['request'] : [];
+            $query = officialQuery(is_array($request['body'] ?? null) ? $request['body'] : []);
+
+            if ($query !== null) {
+                $name = is_string($item['name'] ?? null) ? $item['name'] : '?';
+                $examples[basename($file, '.postman_collection.json') . ': ' . $name] = [$query];
+            }
+        }
+    }
+
+    return $examples;
+}
+
+/**
+ * The GraphQL document of a Postman request body, whichever way it is sent.
+ *
+ * @param  array<mixed>  $body
+ */
+function officialQuery(array $body): ?string
+{
+    $payload = match ($body['mode'] ?? null) {
+        'raw' => is_string($body['raw'] ?? null) ? json_decode($body['raw'], true) : null,
+        'formdata' => (function () use ($body): mixed {
+            foreach (is_array($body['formdata'] ?? null) ? $body['formdata'] : [] as $part) {
+                if (is_array($part) && ($part['key'] ?? null) === 'operations' && is_string($part['value'] ?? null)) {
+                    return json_decode($part['value'], true);
+                }
+            }
+
+            return null;
+        })(),
+        default => null,
+    };
+
+    return is_array($payload) && is_string($payload['query'] ?? null) ? $payload['query'] : null;
+}
+
+it('validates every example in Autentique\'s own Postman collections', function (string $query) {
+    $errors = DocumentValidator::validate(endpointSchema(Endpoint::Standard), Parser::parse($query));
+
+    expect(array_map(fn(Error $error): string => $error->getMessage(), $errors))->toBe([]);
+})->with(officialExamples());
+
+it('finds the examples it exists to check', function () {
+    expect(count(officialExamples()))->toBe(17);
+});
+
 it('refuses an operation that asks for a field the API does not have', function () {
     // The gate has to be able to fail, on the mistake it exists to catch.
     $errors = DocumentValidator::validate(
