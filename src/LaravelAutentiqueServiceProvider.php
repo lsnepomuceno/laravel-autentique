@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace LSNepomuceno\LaravelAutentique;
 
 use Illuminate\Support\ServiceProvider;
-use LSNepomuceno\LaravelAutentique\Commands\SchemaCommand;
+use LSNepomuceno\LaravelAutentique\Commands\{CheckCommand, SchemaCommand};
 use LSNepomuceno\LaravelAutentique\Contracts\{Autentique, GraphQLClient};
 use LSNepomuceno\LaravelAutentique\GraphQL\{Client, OperationLoader};
 
@@ -40,6 +40,7 @@ final class LaravelAutentiqueServiceProvider extends ServiceProvider
             ], 'autentique-config');
 
             $this->commands([
+                CheckCommand::class,
                 SchemaCommand::class,
             ]);
         }

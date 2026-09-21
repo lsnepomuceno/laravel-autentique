@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Facade;
 use LSNepomuceno\LaravelAutentique\Contracts\Autentique as AutentiqueContract;
 
 /**
+ * @method static \LSNepomuceno\LaravelAutentique\Api\Account account()
  * @method static array<string, mixed> query(string $graphql, array<string, mixed> $variables = [])
  *
  * @see \LSNepomuceno\LaravelAutentique\AutentiqueManager

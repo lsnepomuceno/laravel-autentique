@@ -1,5 +1,21 @@
 # Commands
 
+## `autentique:check`
+
+```bash
+php artisan autentique:check
+```
+
+Answers whether this application can talk to Autentique, before anything is
+sent: the endpoint, whether documents are sandbox by default, whether the token
+is accepted, whose account it is, and how many documents and verification
+credits are left. It costs one `me` query.
+
+| Exit code | When |
+|---|---|
+| `0` | the token was accepted |
+| `1` | no token, a rejected token, a rate limit, or an unreachable endpoint; the reason is printed |
+
 ## `autentique:schema`
 
 ```bash

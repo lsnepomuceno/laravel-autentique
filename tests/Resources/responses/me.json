@@ -1,0 +1,24 @@
+{
+  "data": {
+    "me": {
+      "id": "1ac41a793ed27015abd0a381eb2846e1c3e7fe01",
+      "name": "Mateus Zanella",
+      "email": "mateus@autentique.com.br",
+      "phone": null,
+      "cpf": "012.345.678-90",
+      "cnpj": null,
+      "birthday": "01/01/2001",
+      "subscription": {
+        "has_premium_features": false,
+        "documents": 20,
+        "credits": 200
+      },
+      "organization": {
+        "id": 179,
+        "uuid": "91155c91-a411-4d93-b2a4-92e37548256b",
+        "name": "Autentique",
+        "cnpj": "29.423.653/0001-65"
+      }
+    }
+  }
+}

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LSNepomuceno\LaravelAutentique;
 
+use LSNepomuceno\LaravelAutentique\Api\Account;
 use LSNepomuceno\LaravelAutentique\Contracts\{Autentique, GraphQLClient};
 
 /**
@@ -12,6 +13,12 @@ use LSNepomuceno\LaravelAutentique\Contracts\{Autentique, GraphQLClient};
 final readonly class AutentiqueManager implements Autentique
 {
     public function __construct(private GraphQLClient $client) {}
+
+    #[\Override]
+    public function account(): Account
+    {
+        return new Account($this->client);
+    }
 
     /**
      * @param  array<string, mixed>  $variables

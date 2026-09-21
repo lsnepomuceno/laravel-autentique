@@ -27,6 +27,10 @@ today:
 ```php
 use LSNepomuceno\LaravelAutentique\Facades\Autentique;
 
+// Who the token belongs to, their plan and their organization.
+$user = Autentique::account()->me();
+$user->subscription?->documents;
+
 // The escape hatch: any GraphQL document, with variables, for what the
 // package does not model yet. Returns the response's `data`.
 $data = Autentique::query('query { me { id name } }');

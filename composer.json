@@ -29,7 +29,8 @@
         "illuminate/console": "^13",
         "illuminate/filesystem": "^13",
         "illuminate/http": "^13",
-        "illuminate/support": "^13"
+        "illuminate/support": "^13",
+        "nesbot/carbon": "^3"
     },
     "require-dev": {
         "ext-tokenizer": "*",

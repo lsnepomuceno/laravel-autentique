@@ -24,8 +24,9 @@ You never check a response for errors yourself: a method that returns, succeeded
 | `TransportFailed` | the connection failed or timed out, or the answer was not GraphQL (a 5xx, a proxy page) | **only if the operation is safe to repeat** |
 | `MissingToken` | no token is configured; nothing was sent | after configuring it |
 | `InvalidOperation` | an operation file is missing or broken; a defect in the package | no, report it |
+| `UnexpectedResponse` | Autentique answered without a field the package cannot do without; the API and the package disagree about the schema | no, report it |
 
-Every exception except the last two extends `RequestFailed`, and carries:
+Every exception except the last three extends `RequestFailed`, and carries:
 
 | Property | |
 |---|---|
