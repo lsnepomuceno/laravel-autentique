@@ -1,0 +1,44 @@
+query documents(
+  $limit: Int!
+  $page: Int!
+  $status: DocumentStatusEnum
+  $search: String
+  $name: String
+  $signer: String
+  $folder_id: UUID
+  $context: ContextEnum
+  $start_date: String
+  $end_date: String
+  $include_deleted: Boolean
+  $include_archived: Boolean
+  $orderBy: OrderBy
+  $showSandbox: Boolean
+  $onlySandbox: Boolean
+) {
+  documents(
+    limit: $limit
+    page: $page
+    status: $status
+    search: $search
+    name: $name
+    signer: $signer
+    folder_id: $folder_id
+    context: $context
+    start_date: $start_date
+    end_date: $end_date
+    include_deleted: $include_deleted
+    include_archived: $include_archived
+    orderBy: $orderBy
+    showSandbox: $showSandbox
+    onlySandbox: $onlySandbox
+  ) {
+    total
+    per_page
+    current_page
+    last_page
+    has_more_pages
+    data {
+      ...DocumentFields
+    }
+  }
+}

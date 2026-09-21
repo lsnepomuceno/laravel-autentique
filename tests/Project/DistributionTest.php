@@ -100,5 +100,9 @@ it('still ships the things a consumer needs', function () {
         ->toContain('LICENSE.md')
         ->toContain('README.md')
         ->toContain('src/LaravelAutentiqueServiceProvider.php')
-        ->toContain('src/Facades/Autentique.php');
+        ->toContain('src/Facades/Autentique.php')
+        // The operations are read at runtime, so a release without them is a
+        // release that cannot send a single request.
+        ->toContain('src/Resources/graphql/mutations/createDocument.graphql')
+        ->toContain('src/Resources/graphql/fragments/DocumentFields.graphql');
 });

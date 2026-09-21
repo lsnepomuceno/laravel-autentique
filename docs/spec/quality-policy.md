@@ -69,6 +69,7 @@ Testbench, grouped by what it covers:
 | Directory | Covers |
 |---|---|
 | `tests/Container` | bindings, the config, the stray request guard |
+| `tests/GraphQL` | the operation files, the enum naming them, the loader |
 | `tests/Project` | the structural rules above |
 
 Each feature adds its own directory as it lands.

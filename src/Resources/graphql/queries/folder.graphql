@@ -1,0 +1,19 @@
+query folder($id: UUID!) {
+  folder(id: $id) {
+    ...FolderFields
+    has_password
+    link_identifier
+    parentFolder {
+      id
+      name
+    }
+    subfolders {
+      id
+      name
+      path
+    }
+    shares {
+      ...FolderShareFields
+    }
+  }
+}

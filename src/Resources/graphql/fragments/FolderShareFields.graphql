@@ -1,0 +1,14 @@
+fragment FolderShareFields on FolderShare {
+  id
+  role
+  is_by_link
+  user {
+    id
+    name
+    email
+  }
+  group {
+    id
+    name
+  }
+}

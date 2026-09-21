@@ -1,0 +1,24 @@
+mutation updateSharing(
+  $folder_id: String!
+  $sharing_id: String
+  $role: FolderRoleEnum
+  $share_by_link: Boolean
+  $password: String
+  $remove_password: Boolean
+) {
+  updateSharing(
+    folder_id: $folder_id
+    sharing_id: $sharing_id
+    role: $role
+    share_by_link: $share_by_link
+    password: $password
+    remove_password: $remove_password
+  ) {
+    ...FolderFields
+    has_password
+    link_identifier
+    shares {
+      ...FolderShareFields
+    }
+  }
+}

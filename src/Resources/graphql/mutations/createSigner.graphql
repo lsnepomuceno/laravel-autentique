@@ -1,0 +1,5 @@
+mutation createSigner($document_id: UUID!, $signer: SignerInput!) {
+  createSigner(document_id: $document_id, signer: $signer) {
+    ...SignatureFields
+  }
+}

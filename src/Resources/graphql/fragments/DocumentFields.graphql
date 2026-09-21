@@ -1,0 +1,28 @@
+fragment DocumentFields on Document {
+  id
+  name
+  message
+  reminder
+  refusable
+  sortable
+  qualified
+  sandbox
+  stop_on_rejected
+  new_signature_style
+  show_audit_page
+  footer
+  email_template_id
+  created_at
+  deleted_at
+  deadline_at
+  expiration_at
+  files {
+    original
+    signed
+    certified
+    pades
+  }
+  signatures {
+    ...SignatureFields
+  }
+}

@@ -1,0 +1,3 @@
+mutation signDocument($id: UUID!, $organization_id: Int) {
+  signDocument(id: $id, organization_id: $organization_id)
+}

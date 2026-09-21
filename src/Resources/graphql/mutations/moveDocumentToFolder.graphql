@@ -1,0 +1,13 @@
+mutation moveDocumentToFolder(
+  $document_id: UUID!
+  $folder_id: UUID
+  $current_folder_id: UUID
+  $context: ContextEnum
+) {
+  moveDocumentToFolder(
+    document_id: $document_id
+    folder_id: $folder_id
+    current_folder_id: $current_folder_id
+    context: $context
+  )
+}

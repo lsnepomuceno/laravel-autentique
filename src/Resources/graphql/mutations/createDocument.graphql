@@ -1,0 +1,21 @@
+mutation createDocument(
+  $document: DocumentInput!
+  $signers: [SignerInput!]!
+  $file: Upload!
+  $sandbox: Boolean
+  $folder_id: UUID
+  $organization_id: Int
+  $type: DocumentTypeEnum
+) {
+  createDocument(
+    document: $document
+    signers: $signers
+    file: $file
+    sandbox: $sandbox
+    folder_id: $folder_id
+    organization_id: $organization_id
+    type: $type
+  ) {
+    ...DocumentFields
+  }
+}

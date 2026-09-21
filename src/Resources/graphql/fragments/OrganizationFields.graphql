@@ -1,0 +1,6 @@
+fragment OrganizationFields on Organization {
+  id
+  uuid
+  name
+  cnpj
+}

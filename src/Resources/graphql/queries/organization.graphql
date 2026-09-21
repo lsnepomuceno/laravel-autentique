@@ -1,0 +1,10 @@
+query organization {
+  organization {
+    ...OrganizationFields
+    groups {
+      id
+      uuid
+      name
+    }
+  }
+}

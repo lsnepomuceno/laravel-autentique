@@ -1,0 +1,3 @@
+mutation deleteDocument($id: UUID!, $folder_id: UUID) {
+  deleteDocument(id: $id, folder_id: $folder_id)
+}

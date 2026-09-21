@@ -1,0 +1,10 @@
+fragment FolderFields on Folder {
+  id
+  name
+  path
+  context
+  children_counter
+  is_editor
+  created_at
+  updated_at
+}

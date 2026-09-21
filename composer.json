@@ -28,7 +28,8 @@
         "ext-json": "*",
         "illuminate/console": "^13",
         "illuminate/http": "^13",
-        "illuminate/support": "^13"
+        "illuminate/support": "^13",
+        "illuminate/filesystem": "^13"
     },
     "require-dev": {
         "ext-tokenizer": "*",
