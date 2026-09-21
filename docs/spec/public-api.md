@@ -39,7 +39,7 @@ through the `Autentique` facade, which is auto discovered.
 | Method | Returns | Notes |
 |---|---|---|
 | `account()` | `Api\Account` | `me()` returns `Data\User` |
-| `documents()` | `Api\Documents` | `create()` returns `Data\Document` |
+| `documents()` | `Api\Documents` | `create()`, `find()`, `update()`, `block()` return `Data\Document`; `list()` returns `Data\Page<Document>`; `delete()`, `sign()`, `transfer()`, `moveToFolder()` return `bool` |
 | `newDocument($name)` | `Api\PendingDocument` | the builder; `send()` returns `Data\Document` |
 | `fromPath($path, ?$name)`, `fromUpload($file, ?$name)`, `fromDisk($disk, $path, ?$name)` | `Contracts\FileSource` | **Laravel only**: uploads and disks stream |
 | `query($graphql, $variables)` | `array<string, mixed>`, the response's `data` | the escape hatch; values as variables, the document is the caller's |
@@ -84,6 +84,7 @@ omit is nullable.
 | `Data\User` | `me` |
 | `Data\Subscription`, `Data\Organization`, `Data\Group` | nested in the above, and in `organization` |
 | `Data\Document` | `createDocument` and every operation returning a document |
+| `Data\Page<T>` | every listing; countable and iterable |
 | `Data\Signature`, `Data\Link`, `Data\Files`, `Data\Event`, `Data\Geolocation`, `Data\EmailEvents`, `Data\SignaturePosition`, `Data\Verification` | nested in a document |
 
 An enum value the API returns and the package does not know yet becomes `null`
@@ -92,7 +93,7 @@ rather than an exception, so a new value Autentique adds breaks nothing.
 ## Inputs
 
 What is sent is a `final readonly` class under `Data\Input\`: `NewDocument`,
-`Signer`, `Position`, `SecurityVerification`, `Locale`, `DocumentConfig`,
+`DocumentChanges`, `Signer`, `Position`, `SecurityVerification`, `Locale`, `DocumentConfig`,
 `Expiration`. Each refuses, with `InvalidInput`, a value Autentique documents it
 would refuse or silently change. `toArray()` returns what is sent, with every
 unset option left out so Autentique's default applies.
