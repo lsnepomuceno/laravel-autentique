@@ -6,6 +6,7 @@ The gates a change has to pass, and why each sits where it does.
 
 ```
 pint --test        code style, PER-CS, strict types
+normalize          composer.json formatting, --dry-run
 phpstan            level max, no baseline
 composer deps      unused and shadow dependencies
 pest               the suite, --fail-on-skipped
@@ -15,7 +16,9 @@ pest --type-coverage --min=100
 CI runs exactly this list and nothing else, on every cell of the matrix. **A
 gate CI runs and the documented local command does not is a gate discovered on
 a pull request**, which is how laravel-a1-pdf-sign learnt to put type coverage
-in the list.
+in the list, and how this package learnt to put `composer normalize` in it: the
+first dependency added after the list was written was added out of order, and
+only CI said so.
 
 ## PHPStan at level max, with no baseline
 
