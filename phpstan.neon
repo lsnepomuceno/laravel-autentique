@@ -1,0 +1,37 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+
+parameters:
+    # No baseline, from the first commit. The gate is "no errors", not "no new
+    # errors", and a baseline started on day one is debt taken on for nothing.
+    level: max
+
+    # config/ is left out: Larastan reads it as a file outside the
+    # application's config directory and reports every env() call in it, which
+    # is exactly where env() belongs. Its shape is checked by the suite instead
+    # (tests/Container/ServiceTest.php).
+    paths:
+        - src
+        - tests
+
+    treatPhpDocTypesAsCertain: false
+
+    ignoreErrors:
+        # Pest's fluent API (arch(), expect()->and()->not, dataset chains) is
+        # runtime magic that PHPStan cannot type without a dedicated extension.
+        # These are limits of the tooling, not defects, so they are ignored by
+        # identifier and scoped to tests/ rather than baselined.
+        -
+            identifier: method.notFound
+            path: tests/*
+            reportUnmatched: false
+        -
+            identifier: method.nonObject
+            path: tests/*
+            reportUnmatched: false
+        -
+            identifier: property.nonObject
+            path: tests/*
+            reportUnmatched: false

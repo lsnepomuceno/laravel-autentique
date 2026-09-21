@@ -1,0 +1,17 @@
+# Keep development-only paths out of the distributed package. What remains is
+# src/, config/, composer.json, composer.lock, LICENSE.md, README.md and, from
+# 1.0.0, UPGRADE.md.
+/.docker            export-ignore
+/.husky             export-ignore
+/.github            export-ignore
+/.gitattributes     export-ignore
+/.gitignore         export-ignore
+/tests              export-ignore
+/docs               export-ignore
+/package.json       export-ignore
+/package-lock.json  export-ignore
+/phpunit.xml        export-ignore
+# Configuration for tools a consumer never runs.
+/phpstan.neon       export-ignore
+/pint.json          export-ignore
+/composer-dependency-analyser.php export-ignore

@@ -1,0 +1,47 @@
+# Local reproduction of the CI matrix.
+#
+#   docker compose -f .docker/compose.yaml run --rm php   composer install
+#   docker compose -f .docker/compose.yaml run --rm php   composer check
+#   docker compose -f .docker/compose.yaml run --rm php85 composer check
+#
+# The `php` service (8.4) covers day-to-day work and php85 covers the other edge
+# of the matrix. Each service keeps `vendor/` in its own named volume so
+# switching PHP versions does not invalidate the other install.
+
+# Pinned. Compose derives the project name from the directory holding this
+# file, which is `.docker` here and `.docker` in signet-pdf and
+# laravel-a1-pdf-sign too. Without the pin all three resolve to the project
+# `docker`, share the vendor volumes, and installing in one empties the others.
+name: laravel-autentique
+
+x-php: &php
+  working_dir: /app
+  environment:
+    COMPOSER_CACHE_DIR: /tmp/composer-cache
+
+services:
+  php:
+    <<: *php
+    build:
+      context: ..
+      dockerfile: .docker/Dockerfile
+      args:
+        PHP_VERSION: "8.4"
+    volumes:
+      - ../:/app
+      - vendor-84:/app/vendor
+
+  php85:
+    <<: *php
+    build:
+      context: ..
+      dockerfile: .docker/Dockerfile
+      args:
+        PHP_VERSION: "8.5"
+    volumes:
+      - ../:/app
+      - vendor-85:/app/vendor
+
+volumes:
+  vendor-84:
+  vendor-85:

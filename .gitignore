@@ -1,0 +1,18 @@
+/vendor
+/node_modules
+.idea
+.phpunit.result.cache
+.phpunit.cache/
+*.bak
+*Zone.Identifier
+
+# Documents sent to Autentique in manual tests, and anything that looks like a
+# credential. The token lives in the environment, never in a file here.
+*.pdf
+.env
+.env.*
+
+# The documentation site (#6).
+/docs/.vitepress/dist
+/docs/.vitepress/cache
+/docs/.vitepress/node_modules
