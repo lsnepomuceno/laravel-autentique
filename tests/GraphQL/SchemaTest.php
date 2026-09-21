@@ -61,6 +61,8 @@ function mirroredEnums(): array
         Enums\DocumentType::class => 'DocumentTypeEnum',
         Enums\FallbackBehavior::class => 'FallbackBehaviorEnum',
         Enums\Footer::class => 'FooterEnum',
+        Enums\FolderRole::class => 'FolderRoleEnum',
+        Enums\FolderType::class => 'FolderTypeEnum',
         Enums\FooterType::class => 'FooterTypeEnum',
         Enums\PositionElement::class => 'PositionElementEnum',
         Enums\Reminder::class => 'ReminderEnum',

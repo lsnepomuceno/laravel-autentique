@@ -112,6 +112,7 @@ export default defineConfig({
       '/guide/': sections('guide', [
         { text: 'Getting started', slugs: ['getting-started', 'configuration'] },
         { text: 'Documents', slugs: ['documents', 'signers', 'positions', 'security-verifications', 'sandbox'] },
+        { text: 'Organizing', slugs: ['folders'] },
         { text: 'Working with it', slugs: ['errors', 'raw-queries', 'commands'] },
       ]),
       '/spec/': [{ text: 'Specification', items: pages('spec') }],

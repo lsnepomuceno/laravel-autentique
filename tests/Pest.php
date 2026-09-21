@@ -193,6 +193,9 @@ function multipartParts(Illuminate\Http\Client\Request $request): array
 /**
  * Autentique answering an operation with an object from
  * tests/Resources/responses/objects, under the operation's field.
+ *
+ * Once per test: a second `Http::fake()` adds a stub after the first, and the
+ * first catch-all keeps answering.
  */
 function answerWith(LSNepomuceno\LaravelAutentique\GraphQL\Operation $operation, string $object): void
 {
