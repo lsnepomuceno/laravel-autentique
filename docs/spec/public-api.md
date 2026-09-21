@@ -14,7 +14,7 @@ src/
 ├── LaravelAutentiqueServiceProvider.php   # merges the config, binds the contract
 ├── AutentiqueManager.php                  # the Autentique implementation
 ├── Contracts/                             # Autentique, GraphQLClient, FileSource
-├── Api/                                   # one class per area of the API: Account, Corporate, Documents, Folders, Organizations, PendingDocument, Signers
+├── Api/                                   # one class per area of the API: Account, Corporate, Documents, Folders, OAuth, Organizations, PendingDocument, Signers
 ├── Commands/                              # CheckCommand, SchemaCommand
 ├── Events/                                # AutentiqueWebhookReceived
 ├── Facades/Autentique.php
@@ -45,6 +45,8 @@ through the `Autentique` facade, which is auto discovered.
 | `folders()` | `Api\Folders` | `find()`, `create()`, `rename()`, `share()`, `changeRole()`, `shareByLink()`, `stopSharingByLink()`, `removeLinkPassword()` return `Data\Folder`; `list()` returns `Data\Page<Folder>`; `documents()` returns `Data\Page<Document>`; `delete()` returns `bool` |
 | `organizations()` | `Api\Organizations` | `current()` returns `Data\Organization` with groups; `list()` returns `list<Organization>`; `emailTemplates()` returns `Data\Page<EmailTemplate>` |
 | `corporate()` | `Api\Corporate` | the Corporate endpoint: child organizations, members, login codes, webhook endpoints, custom plans, API usage |
+| `oauth()` | `Api\OAuth` | `begin()` returns `Data\Authorization`; `callback()`, `exchange()`, `refresh()` return `Data\OAuthTokens`; `OAuth::challenge()` is the S256 challenge |
+| `withToken($token)` | `Contracts\Autentique` | the whole API sending another token |
 | `newDocument($name)` | `Api\PendingDocument` | the builder; `send()` returns `Data\Document` |
 | `fromPath($path, ?$name)`, `fromUpload($file, ?$name)`, `fromDisk($disk, $path, ?$name)` | `Contracts\FileSource` | **Laravel only**: uploads and disks stream |
 | `query($graphql, $variables)` | `array<string, mixed>`, the response's `data` | the escape hatch; values as variables, the document is the caller's |
@@ -55,7 +57,8 @@ checks, and in the facade's `@method` docblock.
 ## The transport
 
 `Contracts\GraphQLClient` is bound to `GraphQL\Client`, the only class that
-reaches the network ([invariant 1](invariants.md)). It is a contract so the fake
+reaches the network ([invariant 1](invariants.md)), the OAuth token endpoint
+included. It is a contract so the fake
 can stand in for it; an application may bind its own, at the cost of
 `Http::fake()` no longer reaching it.
 
@@ -93,6 +96,7 @@ omit is nullable.
 | `Data\Folder`, `Data\FolderSummary`, `Data\FolderShare` | the folder operations |
 | `Data\EmailTemplate` | `emailTemplates` |
 | `Data\ChildOrganization`, `Data\OrganizationMember`, `Data\OrganizationPlan`, `Data\CorporatePlan`, `Data\ApiUsage`, `Data\ApiUsageItems`, `Data\WebhookEndpoint` | the Corporate operations. `OrganizationMember::$apiToken` and `WebhookEndpoint::$secret` are credentials |
+| `Data\Authorization`, `Data\OAuthTokens` | the OAuth flow; both carry credentials |
 | `Data\WebhookEvent` | a webhook's body; the resource stays the array Autentique sent |
 | `Data\Signature`, `Data\Link`, `Data\Files`, `Data\Event`, `Data\Geolocation`, `Data\EmailEvents`, `Data\SignaturePosition`, `Data\Verification` | nested in a document |
 
@@ -123,8 +127,10 @@ is abstract.
 
 | Exception | When |
 |---|---|
-| `RequestFailed` (abstract) | base of the seven below; carries `$operation`, `$status`, `$requestId`, `$errors` |
-| `Unauthenticated` | HTTP 401, or `Unauthorized` with 200 |
+| `RequestFailed` (abstract) | base of the nine below; carries `$operation`, `$status`, `$requestId`, `$errors` |
+| `Unauthenticated` | HTTP 401, or the code `unauthorized` |
+| `InsufficientScope` | `Unauthorized`, capitalised, with 200: an OAuth token without the scope |
+| `OAuthFailed` | an OAuth step failed; carries `$error` |
 | `RateLimited` | HTTP 429 after the retries; carries `$retryAfter` |
 | `ValidationFailed` | `message: "validation"`; `violations()`, `messages()` |
 | `NotFound` | a `*_not_found` code, or a `… not found` message |
@@ -136,6 +142,7 @@ is abstract.
 | `UnexpectedResponse` | an answer without a field the package requires. The API and the package disagree about the schema |
 | `InvalidInput` | a value refused before sending |
 | `MissingWebhookSecret` | a webhook arrived with no secret to verify it |
+| `MissingOAuthCredentials` | OAuth used without its configuration |
 
 `Enums\ErrorCode` lists every code Autentique documents; `Data\ApiError` and
 `Data\Violation` carry what arrived. Adding a case is a minor release.
@@ -198,6 +205,8 @@ is a scalar ([invariant 4](invariants.md)).
 | `webhooks.middleware` | | `[]` |
 | `webhooks.deduplicate` | `AUTENTIQUE_WEBHOOK_DEDUPLICATE` | none, off |
 | `webhooks.cache_store` | `AUTENTIQUE_WEBHOOK_CACHE_STORE` | the default store |
+| `oauth.client_id`, `oauth.client_secret`, `oauth.redirect_uri` | `AUTENTIQUE_OAUTH_*` | none |
+| `oauth.url` | `AUTENTIQUE_OAUTH_URL` | `https://api.autentique.com.br/oauth` |
 
 Adding a key is a minor release. Removing or renaming one is a major release,
 because an application's published config file keeps the old name.

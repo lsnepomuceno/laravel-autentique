@@ -5,6 +5,7 @@ declare(strict_types=1);
 use LSNepomuceno\LaravelAutentique\Enums\ErrorCode;
 use LSNepomuceno\LaravelAutentique\Exceptions\{AutentiqueException,
     GraphQLError,
+    InsufficientScope,
     NotFound,
     RateLimited,
     RequestFailed,
@@ -82,8 +83,12 @@ it('turns a documented code into GraphQLError carrying the code', function () {
         ->and($exception->errors[0]->code)->toBe(ErrorCode::TooManyResentEmails);
 });
 
-it('turns a missing OAuth scope into Unauthenticated, although it arrives with HTTP 200', function () {
-    expect(parseFailure(200, responseFixture('errors/unauthorized-scope')))->toBeInstanceOf(Unauthenticated::class);
+it('turns a missing OAuth scope into InsufficientScope, although it arrives with HTTP 200', function () {
+    expect(parseFailure(200, responseFixture('errors/unauthorized-scope')))->toBeInstanceOf(InsufficientScope::class);
+});
+
+it('turns the error table\'s unauthorized code into Unauthenticated', function () {
+    expect(parseFailure(200, ['errors' => [['message' => 'unauthorized']]]))->toBeInstanceOf(Unauthenticated::class);
 });
 
 it('turns HTTP 401 into Unauthenticated', function () {

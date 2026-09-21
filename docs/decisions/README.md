@@ -24,6 +24,7 @@ to point at.
 | [0008](0008-responses-are-typed-value-objects.md) | Responses are typed, immutable value objects |
 | [0009](0009-only-a-refused-request-is-retried.md) | Only a request Autentique refused to process is retried |
 | [0010](0010-corporate-is-an-area-on-its-own-endpoint.md) | Corporate is one more area of the API, on its own endpoint |
+| [0011](0011-oauth-goes-through-the-same-client.md) | OAuth goes through the same client, and the tokens are the application's |
 
 The first eight were decided before the first line of code. Each gains its
 outcome when the code it decided ships.

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace LSNepomuceno\LaravelAutentique\Contracts;
 
 use Illuminate\Http\UploadedFile;
-use LSNepomuceno\LaravelAutentique\Api\{Account, Corporate, Documents, Folders, Organizations, PendingDocument, Signers};
+use LSNepomuceno\LaravelAutentique\Api\{Account, Corporate, Documents, Folders, OAuth, Organizations, PendingDocument, Signers};
 use LSNepomuceno\LaravelAutentique\Exceptions\{AutentiqueException, InvalidInput};
 
 /**
@@ -44,6 +44,17 @@ interface Autentique
      * The Corporate plan's extension of the API, on its own endpoint.
      */
     public function corporate(): Corporate;
+
+    /**
+     * OAuth 2.0 with PKCE, for acting on behalf of accounts that authorize it.
+     */
+    public function oauth(): OAuth;
+
+    /**
+     * The whole API, sending another token: an OAuth access token, or a Corporate
+     * member's. The configured token is untouched.
+     */
+    public function withToken(#[\SensitiveParameter] string $token): self;
 
     /**
      * Starts a document, sent with `->send()`.

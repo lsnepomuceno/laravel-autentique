@@ -141,6 +141,29 @@ final class AutentiqueFake implements GraphQLClient
     }
 
     /**
+     * Answers the OAuth token endpoint with a fresh fake pair, and records the
+     * grant type asked for as the variables of a call with no operation.
+     *
+     * @param  array<string, string>  $form
+     * @return array<string, mixed>
+     */
+    #[\Override]
+    public function oauthToken(#[\SensitiveParameter] array $form): array
+    {
+        $root = $this->root();
+        $root->sent[] = new SentOperation(null, ['grant_type' => $form['grant_type'] ?? null], query: 'oauth/token', token: $this->token);
+
+        $count = count($root->sent);
+
+        return [
+            'access_token' => "fake-access-token-{$count}",
+            'refresh_token' => "fake-refresh-token-{$count}",
+            'token_type' => 'Bearer',
+            'expires_in' => 1296000,
+        ];
+    }
+
+    /**
      * A copy recording into this fake, marking what it sends with the token.
      */
     #[\Override]

@@ -133,4 +133,23 @@ return [
         'cache_store' => env('AUTENTIQUE_WEBHOOK_CACHE_STORE'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | OAuth
+    |--------------------------------------------------------------------------
+    |
+    | For an application acting on behalf of other people's accounts, which
+    | authorize it, rather than on its own account's token. Register the
+    | application in the dashboard to get its client id and secret; the
+    | redirect URI must match the registered one exactly.
+    |
+    */
+
+    'oauth' => [
+        'client_id' => env('AUTENTIQUE_OAUTH_CLIENT_ID'),
+        'client_secret' => env('AUTENTIQUE_OAUTH_CLIENT_SECRET'),
+        'redirect_uri' => env('AUTENTIQUE_OAUTH_REDIRECT_URI'),
+        'url' => env('AUTENTIQUE_OAUTH_URL', 'https://api.autentique.com.br/oauth'),
+    ],
+
 ];

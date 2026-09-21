@@ -114,6 +114,7 @@ export default defineConfig({
         { text: 'Documents', slugs: ['documents', 'signers', 'positions', 'security-verifications', 'sandbox'] },
         { text: 'Organizing', slugs: ['folders', 'organizations', 'corporate'] },
         { text: 'Receiving', slugs: ['webhooks'] },
+        { text: 'Acting for others', slugs: ['oauth'] },
         { text: 'Working with it', slugs: ['errors', 'testing', 'raw-queries', 'commands'] },
       ]),
       '/spec/': [{ text: 'Specification', items: pages('spec') }],

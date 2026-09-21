@@ -6,6 +6,7 @@ namespace LSNepomuceno\LaravelAutentique\GraphQL;
 
 use LSNepomuceno\LaravelAutentique\Data\{ApiError, Violation};
 use LSNepomuceno\LaravelAutentique\Exceptions\{GraphQLError,
+    InsufficientScope,
     NotFound,
     RateLimited,
     RequestFailed,
@@ -112,6 +113,16 @@ final class ResponseParser
     private function exceptionFor(array $errors, int $status, ?string $operation, ?string $requestId): RequestFailed
     {
         $summary = implode(' ', array_map(fn(ApiError $error): string => $this->describe($error), $errors));
+
+        // The OAuth documentation shows a missing scope as `Unauthorized`,
+        // capitalised, with HTTP 200; the error table's `unauthorized`, lower
+        // case, is a token that is no longer valid
+        // (docs/decisions/0011-oauth-goes-through-the-same-client.md).
+        foreach ($errors as $error) {
+            if ($error->message === 'Unauthorized') {
+                return new InsufficientScope("The token lacks the scope this operation needs: {$summary}", $operation, $status, $requestId, $errors);
+            }
+        }
 
         foreach ($errors as $error) {
             if ($error->isUnauthorized()) {
