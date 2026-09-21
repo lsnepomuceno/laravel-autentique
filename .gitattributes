@@ -21,3 +21,4 @@
 /phpstan.neon       export-ignore
 /pint.json          export-ignore
 /composer-dependency-analyser.php export-ignore
+/.graphqlconfig     export-ignore

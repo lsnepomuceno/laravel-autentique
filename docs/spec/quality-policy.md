@@ -72,7 +72,8 @@ Testbench, grouped by what it covers:
 | Directory | Covers |
 |---|---|
 | `tests/Container` | bindings, the config, the stray request guard |
-| `tests/GraphQL` | the operation files, the enum naming them, the loader, the client, the parser |
+| `tests/GraphQL` | the operation files, the enum naming them, the loader, the client, the parser, and every operation against the schema |
+| `tests/Console` | the artisan commands, against a faked API |
 | `tests/Enums` | the enums and what hangs off them: error codes and their text |
 | `tests/Project` | the structural rules above |
 

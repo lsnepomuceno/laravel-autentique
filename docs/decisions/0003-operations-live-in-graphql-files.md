@@ -79,5 +79,23 @@ package does not offer.
 
 ## Outcome
 
-Not yet written: this section is filled in when the code that depends on this
-record ships.
+Shipped in #7 and #9: 27 operations on the standard endpoint, seven shared
+fragments and three for introspection, `GraphQL\Operation` naming each file,
+`GraphQL\OperationLoader` appending fragments, and every file validated against
+the schema by `webonyx/graphql-php`, a development dependency only.
+
+**The committed schema is assembled rather than introspected**, which this
+record did not foresee. Introspection needs a token, and a repository that must
+never hold one cannot introspect in CI or anywhere else on its own. The schema
+was built from the documentation and a partial 2023 dump, and eleven type names
+in it are guesses. The validation is real against that schema, and exactly as
+good as the schema is: #34 replaces it with an introspection run by the
+maintainer.
+
+**Introspection is itself an operation file**, `queries/introspection.graphql`,
+so `autentique:schema` obeys the same rule as everything else: no GraphQL
+written in PHP. The only operation whose answer does not arrive under its own
+name is this one, under `__schema`, and `Operation::field()` says so.
+
+Variables are named after the argument they feed, snake case included, which
+the record left open.

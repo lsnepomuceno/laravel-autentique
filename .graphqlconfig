@@ -1,0 +1,5 @@
+{
+  "name": "Autentique API v2",
+  "schemaPath": "tests/Resources/schema.graphql",
+  "includes": ["src/Resources/graphql/**/*.graphql"]
+}

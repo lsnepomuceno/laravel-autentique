@@ -26,6 +26,9 @@ enum Operation: string
     case Folder = 'queries/folder';
     case EmailTemplates = 'queries/emailTemplates';
 
+    /** The schema itself, for `autentique:schema`. */
+    case Introspection = 'queries/introspection';
+
     // Mutations, standard endpoint.
     case CreateDocument = 'mutations/createDocument';
     case UpdateDocument = 'mutations/updateDocument';
@@ -55,12 +58,12 @@ enum Operation: string
     }
 
     /**
-     * The field of `data` the answer arrives under, which for every operation
-     * here is the operation's own name.
+     * The field of `data` the answer arrives under: the operation's own name,
+     * except for introspection, which GraphQL answers under `__schema`.
      */
     public function field(): string
     {
-        return $this->operationName();
+        return $this === self::Introspection ? '__schema' : $this->operationName();
     }
 
     public function isMutation(): bool

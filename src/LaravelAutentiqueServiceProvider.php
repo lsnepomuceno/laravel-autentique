@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LSNepomuceno\LaravelAutentique;
 
 use Illuminate\Support\ServiceProvider;
+use LSNepomuceno\LaravelAutentique\Commands\SchemaCommand;
 use LSNepomuceno\LaravelAutentique\Contracts\{Autentique, GraphQLClient};
 use LSNepomuceno\LaravelAutentique\GraphQL\{Client, OperationLoader};
 
@@ -37,6 +38,10 @@ final class LaravelAutentiqueServiceProvider extends ServiceProvider
             $this->publishes([
                 self::CONFIG_PATH => $this->app->configPath('autentique.php'),
             ], 'autentique-config');
+
+            $this->commands([
+                SchemaCommand::class,
+            ]);
         }
     }
 }

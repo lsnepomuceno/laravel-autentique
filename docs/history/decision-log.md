@@ -31,4 +31,4 @@ when the work was started on it.
 
 | # | Question | Needed by |
 |---|---|---|
-| 7 | A sandbox token to introspect the schema once, run by the maintainer so it never leaves the machine | #9 |
+| 7 | A sandbox token to introspect the schema once, run by the maintainer so it never leaves the machine | #34. #9 shipped against a schema assembled from the documentation in the meantime |

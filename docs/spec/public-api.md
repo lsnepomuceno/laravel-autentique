@@ -14,6 +14,7 @@ src/
 ├── LaravelAutentiqueServiceProvider.php   # merges the config, binds the contract
 ├── AutentiqueManager.php                  # the Autentique implementation
 ├── Contracts/                             # Autentique, GraphQLClient, FileSource
+├── Commands/                              # SchemaCommand
 ├── Facades/Autentique.php
 ├── Data/                                  # ApiError, Violation
 ├── Enums/                                 # ErrorCode
@@ -82,6 +83,14 @@ is abstract.
 
 `Enums\ErrorCode` lists every code Autentique documents; `Data\ApiError` and
 `Data\Violation` carry what arrived. Adding a case is a minor release.
+
+## Commands
+
+| Command | Exit codes |
+|---|---|
+| `autentique:schema {--output=}` | `0` written, `1` refused |
+
+Their names and exit codes are public: a pipeline calls them.
 
 ## Configuration
 
