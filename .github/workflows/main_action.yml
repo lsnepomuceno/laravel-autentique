@@ -1,0 +1,114 @@
+name: CI
+
+# Every pull request, whatever its base, and main itself after a merge.
+#
+# **No branch filter on pull requests.** The work towards 1.0.0 arrives as
+# stacked pull requests, each based on the one before it (#1), and a workflow
+# filtered to `main` does not run on a pull request whose base is another
+# branch. The pull request that finally reached main would be the first time CI
+# saw any of the stack. laravel-a1-pdf-sign met the same problem with its
+# integration branch and listed it by name; with no fixed branch to list, the
+# filter is simply left off.
+#
+# The push to main is not the duplication it looks like. A pull request is
+# tested against its own branch, not against main with it merged, so two
+# branches that are each green can still produce a main that is not.
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+concurrency:
+  # head_ref is empty on a push, so fall back to the ref: without it every
+  # push to main would share one group and cancel the run before it.
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  # Superseding a pull request's run is a saving; superseding a main build is a
+  # merge that never got verified, which is the whole reason main is built.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Laravel 13 supports PHP 8.3 to 8.5 and the package floor is 8.4.1.
+        # Laravel 12 cannot be installed beside Pest 5. See
+        # docs/decisions/0002-php-and-laravel-floor.md.
+        php: [ '8.4', '8.5' ]
+
+    name: PHP ${{ matrix.php }} - Laravel 13
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, dom, fileinfo, json, tokenizer
+          coverage: pcov
+
+      - name: Validate PHP and Composer
+        run: |
+          php -v
+          composer -V
+          composer validate --strict
+
+      # update rather than install: a library is installed next to whatever the
+      # application resolves, so the suite runs against the newest versions the
+      # constraints allow, not against the lock.
+      - name: Install dependencies
+        run: composer update --prefer-dist --prefer-stable --no-interaction --no-progress
+
+      # setup-php sets COMPOSER_NO_AUDIT, so advisories are silently not checked
+      # unless a step asks. A package holding an API token is worth blocking on
+      # a known vulnerability in its tree; --abandoned=ignore keeps the gate
+      # about vulnerabilities rather than about maintenance status.
+      - name: Audit dependencies
+        run: composer audit --abandoned=ignore
+
+      # composer test carries --fail-on-skipped: every check has to run
+      # somewhere, and a skip is how one quietly stops. Nothing here reaches
+      # Autentique: every request is faked (docs/spec/invariants.md).
+      - name: Run tests
+        run: composer test
+
+  quality:
+    name: Code style and static analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, dom, fileinfo, json, tokenizer
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --prefer-stable --no-interaction --no-progress
+
+      - name: Check code style
+        run: vendor/bin/pint --test
+
+      - name: Check dependencies
+        run: vendor/bin/composer-dependency-analyser
+
+      - name: Check composer.json formatting
+        run: composer normalize --dry-run
+
+      - name: Run static analysis
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+
+      - name: Check type coverage
+        run: vendor/bin/pest --type-coverage --min=100

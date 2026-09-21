@@ -1,0 +1,24 @@
+# Monthly, for every manifest the repository carries. The package's own
+# dependencies are in composer.json; the other two serve the Git hooks and the
+# documentation site, and neither reaches a consumer.
+version: 2
+updates:
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "npm"
+    directory: "/docs/.vitepress"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
