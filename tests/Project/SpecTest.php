@@ -134,9 +134,9 @@ it('finds the references it exists to guard', function () {
         $cited = array_merge($cited, specDocReferences(specContents($file), $file));
     }
 
-    expect(count($cited))->toBeGreaterThanOrEqual(15)
+    expect(count($cited))->toBeGreaterThanOrEqual(40)
         ->and(array_map(fn(string $path): string => basename($path), $cited))
-        ->toContain('decision-log.md', '0003-operations-live-in-graphql-files.md');
+        ->toContain('invariants.md', 'decision-log.md', '0003-operations-live-in-graphql-files.md');
 });
 
 it('resolves a relative hop from inside docs/', function () {
