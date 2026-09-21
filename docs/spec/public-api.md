@@ -14,7 +14,7 @@ src/
 ├── LaravelAutentiqueServiceProvider.php   # merges the config, binds the contract
 ├── AutentiqueManager.php                  # the Autentique implementation
 ├── Contracts/                             # Autentique, GraphQLClient, FileSource
-├── Api/                                   # one class per area of the API: Account, Documents, Folders, PendingDocument, Signers
+├── Api/                                   # one class per area of the API: Account, Documents, Folders, Organizations, PendingDocument, Signers
 ├── Commands/                              # CheckCommand, SchemaCommand
 ├── Facades/Autentique.php
 ├── Data/                                  # value objects returned: Document, Signature, User, …
@@ -42,6 +42,7 @@ through the `Autentique` facade, which is auto discovered.
 | `documents()` | `Api\Documents` | `create()`, `find()`, `update()`, `block()` return `Data\Document`; `list()` returns `Data\Page<Document>`; `delete()`, `sign()`, `transfer()`, `moveToFolder()` return `bool` |
 | `signers()` | `Api\Signers` | `add()`, `approveBiometric()`, `rejectBiometric()` return `Data\Signature`; `link()` returns `Data\Link`; `remove()`, `resend()` return `bool` |
 | `folders()` | `Api\Folders` | `find()`, `create()`, `rename()`, `share()`, `changeRole()`, `shareByLink()`, `stopSharingByLink()`, `removeLinkPassword()` return `Data\Folder`; `list()` returns `Data\Page<Folder>`; `documents()` returns `Data\Page<Document>`; `delete()` returns `bool` |
+| `organizations()` | `Api\Organizations` | `current()` returns `Data\Organization` with groups; `list()` returns `list<Organization>`; `emailTemplates()` returns `Data\Page<EmailTemplate>` |
 | `newDocument($name)` | `Api\PendingDocument` | the builder; `send()` returns `Data\Document` |
 | `fromPath($path, ?$name)`, `fromUpload($file, ?$name)`, `fromDisk($disk, $path, ?$name)` | `Contracts\FileSource` | **Laravel only**: uploads and disks stream |
 | `query($graphql, $variables)` | `array<string, mixed>`, the response's `data` | the escape hatch; values as variables, the document is the caller's |
@@ -88,6 +89,7 @@ omit is nullable.
 | `Data\Document` | `createDocument` and every operation returning a document |
 | `Data\Page<T>` | every listing; countable and iterable |
 | `Data\Folder`, `Data\FolderSummary`, `Data\FolderShare` | the folder operations |
+| `Data\EmailTemplate` | `emailTemplates` |
 | `Data\Signature`, `Data\Link`, `Data\Files`, `Data\Event`, `Data\Geolocation`, `Data\EmailEvents`, `Data\SignaturePosition`, `Data\Verification` | nested in a document |
 
 An enum value the API returns and the package does not know yet becomes `null`

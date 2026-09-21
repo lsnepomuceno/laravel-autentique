@@ -59,6 +59,7 @@ function mirroredEnums(): array
         Enums\DateFormat::class => 'DateFormatEnum',
         Enums\DeliveryMethod::class => 'DeliveryMethodEnum',
         Enums\DocumentType::class => 'DocumentTypeEnum',
+        Enums\EmailTemplateType::class => 'EmailTemplateTypeEnum',
         Enums\FallbackBehavior::class => 'FallbackBehaviorEnum',
         Enums\Footer::class => 'FooterEnum',
         Enums\FolderRole::class => 'FolderRoleEnum',
