@@ -6,9 +6,12 @@ each one and hands it to you as a Laravel event.
 
 ## Setting it up
 
-1. Register an endpoint in Autentique's dashboard, pointing at
-   `https://your-app.example/webhooks/autentique`, and choose its events.
-   Copy the secret it shows.
+1. Register an endpoint in Autentique's dashboard, under **Settings, Webhooks,
+   Add endpoint**: a name, `https://your-app.example/webhooks/autentique`, the
+   JSON format, the kind of resource and its events. On saving, the dashboard
+   shows the endpoint's **secret once**; copy it then, since it cannot be shown
+   again. Every plan gets one: the dashboard's "Autenticação" option, marked
+   Pro, is a different thing.
 2. Configure the package:
 
    ```ini
@@ -57,6 +60,21 @@ With no secret configured, a webhook throws `MissingWebhookSecret` instead of
 being answered, so it reaches your error tracker rather than passing as a quiet
 stream of 401s.
 
+## What a delivery looks like
+
+Measured against the live API on 2026-09-21, with a sandbox document:
+
+- a `POST` with `Content-Type: application/json` and
+  `User-Agent: Autentique-Webhook/1.0`;
+- `X-Autentique-Signature` as 64 lower case hexadecimal characters;
+- one delivery per event, a second or two apart: creating and signing a document
+  sent `document.updated`, `document.created`, `document.updated` and
+  `document.finished`;
+- **sandbox documents deliver webhooks too**, marked `"sandbox": true`, so a
+  whole flow can be tested without spending anything but the deliveries;
+- deleting a signed document sent no `document.deleted`: it only moves to the
+  trash, and the event is for a permanent deletion.
+
 ## The event
 
 `$received->event` is a `Data\WebhookEvent`:
@@ -81,8 +99,10 @@ $event->payload()->nullableString('user.email');
 The resource is kept as Autentique sent it because webhook payloads are shaped
 differently from API answers: an action is `"Sign"` rather than `SIGN`, events are
 timestamps. Autentique's own examples also disagree about where the resource
-sits, `event.data.object` in one and `event.data` in the others; both are read,
-and `$object` holds it either way.
+sits, `event.data.object` in one and `event.data` in the others. **The live API
+sends it at `event.data`**, with `object` a type marker (`"document"`) and
+`previous_attributes` beside `data`; the other shape is still read, and `$object`
+holds the resource either way.
 
 ## The seventeen types
 

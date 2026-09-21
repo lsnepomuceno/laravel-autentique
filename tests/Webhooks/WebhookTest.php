@@ -73,6 +73,25 @@ describe('the route', function () {
         });
     });
 
+    it('reads a delivery recorded from the live API, personal data replaced', function () {
+        // Recorded on 2026-09-21 from a real document.finished delivery: the
+        // resource directly at event.data, with `object` a type marker rather
+        // than the resource, and previous_attributes beside data.
+        $this->postWebhook(webhookBody('live-document-finished'))->assertOk();
+
+        Event::assertDispatched(function (AutentiqueWebhookReceived $received): bool {
+            $event = $received->event;
+
+            return $event->type === WebhookEventType::DocumentFinished
+                && $event->documentId() === 'da0454a42b8859527151f6cd08430a40850cc873e35b52714'
+                && $event->previousAttributes === ['signed_count' => 1]
+                && $event->endpoint === 'laravel-autentique e2e'
+                && $event->payload()->nullableBool('sandbox') === true
+                && $event->payload()->nullableString('signatures.0.action') === 'Sign'
+                && $event->payload()->date('signatures.0.signed')?->toIso8601ZuluString() === '2026-09-21T18:09:30Z';
+        });
+    });
+
     it('dispatches a member event', function () {
         $this->postWebhook(webhookBody('member-created'))->assertOk();
 

@@ -26,7 +26,8 @@ it('reads who the token belongs to', function () {
         ->and($user->organization?->id)->toBe(179)
         ->and($user->organization?->uuid)->toBe('91155c91-a411-4d93-b2a4-92e37548256b')
         ->and($user->organization?->cnpj)->toBe('29.423.653/0001-65')
-        ->and($user->organization?->groups)->toBe([]);
+        ->and($user->organization?->groups)->toBe([])
+        ->and($user->group?->name)->toBe('Administrador');
 
     Http::assertSent(fn(Request $request): bool => $request['operationName'] === 'me');
 });

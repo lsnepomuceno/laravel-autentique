@@ -35,6 +35,13 @@ schema now introspected rather than assembled.
   `PositionElement::Radio`, `PositionElement::SquareInitials`,
   `VerificationType::PfFacialMatch`, with `SecurityVerification::pfFacialMatch()`.
 - `Data\Page::filter()`.
+- `Data\User::$group`, the token owner's group, read from `me` because
+  Autentique answers an organization's `groups` with null.
+
+### Verified
+
+- Webhooks against real deliveries: the signature, the payload shape (the
+  resource at `event.data`), the middleware, the controller and the event.
 
 ## [1.0.0-rc.1] - 2026-09-21
 
