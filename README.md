@@ -53,6 +53,9 @@ Autentique::folders()->share($folder->id, [Share::withEmail('legal@example.com',
 Autentique::organizations()->current()->groups;
 Autentique::organizations()->emailTemplates();
 
+// The Corporate plan: child organizations, their members, plans and webhooks.
+$child = Autentique::corporate()->createOrganization(new NewChildOrganization(name: 'Branch office'));
+
 // Who the token belongs to, their plan and their organization.
 $user = Autentique::account()->me();
 $user->subscription?->documents;

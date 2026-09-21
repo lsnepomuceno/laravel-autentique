@@ -1,0 +1,27 @@
+mutation createEndpoint(
+  $organization_id: Int!
+  $url: String!
+  $format: WebhookFormatEnum!
+  $type: WebhookEndpointTypeEnum!
+  $name: String!
+  $events: [WebhookEventTypeEnum!]!
+  $folder_id: String
+) {
+  createEndpoint(
+    organization_id: $organization_id
+    url: $url
+    format: $format
+    type: $type
+    name: $name
+    events: $events
+    folder_id: $folder_id
+  ) {
+    secret
+    webhook_endpoint {
+      id
+      url
+      active
+      events
+    }
+  }
+}

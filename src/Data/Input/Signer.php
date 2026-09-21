@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace LSNepomuceno\LaravelAutentique\Data\Input;
 
-use LSNepomuceno\LaravelAutentique\Enums\{Action, DeliveryMethod, SignerType};
+use LSNepomuceno\LaravelAutentique\Enums\{Action, DeliveryMethod, SessionBehavior, SignerType};
 use LSNepomuceno\LaravelAutentique\Exceptions\InvalidInput;
 
 /**
@@ -38,6 +38,8 @@ final readonly class Signer
         public array $verifications = [],
         public ?string $cpf = null,
         public ?SignerType $type = null,
+        public ?SessionBehavior $sessionBehavior = null,
+        public ?PrefilledFields $prefilledFields = null,
     ) {
         if ($email === null && $name === null && $phone === null) {
             throw new InvalidInput('A signer needs an email, a name or a phone.');
@@ -108,7 +110,7 @@ final readonly class Signer
      */
     public function withAction(Action $action): self
     {
-        return new self($action, $this->email, $this->name, $this->phone, $this->deliveryMethod, $this->positions, $this->verifications, $this->cpf, $this->type);
+        return new self($action, $this->email, $this->name, $this->phone, $this->deliveryMethod, $this->positions, $this->verifications, $this->cpf, $this->type, $this->sessionBehavior, $this->prefilledFields);
     }
 
     /**
@@ -118,7 +120,7 @@ final readonly class Signer
      */
     public function withName(string $name): self
     {
-        return new self($this->action, $this->email, $name, $this->phone, $this->deliveryMethod, $this->positions, $this->verifications, $this->cpf, $this->type);
+        return new self($this->action, $this->email, $name, $this->phone, $this->deliveryMethod, $this->positions, $this->verifications, $this->cpf, $this->type, $this->sessionBehavior, $this->prefilledFields);
     }
 
     /**
@@ -129,7 +131,7 @@ final readonly class Signer
      */
     public function withPosition(Position $position): self
     {
-        return new self($this->action, $this->email, $this->name, $this->phone, $this->deliveryMethod, [...$this->positions, $position], $this->verifications, $this->cpf, $this->type);
+        return new self($this->action, $this->email, $this->name, $this->phone, $this->deliveryMethod, [...$this->positions, $position], $this->verifications, $this->cpf, $this->type, $this->sessionBehavior, $this->prefilledFields);
     }
 
     /**
@@ -139,7 +141,7 @@ final readonly class Signer
      */
     public function withVerification(SecurityVerification $verification): self
     {
-        return new self($this->action, $this->email, $this->name, $this->phone, $this->deliveryMethod, $this->positions, [...$this->verifications, $verification], $this->cpf, $this->type);
+        return new self($this->action, $this->email, $this->name, $this->phone, $this->deliveryMethod, $this->positions, [...$this->verifications, $verification], $this->cpf, $this->type, $this->sessionBehavior, $this->prefilledFields);
     }
 
     /**
@@ -149,7 +151,7 @@ final readonly class Signer
      */
     public function withCpf(string $cpf): self
     {
-        return new self($this->action, $this->email, $this->name, $this->phone, $this->deliveryMethod, $this->positions, $this->verifications, $cpf, $this->type);
+        return new self($this->action, $this->email, $this->name, $this->phone, $this->deliveryMethod, $this->positions, $this->verifications, $cpf, $this->type, $this->sessionBehavior, $this->prefilledFields);
     }
 
     /**
@@ -160,7 +162,29 @@ final readonly class Signer
      */
     public function qualified(): self
     {
-        return new self($this->action, $this->email, $this->name, $this->phone, $this->deliveryMethod, $this->positions, $this->verifications, $this->cpf, SignerType::Qualified);
+        return new self($this->action, $this->email, $this->name, $this->phone, $this->deliveryMethod, $this->positions, $this->verifications, $this->cpf, SignerType::Qualified, $this->sessionBehavior, $this->prefilledFields);
+    }
+
+    /**
+     * The signer's session ends when they finish, or after five minutes.
+     * Corporate plan.
+     *
+     * @throws InvalidInput
+     */
+    public function ephemeralSession(): self
+    {
+        return new self($this->action, $this->email, $this->name, $this->phone, $this->deliveryMethod, $this->positions, $this->verifications, $this->cpf, $this->type, SessionBehavior::Ephemeral, $this->prefilledFields);
+    }
+
+    /**
+     * What a signer with no Autentique account finds already filled in.
+     * Corporate plan.
+     *
+     * @throws InvalidInput
+     */
+    public function withPrefilledFields(PrefilledFields $fields): self
+    {
+        return new self($this->action, $this->email, $this->name, $this->phone, $this->deliveryMethod, $this->positions, $this->verifications, $this->cpf, $this->type, $this->sessionBehavior, $fields);
     }
 
     /**
@@ -176,7 +200,11 @@ final readonly class Signer
             'action' => $this->action->value,
             'positions' => array_map(fn(Position $position): array => $position->toArray(), $this->positions),
             'security_verifications' => array_map(fn(SecurityVerification $check): array => $check->toArray(), $this->verifications),
-            'configs' => $this->cpf === null ? [] : ['cpf' => $this->cpf],
+            'configs' => array_filter([
+                'cpf' => $this->cpf,
+                'session_behavior' => $this->sessionBehavior?->value,
+                'prefilled_fields' => $this->prefilledFields?->toArray(),
+            ], fn(mixed $value): bool => $value !== null && $value !== []),
             'type' => $this->type?->value,
         ], fn(mixed $value): bool => $value !== null && $value !== []);
     }

@@ -68,9 +68,28 @@ function mirroredEnums(): array
         Enums\PositionElement::class => 'PositionElementEnum',
         Enums\Reminder::class => 'ReminderEnum',
         Enums\SignatureAppearance::class => 'SignatureAppearanceEnum',
+        Enums\SessionBehavior::class => 'SessionBehaviorEnum',
         Enums\SignerType::class => 'SignerTypeEnum',
         Enums\VerificationType::class => 'SecurityVerificationEnum',
         Enums\WhatsappTemplate::class => 'WhatsappTemplateEnum',
+    ];
+}
+
+/**
+ * The package's enums that mirror an enum of the Corporate schema.
+ *
+ * @return array<class-string<BackedEnum>, string>
+ */
+function corporateMirroredEnums(): array
+{
+    return [
+        Enums\ChildOrganizationPlan::class => 'PipefyPlansEnum',
+        Enums\CreditsRecurrence::class => 'CreditsRecurrenceEnum',
+        Enums\CustomPlan::class => 'CustomPlansEnum',
+        Enums\IntervalType::class => 'IntervalTypeEnum',
+        Enums\Tier::class => 'TierEnum',
+        Enums\WebhookEndpointType::class => 'WebhookEndpointTypeEnum',
+        Enums\WebhookFormat::class => 'WebhookFormatEnum',
     ];
 }
 
@@ -91,6 +110,8 @@ function unmirroredEnums(): array
         // Webhook event types are dotted strings in the payload. The Corporate
         // schema has an enum for registering endpoints, spelt differently.
         Enums\WebhookEventType::class,
+        // The keys of the member permissions input, not an enum.
+        Enums\MemberPermission::class,
     ];
 }
 
@@ -127,8 +148,18 @@ it('mirrors every value of each API enum, and nothing else', function () {
     // package has grown its own yet.
     expect(endpointSchema(Endpoint::Standard)->getType('ActionEnum'))->toBeInstanceOf(EnumType::class);
 
+    $mirrored = [];
+
     foreach (mirroredEnums() as $enum => $name) {
-        $type = endpointSchema(Endpoint::Standard)->getType($name);
+        $mirrored[] = [$enum, $name, Endpoint::Standard];
+    }
+
+    foreach (corporateMirroredEnums() as $enum => $name) {
+        $mirrored[] = [$enum, $name, Endpoint::Corporate];
+    }
+
+    foreach ($mirrored as [$enum, $name, $endpoint]) {
+        $type = endpointSchema($endpoint)->getType($name);
 
         expect($type)->toBeInstanceOf(EnumType::class);
 
@@ -156,9 +187,27 @@ it('lists every enum that mirrors the API', function () {
         $enums[] = 'LSNepomuceno\\LaravelAutentique\\Enums\\' . basename($file, '.php');
     }
 
-    $unmapped = array_diff($enums, array_keys(mirroredEnums()), unmirroredEnums());
+    $unmapped = array_diff($enums, array_keys(mirroredEnums()), array_keys(corporateMirroredEnums()), unmirroredEnums());
 
     expect(array_values($unmapped))->toBe([]);
+});
+
+it('names every webhook event the Corporate endpoint registers, and knows the two it does not', function () {
+    $type = endpointSchema(Endpoint::Corporate)->getType('WebhookEventTypeEnum');
+
+    expect($type)->toBeInstanceOf(EnumType::class);
+
+    /** @var EnumType $type */
+    $registrable = array_map(fn($value): string => $value->name, $type->getValues());
+
+    $names = array_values(array_filter(
+        array_map(fn(Enums\WebhookEventType $event): ?string => $event->endpointName(), Enums\WebhookEventType::cases()),
+        fn(?string $name): bool => $name !== null,
+    ));
+
+    expect($names)->toEqualCanonicalizing($registrable)
+        ->and(Enums\WebhookEventType::SignatureBiometricReset->endpointName())->toBeNull()
+        ->and(Enums\WebhookEventType::SignatureDeliveryFailed->endpointName())->toBeNull();
 });
 
 it('prints an introspection back into the schema it came from', function () {

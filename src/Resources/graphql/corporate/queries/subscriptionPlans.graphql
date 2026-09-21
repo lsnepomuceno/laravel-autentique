@@ -1,0 +1,5 @@
+query subscriptionPlans($id: String, $limit: Int, $page: Int) {
+  subscriptionPlans(id: $id, limit: $limit, page: $page) {
+    ...CorporatePlanFields
+  }
+}

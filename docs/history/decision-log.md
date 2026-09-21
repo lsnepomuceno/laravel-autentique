@@ -32,3 +32,10 @@ when the work was started on it.
 | # | Question | Needed by |
 |---|---|---|
 | 7 | A sandbox token to introspect the schema once, run by the maintainer so it never leaves the machine | #34. #9 shipped against a schema assembled from the documentation in the meantime |
+
+## Superseded during the work
+
+| # | Question | Decision |
+|---|---|---|
+| 4 | Corporate endpoint and OAuth in 1.0.0? | **In 1.0.0 after all.** Both were built before the first tag, in #20 and #21, so shipping them as minor releases later would have meant holding finished work back. Entry 4 above stands as what was decided at the time |
+

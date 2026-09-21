@@ -1,0 +1,11 @@
+fragment UsageItemsFields on ApiUsageItems {
+  create_document
+  email
+  sms
+  whatsapp
+  whatsapp_otp
+  documents_query
+  link
+  sign_phone_security_verification
+  webhook
+}

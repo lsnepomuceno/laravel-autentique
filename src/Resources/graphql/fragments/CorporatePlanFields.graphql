@@ -1,0 +1,10 @@
+fragment CorporatePlanFields on CorporatePlan {
+  id
+  display_name
+  document_amount
+  credit_amount
+  credits_recurrence_method
+  interval
+  interval_type
+  tier
+}

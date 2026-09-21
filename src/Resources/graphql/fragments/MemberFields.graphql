@@ -1,0 +1,18 @@
+fragment MemberFields on EnterpriseMember {
+  id
+  user {
+    id
+    name
+    email
+    cpf
+    birthday
+  }
+  group {
+    id
+    uuid
+    name
+  }
+  api_token {
+    access_token
+  }
+}

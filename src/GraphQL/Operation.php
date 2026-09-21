@@ -48,6 +48,25 @@ enum Operation: string
     case ShareFolder = 'mutations/shareFolder';
     case UpdateSharing = 'mutations/updateSharing';
 
+    // Corporate endpoint, Corporate plan only.
+    case CorporateOrganizations = 'corporate/queries/organizations';
+    case CorporateOrganizationMembers = 'corporate/queries/organizationMembers';
+    case CorporateOrganizationsPlans = 'corporate/queries/organizationsPlans';
+    case CorporateApiUsage = 'corporate/queries/childOrganizationsApiUsage';
+    case CorporateSubscriptionPlans = 'corporate/queries/subscriptionPlans';
+    case CorporateCreateOrganization = 'corporate/mutations/createOrganization';
+    case CorporateUpdateOrganization = 'corporate/mutations/updateOrganization';
+    case CorporateUpdateOrganizationPlan = 'corporate/mutations/updateOrganizationPlan';
+    case CorporateDeleteOrganization = 'corporate/mutations/deleteOrganization';
+    case CorporateCreateMember = 'corporate/mutations/createOrganizationMember';
+    case CorporateUpdateMember = 'corporate/mutations/updateOrganizationMember';
+    case CorporateDeleteMember = 'corporate/mutations/deleteOrganizationMember';
+    case CorporateCreateLoginCode = 'corporate/mutations/createOrganizationMemberLoginCode';
+    case CorporateCreateEndpoint = 'corporate/mutations/createEndpoint';
+    case CorporateCreateSubscriptionPlan = 'corporate/mutations/createSubscriptionPlan';
+    case CorporateUpdateSubscriptionPlan = 'corporate/mutations/updateSubscriptionPlan';
+    case CorporateUpdateOrganizationSubscription = 'corporate/mutations/updateOrganizationSubscription';
+
     /**
      * The operation's name, which is the file's name and the name written after
      * `query` or `mutation` inside it.

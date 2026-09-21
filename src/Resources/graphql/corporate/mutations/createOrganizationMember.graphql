@@ -1,0 +1,5 @@
+mutation createOrganizationMember($organization_id: Int!, $member: OrganizationMemberInput!) {
+  createOrganizationMember(organization_id: $organization_id, member: $member) {
+    ...MemberFields
+  }
+}

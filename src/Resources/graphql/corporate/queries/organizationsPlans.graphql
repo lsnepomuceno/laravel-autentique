@@ -1,0 +1,8 @@
+query organizationsPlans($organizations_ids: [Int]!) {
+  organizationsPlans(organizations_ids: $organizations_ids) {
+    organization_id
+    subscription {
+      name
+    }
+  }
+}

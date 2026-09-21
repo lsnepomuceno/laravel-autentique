@@ -14,7 +14,7 @@ src/
 ├── LaravelAutentiqueServiceProvider.php   # merges the config, binds the contract
 ├── AutentiqueManager.php                  # the Autentique implementation
 ├── Contracts/                             # Autentique, GraphQLClient, FileSource
-├── Api/                                   # one class per area of the API: Account, Documents, Folders, Organizations, PendingDocument, Signers
+├── Api/                                   # one class per area of the API: Account, Corporate, Documents, Folders, Organizations, PendingDocument, Signers
 ├── Commands/                              # CheckCommand, SchemaCommand
 ├── Events/                                # AutentiqueWebhookReceived
 ├── Facades/Autentique.php
@@ -44,6 +44,7 @@ through the `Autentique` facade, which is auto discovered.
 | `signers()` | `Api\Signers` | `add()`, `approveBiometric()`, `rejectBiometric()` return `Data\Signature`; `link()` returns `Data\Link`; `remove()`, `resend()` return `bool` |
 | `folders()` | `Api\Folders` | `find()`, `create()`, `rename()`, `share()`, `changeRole()`, `shareByLink()`, `stopSharingByLink()`, `removeLinkPassword()` return `Data\Folder`; `list()` returns `Data\Page<Folder>`; `documents()` returns `Data\Page<Document>`; `delete()` returns `bool` |
 | `organizations()` | `Api\Organizations` | `current()` returns `Data\Organization` with groups; `list()` returns `list<Organization>`; `emailTemplates()` returns `Data\Page<EmailTemplate>` |
+| `corporate()` | `Api\Corporate` | the Corporate endpoint: child organizations, members, login codes, webhook endpoints, custom plans, API usage |
 | `newDocument($name)` | `Api\PendingDocument` | the builder; `send()` returns `Data\Document` |
 | `fromPath($path, ?$name)`, `fromUpload($file, ?$name)`, `fromDisk($disk, $path, ?$name)` | `Contracts\FileSource` | **Laravel only**: uploads and disks stream |
 | `query($graphql, $variables)` | `array<string, mixed>`, the response's `data` | the escape hatch; values as variables, the document is the caller's |
@@ -91,6 +92,7 @@ omit is nullable.
 | `Data\Page<T>` | every listing; countable and iterable |
 | `Data\Folder`, `Data\FolderSummary`, `Data\FolderShare` | the folder operations |
 | `Data\EmailTemplate` | `emailTemplates` |
+| `Data\ChildOrganization`, `Data\OrganizationMember`, `Data\OrganizationPlan`, `Data\CorporatePlan`, `Data\ApiUsage`, `Data\ApiUsageItems`, `Data\WebhookEndpoint` | the Corporate operations. `OrganizationMember::$apiToken` and `WebhookEndpoint::$secret` are credentials |
 | `Data\WebhookEvent` | a webhook's body; the resource stays the array Autentique sent |
 | `Data\Signature`, `Data\Link`, `Data\Files`, `Data\Event`, `Data\Geolocation`, `Data\EmailEvents`, `Data\SignaturePosition`, `Data\Verification` | nested in a document |
 
@@ -100,7 +102,8 @@ rather than an exception, so a new value Autentique adds breaks nothing.
 ## Inputs
 
 What is sent is a `final readonly` class under `Data\Input\`: `NewDocument`,
-`DocumentChanges`, `Share`, `Signer`, `Position`, `SecurityVerification`, `Locale`, `DocumentConfig`,
+`DocumentChanges`, `Share`, `Signer`, `PrefilledFields`, `NewChildOrganization`,
+`ChildOrganizationChanges`, `NewMember`, `NewSubscriptionPlan`, `Position`, `SecurityVerification`, `Locale`, `DocumentConfig`,
 `Expiration`. Each refuses, with `InvalidInput`, a value Autentique documents it
 would refuse or silently change. `toArray()` returns what is sent, with every
 unset option left out so Autentique's default applies.
@@ -185,6 +188,7 @@ is a scalar ([invariant 4](invariants.md)).
 |---|---|---|
 | `token` | `AUTENTIQUE_TOKEN` | none |
 | `url` | `AUTENTIQUE_URL` | `https://api.autentique.com.br/v2/graphql` |
+| `corporate_url` | `AUTENTIQUE_CORPORATE_URL` | `https://api.autentique.com.br/v2/graphql/corporate` |
 | `sandbox` | `AUTENTIQUE_SANDBOX` | `false` |
 | `timeout` | `AUTENTIQUE_TIMEOUT` | `30` seconds |
 | `retry.times` | `AUTENTIQUE_RETRY_TIMES` | `2` |

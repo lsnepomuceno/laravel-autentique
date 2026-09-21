@@ -1,0 +1,5 @@
+mutation updateOrganizationMember($organization_id: Int!, $user_id: String!, $member: OrganizationMemberInput!) {
+  updateOrganizationMember(organization_id: $organization_id, user_id: $user_id, member: $member) {
+    ...MemberFields
+  }
+}

@@ -1,0 +1,17 @@
+query childOrganizationsApiUsage($organization_id: Int!, $start_date: String!, $end_date: String!) {
+  childOrganizationsApiUsage(organization_id: $organization_id, start_date: $start_date, end_date: $end_date) {
+    pricing {
+      valid_since
+      currency
+      items {
+        ...UsageItemsFields
+      }
+    }
+    usage {
+      day
+      items {
+        ...UsageItemsFields
+      }
+    }
+  }
+}

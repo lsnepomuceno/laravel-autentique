@@ -1,0 +1,10 @@
+mutation updateOrganizationSubscription($organization_id: Int!, $plan_id: String!, $renew_date: InternationalDateScalar) {
+  updateOrganizationSubscription(organization_id: $organization_id, plan_id: $plan_id, renew_date: $renew_date) {
+    name
+    documents
+    credits
+    credits_bonus
+    renew_at
+    bought_at
+  }
+}

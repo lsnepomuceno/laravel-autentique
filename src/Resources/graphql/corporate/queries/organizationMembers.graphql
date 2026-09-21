@@ -1,0 +1,21 @@
+query organizationMembers(
+  $organization_id: Int!
+  $id: String
+  $name: String
+  $start_date: String
+  $end_date: String
+  $limit: Int
+  $page: Int
+) {
+  organizationMembers(
+    organization_id: $organization_id
+    id: $id
+    name: $name
+    start_date: $start_date
+    end_date: $end_date
+    limit: $limit
+    page: $page
+  ) {
+    ...MemberFields
+  }
+}
