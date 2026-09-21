@@ -152,6 +152,21 @@ is set. Its answers are `200 {"received": true}`, `200 {"received": true,
 "duplicate": true}` for a dropped repeat, `400` for a signed body that is not an
 event, `401` for a bad signature.
 
+## Testing
+
+`Autentique::fake()` returns `Testing\AutentiqueFake`, installed in place of
+`Contracts\GraphQLClient`. Its answers are shaped from what was sent;
+`respond()`, `fail()` and `respondToQuery()` override them. Its assertions are
+`assertDocumentSent()`, `assertDocumentSentTimes()`, `assertNoDocumentSent()`,
+`assertSignerAdded()`, `assertResent()`, `assertSent()`, `assertNotSent()`,
+`assertSentTimes()` and `assertNothingSent()`, and `sent()` returns every
+`Testing\SentOperation`.
+
+`Testing\FakeWebhook::make()` builds a signed webhook body.
+
+`src/Testing` uses PHPUnit's assertions, as Laravel's own fakes do, and runs
+only inside a test suite, where PHPUnit is installed.
+
 ## Commands
 
 | Command | Exit codes |

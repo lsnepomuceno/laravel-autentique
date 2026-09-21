@@ -28,4 +28,16 @@ return new Configuration()
     ->ignoreErrorsOnPackages(
         ['orchestra/testbench-core', 'pestphp/pest-plugin-arch'],
         [ErrorType::SHADOW_DEPENDENCY],
+    )
+
+    /*
+     * src/Testing asserts with PHPUnit, as Laravel's own fakes do. It runs only
+     * inside a consumer's test suite, where PHPUnit is installed, and requiring
+     * it would put a test framework in every production install. The suite
+     * reaches PHPUnit's exceptions too, through Pest, which brings it.
+     */
+    ->ignoreErrorsOnPackageAndPaths(
+        'phpunit/phpunit',
+        [__DIR__ . '/src/Testing', __DIR__ . '/tests'],
+        [ErrorType::SHADOW_DEPENDENCY],
     );

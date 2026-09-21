@@ -62,6 +62,16 @@ $user->subscription?->documents;
 $data = Autentique::query('query { me { id name } }');
 ```
 
+In tests, `Autentique::fake()` sends nothing and records everything:
+
+```php
+$autentique = Autentique::fake();
+
+// … the application runs …
+
+$autentique->assertDocumentSent(fn(array $document) => $document['name'] === 'Service agreement');
+```
+
 Every failure is an `LSNepomuceno\LaravelAutentique\Exceptions\AutentiqueException`,
 narrowed to the fault: `Unauthenticated`, `RateLimited`, `ValidationFailed`,
 `NotFound`, `GraphQLError`, `TransportFailed`, `MissingToken`.
