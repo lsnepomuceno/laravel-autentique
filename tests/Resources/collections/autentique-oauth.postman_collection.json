@@ -1,0 +1,276 @@
+{
+  "info": {
+    "_postman_id": "8d5b90aa-8b82-4d8b-9d1d-3f711c9ac8a4",
+    "name": "Autentique OAuth 2.0",
+    "description": "## Before you start\n\nOpen the **Variables** tab and fill every value marked **[Required]**.\n\nThen open the collection's **Authorization** tab and copy the **Callback URL** displayed by Postman. Register that exact URI as a redirect URI for your OAuth application before requesting a token.\n\n## Get an access token\n\n1. Open the collection's **Authorization** tab.\n2. Confirm that **Auth Type** is **OAuth 2.0** and **Authorize using browser** is enabled.\n3. Select **Get New Access Token**.\n4. Complete the Autentique login and consent flow in your browser.\n5. Return to Postman, select **Proceed**, then **Use Token**.\n\nAll GraphQL requests inherit this OAuth 2.0 configuration. Postman adds the access token to the `Authorization` header and can refresh it when the token response includes a refresh token.\n\n## OAuth 2.0 configuration\n\n- **Grant Type:** Authorization Code (With PKCE)\n- **Callback URL:** Provided by Postman; register the displayed URI exactly\n- **Authorize using browser:** Enabled\n- **Auth URL:** `{{base_url}}/oauth/authorize`\n- **Access Token URL:** `{{base_url}}/oauth/token`\n- **Client ID:** `{{client_id}}`\n- **Client Secret:** `{{client_secret}}`\n- **Scope:** `{{scopes}}`\n- **Code Challenge Method:** SHA-256\n- **Client Authentication:** Send client credentials in body\n\nPostman generates `state`, the PKCE verifier, and the PKCE challenge as part of the authorization flow. Tokens stay in Postman's OAuth 2.0 token manager instead of collection variables.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.autentique.com.br",
+      "type": "string",
+      "description": "[Required] Production OAuth API origin."
+    },
+    {
+      "key": "graphql_url",
+      "value": "https://api.autentique.com.br/v2/graphql",
+      "type": "string",
+      "description": "[Required] Production GraphQL endpoint."
+    },
+    {
+      "key": "scopes",
+      "value": "user:read documents:read documents:create documents:update",
+      "type": "string",
+      "description": "[Required] Space-separated scopes enabled for this OAuth application."
+    },
+    {
+      "key": "client_id",
+      "value": "",
+      "type": "string",
+      "description": "[Required] OAuth client identifier provided when the application is created."
+    },
+    {
+      "key": "client_secret",
+      "value": "",
+      "type": "string",
+      "description": "[Required] OAuth client secret provided when the application is created."
+    },
+    {
+      "key": "document_id",
+      "value": "",
+      "type": "string",
+      "description": "[Required] Document UUID returned when creating or retrieving a document."
+    }
+  ],
+  "auth": {
+    "type": "oauth2",
+    "oauth2": [
+      {
+        "key": "tokenName",
+        "value": "Autentique OAuth 2.0",
+        "type": "string"
+      },
+      {
+        "key": "grant_type",
+        "value": "authorization_code_with_pkce",
+        "type": "string"
+      },
+      {
+        "key": "authUrl",
+        "value": "{{base_url}}/oauth/authorize",
+        "type": "string"
+      },
+      {
+        "key": "accessTokenUrl",
+        "value": "{{base_url}}/oauth/token",
+        "type": "string"
+      },
+      {
+        "key": "clientId",
+        "value": "{{client_id}}",
+        "type": "string"
+      },
+      {
+        "key": "clientSecret",
+        "value": "{{client_secret}}",
+        "type": "string"
+      },
+      {
+        "key": "scope",
+        "value": "{{scopes}}",
+        "type": "string"
+      },
+      {
+        "key": "challengeAlgorithm",
+        "value": "S256",
+        "type": "string"
+      },
+      {
+        "key": "client_authentication",
+        "value": "body",
+        "type": "string"
+      },
+      {
+        "key": "addTokenTo",
+        "value": "header",
+        "type": "string"
+      },
+      {
+        "key": "headerPrefix",
+        "value": "Bearer",
+        "type": "string"
+      },
+      {
+        "key": "useBrowser",
+        "value": true,
+        "type": "boolean"
+      },
+      {
+        "key": "refreshTokenUrl",
+        "value": "{{base_url}}/oauth/token",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "GraphQL scope examples",
+      "item": [
+        {
+          "name": "Current user (user:read)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let responseBody = {};",
+                  "try { responseBody = pm.response.json(); } catch (error) {}",
+                  "pm.test('HTTP response is successful', function () { pm.response.to.have.status(200); });",
+                  "pm.test('GraphQL response has no errors', function () { pm.expect(responseBody.errors).to.be.undefined; });",
+                  "pm.test('Response contains the current user', function () { pm.expect(responseBody.data && responseBody.data.me).to.be.an('object'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query Me { me { id email } }\",\n  \"variables\": {},\n  \"operationName\": \"Me\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": "{{graphql_url}}",
+            "description": "Requires user:read. Guide: https://docs.autentique.com.br/api/queries/fetch-current-user"
+          },
+          "response": []
+        },
+        {
+          "name": "Retrieve one document (documents:read)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let responseBody = {};",
+                  "try { responseBody = pm.response.json(); } catch (error) {}",
+                  "pm.test('HTTP response is successful', function () { pm.response.to.have.status(200); });",
+                  "pm.test('GraphQL response has no errors', function () { pm.expect(responseBody.errors).to.be.undefined; });",
+                  "pm.test('Response contains the requested document', function () { pm.expect(responseBody.data && responseBody.data.document).to.be.an('object'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query Document($id: UUID) { document(id: $id) { id name } }\",\n  \"variables\": { \"id\": \"{{document_id}}\" },\n  \"operationName\": \"Document\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": "{{graphql_url}}",
+            "description": "Requires documents:read and document_id. Guide: https://docs.autentique.com.br/api/queries/resgatando-documentos#retrieving-a-specific-document"
+          },
+          "response": []
+        },
+        {
+          "name": "List documents (documents:read)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let responseBody = {};",
+                  "try { responseBody = pm.response.json(); } catch (error) {}",
+                  "pm.test('HTTP response is successful', function () { pm.response.to.have.status(200); });",
+                  "pm.test('GraphQL response has no errors', function () { pm.expect(responseBody.errors).to.be.undefined; });",
+                  "pm.test('Response contains a document list', function () { pm.expect(responseBody.data && responseBody.data.documents && responseBody.data.documents.data).to.be.an('array'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query Documents { documents(limit: 1, page: 1) { data { id name } } }\",\n  \"variables\": {},\n  \"operationName\": \"Documents\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": "{{graphql_url}}",
+            "description": "Requires documents:read. Guide: https://docs.autentique.com.br/api/queries/resgatando-documentos#listing-documents"
+          },
+          "response": []
+        },
+        {
+          "name": "Create a document (documents:create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let responseBody = {};",
+                  "try { responseBody = pm.response.json(); } catch (error) {}",
+                  "pm.test('HTTP response is successful', function () { pm.response.to.have.status(200); });",
+                  "pm.test('GraphQL response has no errors', function () { pm.expect(responseBody.errors).to.be.undefined; });",
+                  "pm.test('Response contains the created document', function () { pm.expect(responseBody.data && responseBody.data.createDocument).to.be.an('object'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {"key": "operations", "value": "{\"query\":\"mutation CreateDocument($document: DocumentInput!, $signers: [SignerInput!]!, $file: Upload!) { createDocument(document: $document, signers: $signers, file: $file) { id name } }\",\"variables\":{\"document\":{\"name\":\"OAuth example document\"},\"signers\":[{\"action\":\"SIGN\",\"name\":\"Example signer\"}],\"file\":null},\"operationName\":\"CreateDocument\"}", "type": "text"},
+                {"key": "map", "value": "{\"0\":[\"variables.file\"]}", "type": "text"},
+                {"key": "0", "type": "file", "src": []}
+              ]
+            },
+            "url": "{{graphql_url}}",
+            "description": "Requires documents:create and a local PDF in multipart field 0. Guide: https://docs.autentique.com.br/api/mutations/criando-um-documento"
+          },
+          "response": []
+        },
+        {
+          "name": "Update a document (documents:update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let responseBody = {};",
+                  "try { responseBody = pm.response.json(); } catch (error) {}",
+                  "pm.test('HTTP response is successful', function () { pm.response.to.have.status(200); });",
+                  "pm.test('GraphQL response has no errors', function () { pm.expect(responseBody.errors).to.be.undefined; });",
+                  "pm.test('Response contains the updated document', function () { pm.expect(responseBody.data && responseBody.data.updateDocument).to.be.an('object'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation UpdateDocument($id: UUID!, $document: UpdateDocumentInput!) { updateDocument(id: $id, document: $document) { id name } }\",\n  \"variables\": { \"id\": \"{{document_id}}\", \"document\": { \"name\": \"Updated OAuth example document\" } },\n  \"operationName\": \"UpdateDocument\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": "{{graphql_url}}",
+            "description": "Requires documents:update and document_id. Guide: https://docs.autentique.com.br/api/mutations/editing-a-document"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

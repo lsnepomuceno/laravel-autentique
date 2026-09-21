@@ -24,7 +24,9 @@ type Query {
   me: User
   organization: Organization
   organizations: [Organization]
-  document(id: UUID!): Document
+  # Nullable: Autentique's own OAuth collection declares `$id: UUID` for it, and
+  # its request test expects no errors (tests/Resources/collections/README.md).
+  document(id: UUID): Document
   documents(
     limit: Int! = 60
     page: Int! = 1
