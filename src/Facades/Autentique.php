@@ -12,6 +12,7 @@ use LSNepomuceno\LaravelAutentique\Contracts\Autentique as AutentiqueContract;
  * @method static \LSNepomuceno\LaravelAutentique\Api\Documents documents()
  * @method static \LSNepomuceno\LaravelAutentique\Api\Signers signers()
  * @method static \LSNepomuceno\LaravelAutentique\Api\Folders folders()
+ * @method static \LSNepomuceno\LaravelAutentique\Api\Organizations organizations()
  * @method static \LSNepomuceno\LaravelAutentique\Api\PendingDocument newDocument(string $name)
  * @method static \LSNepomuceno\LaravelAutentique\Contracts\FileSource fromPath(string $path, ?string $name = null)
  * @method static \LSNepomuceno\LaravelAutentique\Contracts\FileSource fromUpload(\Illuminate\Http\UploadedFile $file, ?string $name = null)

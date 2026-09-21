@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace LSNepomuceno\LaravelAutentique\Contracts;
 
 use Illuminate\Http\UploadedFile;
-use LSNepomuceno\LaravelAutentique\Api\{Account, Documents, Folders, PendingDocument, Signers};
+use LSNepomuceno\LaravelAutentique\Api\{Account, Documents, Folders, Organizations, PendingDocument, Signers};
 use LSNepomuceno\LaravelAutentique\Exceptions\{AutentiqueException, InvalidInput};
 
 /**
@@ -34,6 +34,11 @@ interface Autentique
      * Folders, sharing them, and the documents inside them.
      */
     public function folders(): Folders;
+
+    /**
+     * The organizations the token's owner belongs to, and the email templates.
+     */
+    public function organizations(): Organizations;
 
     /**
      * Starts a document, sent with `->send()`.

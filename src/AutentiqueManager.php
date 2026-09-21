@@ -7,7 +7,7 @@ namespace LSNepomuceno\LaravelAutentique;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Filesystem\Factory as Filesystems;
 use Illuminate\Http\UploadedFile;
-use LSNepomuceno\LaravelAutentique\Api\{Account, Documents, Folders, PendingDocument, Signers};
+use LSNepomuceno\LaravelAutentique\Api\{Account, Documents, Folders, Organizations, PendingDocument, Signers};
 use LSNepomuceno\LaravelAutentique\Contracts\{Autentique, FileSource, GraphQLClient};
 use LSNepomuceno\LaravelAutentique\Io\{DiskFile, PathFile, UploadedFileSource};
 
@@ -44,6 +44,12 @@ final readonly class AutentiqueManager implements Autentique
     public function folders(): Folders
     {
         return new Folders($this->client, $this->config);
+    }
+
+    #[\Override]
+    public function organizations(): Organizations
+    {
+        return new Organizations($this->client);
     }
 
     #[\Override]
