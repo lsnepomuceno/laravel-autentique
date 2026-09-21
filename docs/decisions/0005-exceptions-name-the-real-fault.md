@@ -77,5 +77,18 @@ context array, not in a dumped request.
 
 ## Outcome
 
-Not yet written: this section is filled in when the code that depends on this
-record ships.
+Shipped in #8, with two additions.
+
+**A shared parent, `RequestFailed`**, abstract, between the base and the six
+exceptions a request can end in. It carries what support needs from any of
+them: the operation, the HTTP status, the `X-Attq-Request-Id` Autentique
+returns, and every error.
+
+**`TransportFailed`**, for a connection that failed or an answer that was not
+GraphQL at all: a 5xx, a proxy's page, a body that is not JSON. The record
+listed only what Autentique reports; a client also has to name what it could
+not get an answer to, and say that the request may have been processed.
+
+The codes are `Enums\ErrorCode`, with the text in `lang/en/errors.php` and
+`lang/pt_BR/errors.php`. Five codes the documentation mentions outside its table
+got text written in the table's register.

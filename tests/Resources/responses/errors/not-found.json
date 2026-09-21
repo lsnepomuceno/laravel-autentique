@@ -1,0 +1,10 @@
+{
+  "errors": [
+    {
+      "message": "Folder not found",
+      "locations": [{ "line": 2, "column": 3 }],
+      "path": ["folder"]
+    }
+  ],
+  "data": { "folder": null }
+}

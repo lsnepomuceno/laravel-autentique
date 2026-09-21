@@ -111,6 +111,7 @@ export default defineConfig({
     sidebar: {
       '/guide/': sections('guide', [
         { text: 'Getting started', slugs: ['getting-started', 'configuration'] },
+        { text: 'Working with it', slugs: ['errors', 'raw-queries'] },
       ]),
       '/spec/': [{ text: 'Specification', items: pages('spec') }],
       '/decisions/': [{ text: 'Decisions', items: pages('decisions') }],

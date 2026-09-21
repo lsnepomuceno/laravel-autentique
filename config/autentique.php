@@ -69,4 +69,25 @@ return [
 
     'timeout' => (int) env('AUTENTIQUE_TIMEOUT', 30),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Retrying a refused request
+    |--------------------------------------------------------------------------
+    |
+    | Only HTTP 429 is retried: Autentique refused the request, so nothing was
+    | processed. A timeout or a server error may have been processed, and a
+    | mutation repeated after one can duplicate a billed document, so neither
+    | is ever retried here.
+    |
+    | times  how many retries after the first attempt; 0 turns retrying off
+    | sleep  milliseconds to wait, times the attempt number, when Autentique
+    |        does not say how long in a Retry-After header
+    |
+    */
+
+    'retry' => [
+        'times' => (int) env('AUTENTIQUE_RETRY_TIMES', 2),
+        'sleep' => (int) env('AUTENTIQUE_RETRY_SLEEP', 1000),
+    ],
+
 ];

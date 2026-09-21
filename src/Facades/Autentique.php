@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Facade;
 use LSNepomuceno\LaravelAutentique\Contracts\Autentique as AutentiqueContract;
 
 /**
+ * @method static array<string, mixed> query(string $graphql, array<string, mixed> $variables = [])
+ *
  * @see \LSNepomuceno\LaravelAutentique\AutentiqueManager
  */
 final class Autentique extends Facade

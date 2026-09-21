@@ -1,0 +1,9 @@
+{
+  "errors": [
+    {
+      "message": "too_many_resent_emails",
+      "path": ["resendSignatures"]
+    }
+  ],
+  "data": { "resendSignatures": null }
+}
