@@ -1,21 +1,7 @@
 # Getting started
 
-::: warning A release candidate
-`1.0.0-rc.1` is complete and has not yet run against Autentique itself; `1.0.0`
-follows that run
-([#48](https://github.com/lsnepomuceno/laravel-autentique/issues/48)). Until it
-is on Packagist, install it from GitHub, as below.
-:::
-
 ```bash
 composer require lsnepomuceno/laravel-autentique
-```
-
-Until the package is on Packagist, add the repository first:
-
-```bash
-composer config repositories.laravel-autentique vcs https://github.com/lsnepomuceno/laravel-autentique
-composer require lsnepomuceno/laravel-autentique:^1.0@RC
 ```
 
 Nothing to register: the service provider is discovered and the `Autentique`
@@ -23,12 +9,16 @@ facade is available immediately.
 
 ## Requirements
 
-| | |
+| Requirement | Version |
 |---|---|
 | PHP | 8.4.1 to 8.5 |
 | Laravel | 13 |
-| Extensions | `ext-json` |
+| PHP extensions | `json` and `hash`, enabled in every PHP 8 build; `curl` recommended; and [what Laravel requires](https://laravel.com/docs/13.x/deployment#server-requirements) |
 | An Autentique account | with an API token, from the dashboard's API settings |
+
+The HTTP client, Guzzle under Laravel's, sends through `curl` when it is loaded
+and through PHP streams otherwise, which need `allow_url_fopen` on and `openssl`
+loaded, since Autentique is reached over HTTPS.
 
 Why this floor, and not a lower one, is
 [decision 0002](/decisions/0002-php-and-laravel-floor).

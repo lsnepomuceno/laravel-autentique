@@ -1,5 +1,11 @@
 # OAuth
 
+::: warning Experimental
+OAuth has not yet run against Autentique itself, and until it has it may change
+in a minor release. [The public API](/spec/public-api#experimental) says what
+that covers.
+:::
+
 An API token acts as the account it belongs to. An application used by other
 people, who each authorize it to act in their own Autentique account, uses
 OAuth 2.0 instead: Authorization Code with PKCE (S256).

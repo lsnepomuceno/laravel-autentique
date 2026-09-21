@@ -116,7 +116,7 @@ $autentique = Autentique::fake();
 $autentique->assertDocumentSent();
 ```
 
-## Unreleased
+## To 1.0.0
 
 ### From `1.0.0-rc.1`
 
