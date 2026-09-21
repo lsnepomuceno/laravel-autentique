@@ -32,3 +32,21 @@ manual check after their last attempt, which you then approve or reject. With
 A manual check waiting for you arrives as a `signature.biometric_unapproved`
 webhook, and each `Data\Verification` on a signature carries the `$id` and the
 `$images` to decide on.
+
+## Approving a manual check
+
+A `manual()` check, or an automatic one that fell back to manual, waits for you.
+The photos are on the signature's verification:
+
+```php
+$verification = $document->signature($publicId)?->verifications[0];
+
+$verification->images;   // ['front' => 'https://…', 'selfie' => 'https://…']
+
+Autentique::signers()->approveBiometric($verification->id, $publicId);
+Autentique::signers()->rejectBiometric($verification->id, $publicId);
+```
+
+Both return the signature as it is afterwards. Autentique reports the outcome
+as the `signature.biometric_approved` or `signature.biometric_rejected` webhook.
+

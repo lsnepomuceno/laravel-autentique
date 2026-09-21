@@ -43,3 +43,24 @@ $signer = Signer::email('ana@example.com')
 
 Where to stamp is in [positions](/guide/positions), and identity checks in
 [security verifications](/guide/security-verifications).
+
+## On an existing document
+
+Each signer on a document is a `Data\Signature`, identified by its `$publicId`.
+
+```php
+$signers = Autentique::signers();
+
+$signature = $signers->add($documentId, Signer::email('late@example.com'));   // while the document can still change
+$signers->remove($signature->publicId, $documentId);                          // only before they act; cannot be undone
+$signers->resend([$signature->publicId]);                                     // free of charge
+$link = $signers->link($signature->publicId);                                 // $link->shortLink, exclusive to them
+```
+
+**Resending is throttled by Autentique.** Signatures resent too recently are
+skipped and the rest are resent. When every one of them was, nothing is sent
+and `ResendThrottled` is thrown.
+
+Approving a manual identity check is in
+[security verifications](/guide/security-verifications#approving-a-manual-check).
+
