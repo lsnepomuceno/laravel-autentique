@@ -1,5 +1,7 @@
 # Laravel Autentique
 
+[![CI](https://github.com/lsnepomuceno/laravel-autentique/actions/workflows/main_action.yml/badge.svg)](https://github.com/lsnepomuceno/laravel-autentique/actions/workflows/main_action.yml)
+
 A Laravel client for the [Autentique](https://www.autentique.com.br) GraphQL
 API v2: documents, signers, folders and webhooks.
 

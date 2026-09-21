@@ -55,6 +55,8 @@ docker compose -f .docker/compose.yaml run --rm php85 composer check   # PHP 8.5
 
 The Compose project name is pinned to `laravel-autentique`, so the vendor volumes are not shared with the sibling repositories, whose Compose files also live in a `.docker` directory.
 
+CI (`.github/workflows/main_action.yml`) runs PHP 8.4 and 8.5 against Laravel 13 on every pull request, whatever its base, so a stacked pull request is tested too. Keep it in sync with `composer.json` and the compatibility table in `README.md`. `bc.yml` reports breaks against the last tag and stays dormant until the first one; `docs.yml` builds the site on every pull request touching `docs/` and publishes it from a tag.
+
 A Husky `pre-commit` hook formats staged PHP files with Pint and runs PHPStan, and `pre-push` refuses a push to `main` (`npm install` to enable them).
 
 ### The documentation site
