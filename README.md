@@ -21,7 +21,7 @@ which is no longer maintained.
 ## Development
 
 ```bash
-composer check          # everything CI runs: pint --test, phpstan, deps, pest, type coverage
+composer check          # everything CI runs: pint, normalize, phpstan, deps, pest, type coverage
 docker compose -f .docker/compose.yaml run --rm php85 composer check
 ```
 

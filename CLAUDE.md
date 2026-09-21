@@ -30,7 +30,7 @@ It is a sibling of `lsnepomuceno/signet-pdf` and `lsnepomuceno/laravel-a1-pdf-si
 ## Commands
 
 ```bash
-composer check          # everything CI runs: pint --test, phpstan, deps, pest, type coverage
+composer check          # everything CI runs: pint, normalize, phpstan, deps, pest, type coverage
 composer test           # vendor/bin/pest --fail-on-skipped
 composer analyse        # PHPStan level max, no baseline
 composer lint           # Pint (PER-CS); append --test to only check

@@ -1,0 +1,16 @@
+fragment VerificationFields on SecurityVerificationType {
+  id
+  type
+  verify_phone
+  fallback_behavior
+  payload {
+    url
+    reference
+  }
+  user {
+    images
+    confidence
+  }
+  verified_at
+  max_attempt
+}

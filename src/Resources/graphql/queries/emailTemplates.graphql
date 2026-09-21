@@ -1,0 +1,16 @@
+query emailTemplates($limit: Int!, $page: Int!) {
+  emailTemplates(limit: $limit, page: $page) {
+    has_more_pages
+    data {
+      id
+      name
+      type
+      email {
+        text
+        sender
+        colors
+        template
+      }
+    }
+  }
+}

@@ -4,9 +4,9 @@ How an operation is added to the package, or changed. The reasoning is in
 [0003](../decisions/0003-operations-live-in-graphql-files.md); this page is the
 procedure.
 
-The loader, the operation enum and the schema check are built by #7 and #9.
-Until they land, this page is the specification they are built against, and
-each of those pull requests updates it to match what shipped.
+The files, the enum naming them and the loader shipped with #7. The check
+against the schema is built by #9, and until it lands step 3 below is the
+specification it is built against.
 
 ## Where things live
 
@@ -18,7 +18,11 @@ src/Resources/graphql/
 ```
 
 - **One operation per file.** The operation's name is the file's name:
-  `mutations/createDocument.graphql` holds `mutation createDocument(…)`.
+  `mutations/createDocument.graphql` holds `mutation createDocument(…)`, and
+  the answer arrives under `data.createDocument`.
+- **Variables are named after the argument they feed**, snake case included:
+  `$folder_id` for `folder_id:`. The array a caller's code builds then reads
+  like the API's own documentation.
 - **Values are variables, always** ([invariant 2](invariants.md)). An operation
   declares every value it needs as a `$variable` with its GraphQL type.
 - **A selection used in more than one operation is a fragment**, in its own file
@@ -31,8 +35,10 @@ src/Resources/graphql/
    it has one, turn every literal argument into a variable, and select the
    fields the package will model, reusing fragments where the selection
    already exists.
-2. **Add the enum case** naming it, with whether it is a query or a mutation and
-   which endpoint it targets.
+2. **Add the enum case** to `LSNepomuceno\LaravelAutentique\GraphQL\Operation`,
+   whose value is the file's path without the extension. Whether it is a query
+   or a mutation, which endpoint it targets and the field its answer arrives
+   under all follow from that path.
 3. **Validate it against the schema.** The suite parses and validates every file
    against the committed SDL, so a misspelled field or a wrong argument type
    fails `composer test`.
@@ -44,6 +50,17 @@ src/Resources/graphql/
    sent as well as the object returned.
 6. **Document it** in the guide page for its area, and in
    [the public API](public-api.md).
+
+## What the suite checks today
+
+`tests/GraphQL/OperationTest.php`:
+
+- every enum case has a file and every file has a case;
+- every operation is named after its file;
+- every fragment is named after its file, and every fragment is used;
+- no argument in any file is a literal, only a variable;
+- the loader appends each fragment once, recursively, fails on a fragment no
+  file defines, leaves inline fragments alone, and reads each file once.
 
 ## Changing an operation
 

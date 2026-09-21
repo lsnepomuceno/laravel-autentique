@@ -1,0 +1,30 @@
+query documentsByFolder(
+  $folder_id: UUID!
+  $limit: Int!
+  $page: Int!
+  $status: DocumentStatusEnum
+  $search: String
+  $orderBy: OrderBy
+  $showSandbox: Boolean
+  $onlySandbox: Boolean
+) {
+  documentsByFolder(
+    folder_id: $folder_id
+    limit: $limit
+    page: $page
+    status: $status
+    search: $search
+    orderBy: $orderBy
+    showSandbox: $showSandbox
+    onlySandbox: $onlySandbox
+  ) {
+    total
+    per_page
+    current_page
+    last_page
+    has_more_pages
+    data {
+      ...DocumentFields
+    }
+  }
+}

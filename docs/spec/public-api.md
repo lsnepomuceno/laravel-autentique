@@ -14,7 +14,10 @@ src/
 ├── LaravelAutentiqueServiceProvider.php   # merges the config, binds the contract
 ├── AutentiqueManager.php                  # the Autentique implementation
 ├── Contracts/Autentique.php               # this package's surface
-└── Facades/Autentique.php
+├── Facades/Autentique.php
+├── Exceptions/                            # AutentiqueException and what extends it
+├── GraphQL/                               # Operation, Endpoint, OperationLoader
+└── Resources/graphql/                     # one .graphql file per operation
 ```
 
 The root namespace `LSNepomuceno\LaravelAutentique` is fixed; renaming it would
@@ -31,6 +34,26 @@ docblock.
 
 The contract is bound rather than the class, so an application can bind its own
 implementation in a service provider.
+
+## Operations
+
+`GraphQL\Operation` names every operation the package sends, one case per file
+under `src/Resources/graphql/`. It is public because tests and the fake name
+operations by it. Adding a case is a minor release; removing or renaming one is
+a major release.
+
+The selection of fields inside each file is not itself public: what is public is
+the value object built from it
+([0008](../decisions/0008-responses-are-typed-value-objects.md)).
+
+## Exceptions
+
+Everything the package throws extends `Exceptions\AutentiqueException`, which
+is abstract.
+
+| Exception | When |
+|---|---|
+| `InvalidOperation` | an operation file is missing or spreads a fragment no file defines. A defect in the package, which the suite exists to prevent |
 
 ## Configuration
 

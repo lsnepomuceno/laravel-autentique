@@ -1,0 +1,56 @@
+fragment SignatureFields on Signature {
+  public_id
+  name
+  email
+  delivery_method
+  type
+  created_at
+  action {
+    name
+  }
+  link {
+    id
+    short_link
+  }
+  user {
+    id
+    name
+    email
+    phone
+  }
+  email_events {
+    sent
+    opened
+    delivered
+    refused
+    reason
+  }
+  positions {
+    element
+    x
+    y
+    z
+    angle
+  }
+  verifications {
+    ...VerificationFields
+  }
+  viewed {
+    ...EventFields
+  }
+  signed {
+    ...EventFields
+  }
+  rejected {
+    ...EventFields
+  }
+  signed_unapproved {
+    ...EventFields
+  }
+  biometric_approved {
+    ...EventFields
+  }
+  biometric_rejected {
+    ...EventFields
+  }
+}

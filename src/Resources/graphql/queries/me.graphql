@@ -1,0 +1,19 @@
+query me {
+  me {
+    id
+    name
+    email
+    phone
+    cpf
+    cnpj
+    birthday
+    subscription {
+      has_premium_features
+      documents
+      credits
+    }
+    organization {
+      ...OrganizationFields
+    }
+  }
+}

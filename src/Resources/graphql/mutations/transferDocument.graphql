@@ -1,0 +1,15 @@
+mutation transferDocument(
+  $id: UUID!
+  $organization_id: Int!
+  $group_id: Int!
+  $current_group_id: Int
+  $context: ContextEnum
+) {
+  transferDocument(
+    id: $id
+    organization_id: $organization_id
+    group_id: $group_id
+    current_group_id: $current_group_id
+    context: $context
+  )
+}

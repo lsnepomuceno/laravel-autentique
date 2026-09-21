@@ -1,0 +1,31 @@
+query folders(
+  $limit: Int!
+  $page: Int!
+  $display_children: Boolean!
+  $type: FolderTypeEnum
+  $search: String
+  $orderBy: OrderBy
+) {
+  folders(
+    limit: $limit
+    page: $page
+    display_children: $display_children
+    type: $type
+    search: $search
+    orderBy: $orderBy
+  ) {
+    total
+    per_page
+    current_page
+    last_page
+    has_more_pages
+    data {
+      ...FolderFields
+      subfolders {
+        id
+        name
+        path
+      }
+    }
+  }
+}

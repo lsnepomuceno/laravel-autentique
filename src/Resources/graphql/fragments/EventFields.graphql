@@ -1,0 +1,16 @@
+fragment EventFields on Event {
+  ip
+  port
+  reason
+  created_at
+  geolocation {
+    country
+    countryISO
+    state
+    stateISO
+    city
+    zipcode
+    latitude
+    longitude
+  }
+}

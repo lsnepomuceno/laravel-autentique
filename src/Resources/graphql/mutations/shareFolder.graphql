@@ -1,0 +1,10 @@
+mutation shareFolder($folder_id: String!, $shares: [ShareFolderInput], $email_message: String) {
+  shareFolder(folder_id: $folder_id, shares: $shares, email_message: $email_message) {
+    ...FolderFields
+    has_password
+    link_identifier
+    shares {
+      ...FolderShareFields
+    }
+  }
+}

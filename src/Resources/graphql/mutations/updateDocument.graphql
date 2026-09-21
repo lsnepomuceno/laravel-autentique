@@ -1,0 +1,5 @@
+mutation updateDocument($id: UUID!, $document: UpdateDocumentInput!) {
+  updateDocument(id: $id, document: $document) {
+    ...DocumentFields
+  }
+}
