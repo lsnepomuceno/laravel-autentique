@@ -49,4 +49,34 @@ leave it unset in production, where a forgotten variable should create real
 documents rather than invalid ones
 ([0006](/decisions/0006-sandbox-is-chosen-per-call)).
 
+## Check that it works
+
+```bash
+php artisan autentique:check
+```
+
+```
+  Endpoint ......................... https://api.autentique.com.br/v2/graphql
+  Sandbox by default ............................................... yes
+  Token ....................................................... accepted
+  Account ..................... Mateus Zanella <mateus@autentique.com.br>
+  Organization ............................................... Autentique
+  Documents left ..................................................... 20
+  Verification credits .............................................. 200
+```
+
+It exits with `0` when the token is accepted and `1` otherwise, so a deployment
+can run it before anything else. In code, the same question is:
+
+```php
+use LSNepomuceno\LaravelAutentique\Facades\Autentique;
+
+$user = Autentique::account()->me();
+
+$user->name;                           // 'Mateus Zanella'
+$user->organization?->id;              // 179, what createDocument's organization argument takes
+$user->subscription?->documents;       // documents left in the plan
+$user->birthday?->toDateString();      // a CarbonImmutable, from Autentique's dd/mm/yyyy
+```
+
 Everything else is in [configuration](/guide/configuration).

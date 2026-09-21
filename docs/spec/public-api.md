@@ -14,9 +14,10 @@ src/
 ├── LaravelAutentiqueServiceProvider.php   # merges the config, binds the contract
 ├── AutentiqueManager.php                  # the Autentique implementation
 ├── Contracts/                             # Autentique, GraphQLClient, FileSource
-├── Commands/                              # SchemaCommand
+├── Api/                                   # one class per area of the API: Account
+├── Commands/                              # CheckCommand, SchemaCommand
 ├── Facades/Autentique.php
-├── Data/                                  # ApiError, Violation
+├── Data/                                  # value objects: User, Organization, Group, Subscription, ApiError, Violation
 ├── Enums/                                 # ErrorCode
 ├── Exceptions/                            # AutentiqueException and what extends it
 ├── GraphQL/                               # Client, ResponseParser, Operation, Endpoint, OperationLoader
@@ -35,6 +36,7 @@ through the `Autentique` facade, which is auto discovered.
 
 | Method | Returns | Notes |
 |---|---|---|
+| `account()` | `Api\Account` | `me()` returns `Data\User` |
 | `query($graphql, $variables)` | `array<string, mixed>`, the response's `data` | the escape hatch; values as variables, the document is the caller's |
 
 Every method must appear in the README, which `tests/Project/ArchTest.php`
@@ -64,6 +66,24 @@ The selection of fields inside each file is not itself public: what is public is
 the value object built from it
 ([0008](../decisions/0008-responses-are-typed-value-objects.md)).
 
+## Value objects
+
+Every answer is a `final readonly` class under `Data\`, built from the fields its
+operation selects ([0008](../decisions/0008-responses-are-typed-value-objects.md)).
+Property names are camel case (`$hasPremiumFeatures` for
+`has_premium_features`), dates are `CarbonImmutable`, and a field the API may
+omit is nullable.
+
+| Class | Built from |
+|---|---|
+| `Data\User` | `me` |
+| `Data\Subscription`, `Data\Organization`, `Data\Group` | nested in the above, and in `organization` |
+
+Adding a property is a minor release; removing one, or making a nullable one
+required, is a major release.
+
+`Support\Payload` is how they read an answer. It is not public.
+
 ## Exceptions
 
 Everything the package throws extends `Exceptions\AutentiqueException`, which
@@ -80,6 +100,7 @@ is abstract.
 | `TransportFailed` | the connection failed, or the answer was not GraphQL |
 | `MissingToken` | no token configured, nothing sent |
 | `InvalidOperation` | an operation file is missing or spreads a fragment no file defines. A defect in the package, which the suite exists to prevent |
+| `UnexpectedResponse` | an answer without a field the package requires. The API and the package disagree about the schema |
 
 `Enums\ErrorCode` lists every code Autentique documents; `Data\ApiError` and
 `Data\Violation` carry what arrived. Adding a case is a minor release.
@@ -88,6 +109,7 @@ is abstract.
 
 | Command | Exit codes |
 |---|---|
+| `autentique:check` | `0` token accepted, `1` otherwise |
 | `autentique:schema {--output=}` | `0` written, `1` refused |
 
 Their names and exit codes are public: a pipeline calls them.

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LSNepomuceno\LaravelAutentique\Contracts;
 
+use LSNepomuceno\LaravelAutentique\Api\Account;
 use LSNepomuceno\LaravelAutentique\Exceptions\AutentiqueException;
 
 /**
@@ -12,6 +13,11 @@ use LSNepomuceno\LaravelAutentique\Exceptions\AutentiqueException;
  */
 interface Autentique
 {
+    /**
+     * The account the token belongs to: `account()->me()`.
+     */
+    public function account(): Account;
+
     /**
      * Sends a GraphQL document the package does not ship, and returns its
      * `data`.

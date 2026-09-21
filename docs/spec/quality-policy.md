@@ -22,7 +22,11 @@ only CI said so.
 
 ## PHPStan at level max, with no baseline
 
-There has never been a baseline. The gate is "no errors", not "no new errors",
+There has never been a baseline.
+
+`phpunit.xml` raises `memory_limit` to 1G, because type coverage runs PHPStan
+inside the Pest process and outgrew PHP's 128M default. It is set there rather
+than in a command so CI, which calls `vendor/bin/pest` directly, gets it too. The gate is "no errors", not "no new errors",
 and the only ignores are for Pest's untypeable fluent API, scoped to `tests/*`.
 
 `config/` is outside PHPStan's paths: Larastan reads it as a file outside the
@@ -73,6 +77,8 @@ Testbench, grouped by what it covers:
 |---|---|
 | `tests/Container` | bindings, the config, the stray request guard |
 | `tests/GraphQL` | the operation files, the enum naming them, the loader, the client, the parser, and every operation against the schema |
+| `tests/Api` | each area of the API, against faked responses copied from the documentation |
+| `tests/Support` | the typed reading every value object is built on |
 | `tests/Console` | the artisan commands, against a faked API |
 | `tests/Enums` | the enums and what hangs off them: error codes and their text |
 | `tests/Project` | the structural rules above |
