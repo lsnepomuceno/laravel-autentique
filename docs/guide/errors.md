@@ -24,6 +24,7 @@ You never check a response for errors yourself: a method that returns, succeeded
 | `GraphQLError` | any other error Autentique reported, with its code when the package knows it | depends on the code |
 | `TransportFailed` | the connection failed or timed out, or the answer was not GraphQL (a 5xx, a proxy page) | **only if the operation is safe to repeat** |
 | `MissingToken` | no token is configured; nothing was sent | after configuring it |
+| `MissingWebhookSecret` | a webhook arrived and no secret is configured to verify it | after configuring it |
 | `InvalidInput` | a value the package refused before sending, because Autentique documents it would refuse or silently change it | after fixing the value |
 | `InvalidOperation` | an operation file is missing or broken; a defect in the package | no, report it |
 | `UnexpectedResponse` | Autentique answered without a field the package cannot do without; the API and the package disagree about the schema | no, report it |

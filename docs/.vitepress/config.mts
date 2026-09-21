@@ -113,6 +113,7 @@ export default defineConfig({
         { text: 'Getting started', slugs: ['getting-started', 'configuration'] },
         { text: 'Documents', slugs: ['documents', 'signers', 'positions', 'security-verifications', 'sandbox'] },
         { text: 'Organizing', slugs: ['folders', 'organizations'] },
+        { text: 'Receiving', slugs: ['webhooks'] },
         { text: 'Working with it', slugs: ['errors', 'raw-queries', 'commands'] },
       ]),
       '/spec/': [{ text: 'Specification', items: pages('spec') }],

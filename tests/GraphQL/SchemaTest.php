@@ -88,6 +88,9 @@ function unmirroredEnums(): array
         // LocaleInput.language is a String in the schema; the documentation
         // lists the three values it accepts.
         Enums\Language::class,
+        // Webhook event types are dotted strings in the payload. The Corporate
+        // schema has an enum for registering endpoints, spelt differently.
+        Enums\WebhookEventType::class,
     ];
 }
 

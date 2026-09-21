@@ -1,0 +1,47 @@
+{
+  "id": "MXwyMWZiY2VjOS1lMWI1LTRkY2EtYWZiYi0wMjIwNjFlOWVhODg=",
+  "object": "webhook",
+  "name": "test endpoint 2",
+  "format": "json",
+  "url": "https://this-url-doesnt-exist.autentique.com.br/webhooks",
+  "event": {
+    "id": "21fbcec9-e1b5-4dca-afbb-022061e9ea88",
+    "object": "event",
+    "organization": 1,
+    "type": "document.updated",
+    "data": {
+      "object": {
+        "id": "89c7d2ab31f9f5a13b3d20ecf53319af387e54d240ae7be993",
+        "name": "Updated name",
+        "refusable": true,
+        "sandbox": 0,
+        "object": "document",
+        "message": "I changed this message too",
+        "signatures": [
+          {
+            "public_id": "7f25d72b-6155-11ef-9dae-0242ac170004",
+            "name": "Felipe Autentique",
+            "email": "felipe@autentique.com.br",
+            "action": "Sign",
+            "viewed": "2024-08-26T18:02:27.000000Z",
+            "signed": null,
+            "rejected": null,
+            "created_at": "2024-08-26T18:02:26.000000Z"
+          }
+        ],
+        "files": {
+          "original": "https://storage.googleapis.com/f77/o.original.pdf",
+          "signed": "https://painel.autentique.com.br/documentos/89c7d2ab31f9f5a13b3d20ecf53319af387e54d240ae7be993/assinado.pdf"
+        },
+        "created_at": "2024-08-26T18:02:26.000000Z",
+        "updated_at": "2024-08-26T18:03:27.000000Z"
+      },
+      "previous_attributes": {
+        "name": "teste",
+        "refusable": false,
+        "message": "Please access and electronically sign the document by clicking the button above."
+      }
+    },
+    "created_at": "2024-08-26T18:03:27.387179Z"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "id": "MjV8OTQ4OGNlMTEtNzBiZi00ZGI3LTg1OGItZDc2ZjFkZDI5MGRj",
+  "object": "webhook",
+  "name": "sig",
+  "format": "json",
+  "url": "https://this-url-doesnt-exist.autentique.com.br/webhooks",
+  "event": {
+    "id": "9488ce11-70bf-4db7-858b-d76f1dd290dc",
+    "object": "event",
+    "organization": 1519203,
+    "type": "signature.accepted",
+    "data": {
+      "public_id": "f8911dcd-dfcd-11ef-9465-42010a2b610e",
+      "object": "signature",
+      "user": {
+        "name": "Felipe Autentique",
+        "email": "felipe@autentique.com"
+      },
+      "document": "f48a8b465d02dd87559e08f06c41e3b6d548c4d7ad835eb0f",
+      "action": "Sign",
+      "viewed": "2025-01-31T12:22:01.000000Z",
+      "signed": "2025-01-31T12:22:30.000000Z",
+      "rejected": null,
+      "events": [
+        {
+          "type": "viewed",
+          "document": "f48a8b465d02dd87559e08f06c41e3b6d548c4d7ad835eb0f",
+          "ip": "192.168.65.1",
+          "port": 29317,
+          "created_at": "2025-03-18T16:22:49.000000Z"
+        }
+      ],
+      "created_at": "2025-01-31T12:22:00.000000Z"
+    },
+    "previous_attributes": [],
+    "created_at": "2025-01-31T12:22:30.495056Z"
+  }
+}

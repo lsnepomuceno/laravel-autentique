@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace LSNepomuceno\LaravelAutentique;
 
+use Illuminate\Contracts\Config\Repository;
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use LSNepomuceno\LaravelAutentique\Commands\{CheckCommand, SchemaCommand};
 use LSNepomuceno\LaravelAutentique\Contracts\{Autentique, GraphQLClient};
 use LSNepomuceno\LaravelAutentique\GraphQL\{Client, OperationLoader};
+use LSNepomuceno\LaravelAutentique\Webhooks\{VerifyAutentiqueSignature, WebhookController};
 
 final class LaravelAutentiqueServiceProvider extends ServiceProvider
 {
@@ -34,6 +37,8 @@ final class LaravelAutentiqueServiceProvider extends ServiceProvider
     {
         $this->loadTranslationsFrom(__DIR__ . '/../lang', 'autentique');
 
+        $this->registerWebhookRoute();
+
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 self::CONFIG_PATH => $this->app->configPath('autentique.php'),
@@ -44,5 +49,29 @@ final class LaravelAutentiqueServiceProvider extends ServiceProvider
                 SchemaCommand::class,
             ]);
         }
+    }
+
+    /**
+     * The webhook route, when `autentique.webhooks.path` names one.
+     *
+     * Registered with only the middleware the configuration lists, never the
+     * `web` group: Autentique sends no CSRF token, and the signature check is
+     * what authenticates the request.
+     */
+    private function registerWebhookRoute(): void
+    {
+        $config = $this->app->make(Repository::class);
+        $path = $config->get('autentique.webhooks.path');
+
+        if (! is_string($path) || $path === '') {
+            return;
+        }
+
+        $middleware = $config->get('autentique.webhooks.middleware');
+
+        $this->app->make(Router::class)
+            ->post($path, WebhookController::class)
+            ->middleware([...(is_array($middleware) ? array_values(array_filter($middleware, is_string(...))) : []), VerifyAutentiqueSignature::class])
+            ->name('autentique.webhook');
     }
 }
