@@ -105,6 +105,7 @@ it('still ships the things a consumer needs', function () {
         // release that cannot send a single request.
         ->toContain('src/Resources/graphql/mutations/createDocument.graphql')
         ->toContain('src/Resources/graphql/fragments/DocumentFields.graphql')
+        ->toContain('src/Testing/AutentiqueFake.php')
         ->toContain('lang/en/errors.php')
         ->toContain('lang/pt_BR/errors.php');
 });
