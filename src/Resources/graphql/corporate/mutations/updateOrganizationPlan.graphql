@@ -1,0 +1,9 @@
+mutation updateOrganizationPlan($organization_id: Int!, $plan: CustomPlansEnum!, $days_until_expiration: Int) {
+  updateOrganizationPlan(organization_id: $organization_id, plan: $plan, days_until_expiration: $days_until_expiration) {
+    ...ChildOrganizationFields
+    subscription {
+      name
+      expires_at
+    }
+  }
+}

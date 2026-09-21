@@ -1,0 +1,17 @@
+fragment ChildOrganizationFields on EnterpriseChildOrganization {
+  id
+  uuid
+  name
+  cnpj
+  plan
+  default_email_templates_ids
+  created_at
+  settings {
+    webhook_url
+  }
+  groups {
+    id
+    uuid
+    name
+  }
+}

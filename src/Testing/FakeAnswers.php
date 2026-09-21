@@ -46,6 +46,36 @@ final class FakeAnswers
                 $sent->nullableString('folder.name') ?? 'Fake folder',
             ),
             Operation::Introspection => ['queryType' => ['name' => 'Query'], 'mutationType' => ['name' => 'Mutation'], 'subscriptionType' => null, 'types' => [], 'directives' => []],
+            Operation::CorporateOrganizations => [$this->childOrganization(null)],
+            Operation::CorporateCreateOrganization => $this->childOrganization($sent->nullableString('organization.name')),
+            Operation::CorporateUpdateOrganization, Operation::CorporateUpdateOrganizationPlan => [
+                ...$this->childOrganization($sent->nullableString('organization.name')),
+                'id' => $sent->nullableInt('id') ?? $sent->nullableInt('organization_id') ?? 2,
+            ],
+            Operation::CorporateDeleteOrganization, Operation::CorporateDeleteMember => true,
+            Operation::CorporateOrganizationMembers => [$this->member(null)],
+            Operation::CorporateCreateMember, Operation::CorporateUpdateMember => $this->member($sent->object('member')),
+            Operation::CorporateOrganizationsPlans => array_map(
+                fn(mixed $id): array => ['organization_id' => $id, 'subscription' => ['name' => 'Fake plan']],
+                array_values($sent->object('organizations_ids')?->all() ?? []),
+            ),
+            Operation::CorporateApiUsage => ['pricing' => [], 'usage' => []],
+            Operation::CorporateSubscriptionPlans => [],
+            Operation::CorporateCreateSubscriptionPlan, Operation::CorporateUpdateSubscriptionPlan => [
+                ...($sent->object('plan')?->all() ?? []),
+                'id' => $sent->nullableString('id') ?? $this->id('plan'),
+            ],
+            Operation::CorporateUpdateOrganizationSubscription => ['name' => 'Fake plan', 'documents' => 100, 'credits' => 100],
+            Operation::CorporateCreateLoginCode => $this->id('login-code'),
+            Operation::CorporateCreateEndpoint => [
+                'secret' => $this->id('secret'),
+                'webhook_endpoint' => [
+                    'id' => $this->id('endpoint'),
+                    'url' => $sent->nullableString('url'),
+                    'active' => true,
+                    'events' => $sent->strings('events'),
+                ],
+            ],
         };
     }
 
@@ -119,6 +149,26 @@ final class FakeAnswers
         $now = CarbonImmutable::now()->toIso8601ZuluString('microsecond');
 
         return ['id' => $id, 'name' => $name, 'path' => "/{$name}", 'context' => 'USER', 'created_at' => $now, 'updated_at' => $now];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function childOrganization(?string $name): array
+    {
+        return ['id' => 2, 'uuid' => 'fake-child-organization', 'name' => $name ?? 'Fake child organization', 'plan' => 'FREE', 'groups' => []];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function member(?Payload $member): array
+    {
+        return [
+            'id' => $this->id('member'),
+            'user' => ['id' => $this->id('user'), 'name' => $member?->nullableString('name') ?? 'Fake member', 'email' => $member?->nullableString('email')],
+            'api_token' => ['access_token' => $this->id('member-token')],
+        ];
     }
 
     /**

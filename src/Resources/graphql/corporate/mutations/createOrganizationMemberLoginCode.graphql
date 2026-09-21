@@ -1,0 +1,3 @@
+mutation createOrganizationMemberLoginCode($organization_id: Int!, $user_id: String!) {
+  createOrganizationMemberLoginCode(organization_id: $organization_id, user_id: $user_id)
+}

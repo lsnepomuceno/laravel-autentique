@@ -1,0 +1,19 @@
+query organizations(
+  $id: Int
+  $name: String
+  $start_date: String
+  $end_date: String
+  $limit: Int
+  $page: Int
+) {
+  organizations(
+    id: $id
+    name: $name
+    start_date: $start_date
+    end_date: $end_date
+    limit: $limit
+    page: $page
+  ) {
+    ...ChildOrganizationFields
+  }
+}

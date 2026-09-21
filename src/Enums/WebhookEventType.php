@@ -34,4 +34,16 @@ enum WebhookEventType: string
     {
         return explode('.', $this->value, 2)[0];
     }
+
+    /**
+     * The name the Corporate endpoint's `createEndpoint` takes for this event,
+     * or null for the two it does not list.
+     */
+    public function endpointName(): ?string
+    {
+        return match ($this) {
+            self::SignatureBiometricReset, self::SignatureDeliveryFailed => null,
+            default => strtoupper(str_replace('.', '_', $this->value)),
+        };
+    }
 }

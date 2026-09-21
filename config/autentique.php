@@ -43,6 +43,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Corporate endpoint
+    |--------------------------------------------------------------------------
+    |
+    | The Corporate plan's extension of the API: child organizations, their
+    | members, plans, webhook endpoints and API usage. The same token.
+    |
+    */
+
+    'corporate_url' => env('AUTENTIQUE_CORPORATE_URL', 'https://api.autentique.com.br/v2/graphql/corporate'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Sandbox by default
     |--------------------------------------------------------------------------
     |

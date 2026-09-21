@@ -1,0 +1,310 @@
+# Autentique API v2, Corporate endpoint (/v2/graphql/corporate).
+#
+# ASSEMBLED, NOT INTROSPECTED. Built on 2026-09-21 from the Corporate space of
+# Autentique's documentation, which shows every operation and most types but
+# names few of them. Every type name below that the documentation does not
+# give is a guess, and #34 covers replacing this file with an introspection as
+# well.
+#
+# Every operation file in src/Resources/graphql/corporate is validated against
+# this file by tests/GraphQL/SchemaTest.php.
+
+scalar CNPJScalar
+scalar TimestampScalar
+scalar InternationalDateScalar
+scalar EmailScalar
+scalar CPF
+scalar Date
+
+type Query {
+  organizations(id: Int, name: String, start_date: String, end_date: String, limit: Int, page: Int): [EnterpriseChildOrganization]
+  organizationMembers(
+    organization_id: Int!
+    id: String
+    name: String
+    start_date: String
+    end_date: String
+    limit: Int
+    page: Int
+  ): [EnterpriseMember]
+  organizationsPlans(organizations_ids: [Int]!): [OrganizationPlan]
+  childOrganizationsApiUsage(organization_id: Int!, start_date: String!, end_date: String!): ApiUsage
+  subscriptionPlans(id: String, limit: Int = 60, page: Int = 1): [CorporatePlan]
+}
+
+type Mutation {
+  createOrganization(organization: ChildOrganizationInput!): EnterpriseChildOrganization
+  updateOrganization(id: Int!, organization: UpdateChildOrganizationInput!): EnterpriseChildOrganization
+  updateOrganizationPlan(organization_id: Int!, plan: CustomPlansEnum!, days_until_expiration: Int): EnterpriseChildOrganization
+  deleteOrganization(id: Int!): Boolean
+  createOrganizationMember(organization_id: Int!, member: OrganizationMemberInput!): EnterpriseMember
+  updateOrganizationMember(organization_id: Int!, user_id: String!, member: OrganizationMemberInput!): EnterpriseMember
+  deleteOrganizationMember(organization_id: Int!, user_id: String!): Boolean
+  createOrganizationMemberLoginCode(organization_id: Int!, user_id: String!): String
+  createEndpoint(
+    organization_id: Int!
+    url: String!
+    format: WebhookFormatEnum!
+    type: WebhookEndpointTypeEnum!
+    name: String!
+    events: [WebhookEventTypeEnum!]!
+    folder_id: String
+  ): CreatedEndpoint
+  createSubscriptionPlan(plan: SubscriptionPlanInput!): CorporatePlan
+  updateSubscriptionPlan(id: String!, plan: SubscriptionPlanInput!): CorporatePlan
+  updateOrganizationSubscription(organization_id: Int!, plan_id: String!, renew_date: InternationalDateScalar): Subscription
+}
+
+type EnterpriseChildOrganization {
+  id: Int!
+  uuid: String
+  name: String
+  cnpj: CNPJScalar
+  plan: PipefyPlansEnum!
+  default_email_templates_ids: [Int]
+  settings: Setting
+  groups: [Group]
+  subscription: Subscription
+  created_at: TimestampScalar
+}
+
+type Setting {
+  webhook_url: String
+}
+
+type Group {
+  id: Int!
+  uuid: String
+  name: String
+}
+
+# Guessed name: see #34.
+type EnterpriseMember {
+  id: String
+  user: EnterpriseUser
+  group: Group
+  api_token: ApiToken
+}
+
+# Guessed name: see #34.
+type EnterpriseUser {
+  id: String!
+  name: String
+  email: EmailScalar
+  cpf: CPF
+  birthday: String
+}
+
+# Guessed name: see #34.
+type ApiToken {
+  access_token: String
+}
+
+# Guessed name: see #34.
+type OrganizationPlan {
+  organization_id: Int
+  subscription: Subscription
+}
+
+type Subscription {
+  name: String
+  documents: Int
+  credits: Int
+  credits_bonus: Int
+  renew_at: TimestampScalar
+  bought_at: TimestampScalar
+  expires_at: TimestampScalar
+}
+
+# Guessed name: see #34.
+type ApiUsage {
+  pricing: [ApiUsagePricing]
+  usage: [ApiUsageDay]
+}
+
+# Guessed name: see #34.
+type ApiUsagePricing {
+  valid_since: String
+  currency: String
+  items: ApiUsageItems
+}
+
+# Guessed name: see #34.
+type ApiUsageDay {
+  day: String
+  items: ApiUsageItems
+}
+
+# Guessed name: see #34.
+type ApiUsageItems {
+  create_document: Float
+  email: Float
+  sms: Float
+  whatsapp: Float
+  whatsapp_otp: Float
+  documents_query: Float
+  link: Float
+  sign_phone_security_verification: Float
+  webhook: Float
+}
+
+type CorporatePlan {
+  id: String!
+  display_name: String!
+  document_amount: Int!
+  credit_amount: Int!
+  credits_recurrence_method: CreditsRecurrenceEnum!
+  interval: Int!
+  interval_type: IntervalTypeEnum!
+  tier: TierEnum!
+}
+
+# Guessed name: see #34.
+type CreatedEndpoint {
+  secret: String
+  webhook_endpoint: WebhookEndpoint
+}
+
+# Guessed name: see #34.
+type WebhookEndpoint {
+  id: String
+  url: String
+  active: Boolean
+  events: [WebhookEventTypeEnum]
+}
+
+input ChildOrganizationInput {
+  name: String
+  cnpj: String
+  locale: LocaleInput
+  default_email_templates_ids: [Int]
+}
+
+# Guessed name: see #34.
+input UpdateChildOrganizationInput {
+  name: String
+  cnpj: String
+  settings: SettingsInput
+}
+
+# Guessed name: see #34.
+input SettingsInput {
+  webhook_url: String
+}
+
+input LocaleInput {
+  country: String
+  language: String
+  timezone: String
+  date_format: DateFormatEnum
+}
+
+# Guessed name: see #34.
+input OrganizationMemberInput {
+  name: String
+  email: String
+  birthday: String
+  cpf: String
+  company: String
+  group_id: Int
+  locale: LocaleInput
+  permissions: PermissionsInput
+}
+
+# Guessed name: see #34.
+input PermissionsInput {
+  create_documents: Boolean
+  archive_documents: Boolean
+  delete_documents: Boolean
+  sign_documents: Boolean
+  view_documents_gr: Boolean
+  view_folders_gr: Boolean
+  actions_documents_gr: Boolean
+  actions_folders_gr: Boolean
+  actions_templates_gr: Boolean
+  view_documents_oz: Boolean
+  view_folders_oz: Boolean
+  view_member_documents_oz: Boolean
+  view_member_folders_oz: Boolean
+  view_group_documents_oz: Boolean
+  view_group_folders_oz: Boolean
+  actions_documents_oz: Boolean
+  actions_folders_oz: Boolean
+  view_invoices_oz: Boolean
+  change_plan_oz: Boolean
+  actions_members_oz: Boolean
+  actions_groups_oz: Boolean
+  actions_webhooks_oz: Boolean
+  change_appearances_oz: Boolean
+}
+
+input SubscriptionPlanInput {
+  display_name: String!
+  document_amount: Int!
+  credit_amount: Int!
+  interval: Int
+  interval_type: IntervalTypeEnum
+  tier: TierEnum
+  credits_recurrence_method: CreditsRecurrenceEnum
+}
+
+enum DateFormatEnum {
+  DD_MM_YYYY
+  MM_DD_YYYY
+}
+
+enum PipefyPlansEnum {
+  FREE
+  UNLIMITED
+}
+
+enum CustomPlansEnum {
+  FREE
+  PROFESSIONAL
+}
+
+enum CreditsRecurrenceEnum {
+  DETACHED
+  OVERRIDE
+}
+
+enum IntervalTypeEnum {
+  DAY
+  WEEK
+  MONTH
+  YEAR
+}
+
+enum TierEnum {
+  FREE
+  PROFESSIONAL
+}
+
+enum WebhookFormatEnum {
+  URLENCODED
+  JSON
+}
+
+enum WebhookEndpointTypeEnum {
+  DOCUMENT
+  SIGNATURE
+  MEMBER
+}
+
+enum WebhookEventTypeEnum {
+  DOCUMENT_CREATED
+  DOCUMENT_UPDATED
+  DOCUMENT_DELETED
+  DOCUMENT_FINISHED
+  SIGNATURE_CREATED
+  SIGNATURE_UPDATED
+  SIGNATURE_DELETED
+  SIGNATURE_VIEWED
+  SIGNATURE_ACCEPTED
+  SIGNATURE_REJECTED
+  SIGNATURE_BIOMETRIC_APPROVED
+  SIGNATURE_BIOMETRIC_UNAPPROVED
+  SIGNATURE_BIOMETRIC_REJECTED
+  MEMBER_CREATED
+  MEMBER_DELETED
+}

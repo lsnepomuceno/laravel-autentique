@@ -1,0 +1,5 @@
+mutation updateSubscriptionPlan($id: String!, $plan: SubscriptionPlanInput!) {
+  updateSubscriptionPlan(id: $id, plan: $plan) {
+    ...CorporatePlanFields
+  }
+}

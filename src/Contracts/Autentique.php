@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace LSNepomuceno\LaravelAutentique\Contracts;
 
 use Illuminate\Http\UploadedFile;
-use LSNepomuceno\LaravelAutentique\Api\{Account, Documents, Folders, Organizations, PendingDocument, Signers};
+use LSNepomuceno\LaravelAutentique\Api\{Account, Corporate, Documents, Folders, Organizations, PendingDocument, Signers};
 use LSNepomuceno\LaravelAutentique\Exceptions\{AutentiqueException, InvalidInput};
 
 /**
@@ -39,6 +39,11 @@ interface Autentique
      * The organizations the token's owner belongs to, and the email templates.
      */
     public function organizations(): Organizations;
+
+    /**
+     * The Corporate plan's extension of the API, on its own endpoint.
+     */
+    public function corporate(): Corporate;
 
     /**
      * Starts a document, sent with `->send()`.

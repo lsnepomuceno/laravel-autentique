@@ -18,6 +18,7 @@ says so, and #34 lists every name in it that is a guess.
 src/Resources/graphql/
 ├── queries/        one file per query:    document.graphql, documents.graphql
 ├── mutations/      one file per mutation: createDocument.graphql
+├── corporate/      the same two, for the Corporate endpoint
 └── fragments/      shared selections:     DocumentFields.graphql
 ```
 
@@ -79,7 +80,9 @@ new one cannot skip the comparison.
 
 `tests/GraphQL/SchemaTest.php`:
 
-- every operation validates against the schema of its endpoint;
+- every operation validates against the schema of its endpoint:
+  `tests/Resources/schema.graphql` for the standard one,
+  `tests/Resources/schema-corporate.graphql` for Corporate, both assembled;
 - the check fails on an unknown field and on a variable of the wrong type;
 - every mirrored enum has exactly the schema's non deprecated values;
 - an introspection prints back into a schema the operations validate against.

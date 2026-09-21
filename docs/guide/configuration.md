@@ -16,6 +16,7 @@ That writes `config/autentique.php` into the application.
 | `token` | `AUTENTIQUE_TOKEN` | none | the API token, sent as a Bearer token |
 | `url` | `AUTENTIQUE_URL` | `https://api.autentique.com.br/v2/graphql` | the GraphQL endpoint |
 | `sandbox` | `AUTENTIQUE_SANDBOX` | `false` | whether documents are created as sandbox documents when a call does not say |
+| `corporate_url` | `AUTENTIQUE_CORPORATE_URL` | `https://api.autentique.com.br/v2/graphql/corporate` | the Corporate endpoint; see [Corporate](/guide/corporate) |
 | `timeout` | `AUTENTIQUE_TIMEOUT` | `30` | seconds to wait for a response |
 | `retry.times` | `AUTENTIQUE_RETRY_TIMES` | `2` | retries of a request Autentique refused with HTTP 429; `0` turns retrying off |
 | `webhooks.secret` | `AUTENTIQUE_WEBHOOK_SECRET` | none | the endpoint's secret, from the dashboard; see [webhooks](/guide/webhooks) |

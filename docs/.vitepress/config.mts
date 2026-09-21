@@ -112,7 +112,7 @@ export default defineConfig({
       '/guide/': sections('guide', [
         { text: 'Getting started', slugs: ['getting-started', 'configuration'] },
         { text: 'Documents', slugs: ['documents', 'signers', 'positions', 'security-verifications', 'sandbox'] },
-        { text: 'Organizing', slugs: ['folders', 'organizations'] },
+        { text: 'Organizing', slugs: ['folders', 'organizations', 'corporate'] },
         { text: 'Receiving', slugs: ['webhooks'] },
         { text: 'Working with it', slugs: ['errors', 'testing', 'raw-queries', 'commands'] },
       ]),

@@ -16,7 +16,7 @@ use LSNepomuceno\LaravelAutentique\GraphQL\OperationLoader;
 it('has a file for every case, and a case for every file', function () {
     $files = [];
 
-    foreach (['queries', 'mutations', 'corporate'] as $directory) {
+    foreach (['queries', 'mutations', 'corporate/queries', 'corporate/mutations'] as $directory) {
         foreach (graphqlFiles($directory) as $file) {
             $files[] = $directory . '/' . basename($file, '.graphql');
         }
@@ -67,6 +67,10 @@ it('knows how each operation travels', function () {
         ->and(Operation::CreateDocument->uploadsAFile())->toBeTrue()
         ->and(Operation::CreateSigner->uploadsAFile())->toBeFalse()
         ->and(Operation::Documents->endpoint())->toBe(Endpoint::Standard)
+        ->and(Operation::CorporateOrganizations->endpoint())->toBe(Endpoint::Corporate)
+        ->and(Operation::CorporateOrganizations->operationName())->toBe('organizations')
+        ->and(Operation::CorporateCreateEndpoint->isMutation())->toBeTrue()
+        ->and(Operation::CorporateOrganizations->isMutation())->toBeFalse()
         ->and(Operation::Documents->field())->toBe('documents')
         ->and(Operation::Introspection->field())->toBe('__schema');
 });

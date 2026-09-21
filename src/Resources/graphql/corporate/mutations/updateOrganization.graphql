@@ -1,0 +1,5 @@
+mutation updateOrganization($id: Int!, $organization: UpdateChildOrganizationInput!) {
+  updateOrganization(id: $id, organization: $organization) {
+    ...ChildOrganizationFields
+  }
+}
